@@ -1,0 +1,41 @@
+{
+    "format_version": 2,
+    "header": {
+        "name": "Paradox日本語版！！",
+        "description": "Paradoxv3.3.4 日本語版です！！編集者：こう君",
+        "uuid": "0b9c3761-e4ba-402d-ae00-fec098ef18ba",
+        "version": [3, 3, 3],
+        "min_engine_version": [1, 20, 10]
+    },
+    "metadata": {
+        "authors": ["MrDiamond64, Visual1mpact, Koukunn_"],
+        "license": "GPLv3",
+        "url": "https://github.com/Visual1mpact/Paradox_AntiCheat"
+    },
+    "modules": [
+        {
+            "type": "data",
+            "uuid": "8637e7b7-340f-40ba-816f-dd87ff44b97e",
+            "version": [1, 0, 0]
+        },
+        {
+            "description": "Paradox AntiCheat Gametest Features",
+            "language": "javascript",
+            "type": "script",
+            "uuid": "8abbc147-2d85-4748-bad5-a3f58cfe9ea0",
+            "version": [0, 0, 1],
+            "entry": "scripts/paradox.js"
+        }
+    ],
+    "dependencies": [
+        {
+            "module_name": "@minecraft/server",
+            "version": "1.4.0-beta"
+        },
+        {
+            "module_name": "@minecraft/server-ui",
+            "version": "1.2.0-beta"
+        }
+    ],
+    "capabilities": ["script_eval"]
+}
