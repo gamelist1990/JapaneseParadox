@@ -1,0 +1,26 @@
+import { ModalFormData } from "@minecraft/server-ui";
+import { uiINVALIDSPRINT } from "../../../../modules/uiInvalidSprint";
+import { dynamicPropertyRegistry } from "../../../../../penrose/WorldInitializeAfterEvent/registry";
+export function invalidSprintHandler(player) {
+    //Invalid Sprint
+    const modulesinvalidsprintui = new ModalFormData();
+    const invalidSprintABoolean = dynamicPropertyRegistry.get("invalidsprinta_b");
+    modulesinvalidsprintui.title("§4Invalid Sprint§4");
+                                modulesinvalidsprintui.toggle("Invalid Sprintを検知します", invalidSprintABoolean);
+    modulesinvalidsprintui
+        .show(player)
+        .then((invalidsprintResult) => {
+        uiINVALIDSPRINT(invalidsprintResult, player);
+    })
+        .catch((error) => {
+        console.error("Paradox Unhandled Rejection: ", error);
+        // Extract stack trace information
+        if (error instanceof Error) {
+            const stackLines = error.stack.split("\n");
+            if (stackLines.length > 1) {
+                const sourceInfo = stackLines;
+                console.error("Error originated from:", sourceInfo[0]);
+            }
+        }
+    });
+}
