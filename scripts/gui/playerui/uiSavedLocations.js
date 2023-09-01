@@ -24,14 +24,14 @@ export function uiSAVEDLOCATIONS(savedlocationsResult, Locations, player, coordA
     }
     if (teleportToSelectedLocation && deleteSelectedLocation === true) {
         //If both toggles are enabled the message bellow will be sent to the player and the UI will be dispalyed.
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  TPと消去は同時に使えません`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cant teleport and delete the location!`);
         return paradoxui(player);
     }
     if (teleportToSelectedLocation === true) {
         //Teleport the player to the location set in the dropdown.
         setTimer(player.id);
         player.teleport({ x: x, y: y, z: z }, { dimension: world.getDimension(dimension), rotation: { x: 0, y: 0 }, facingLocation: { x: 0, y: 0, z: 0 }, checkForBlocks: false, keepVelocity: false });
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f TPしました`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Welcome back!`);
         return player;
     }
     if (deleteSelectedLocation === true) {
@@ -57,7 +57,7 @@ export function uiSAVEDLOCATIONS(savedlocationsResult, Locations, player, coordA
             }
             if (tags[i].startsWith("LocationHome:" && Locations[selectedLocationvalue] + " X", 13)) {
                 player.removeTag(encryptedString);
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  '${Locations[selectedLocationvalue]}を消去しました'!`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Successfully deleted home '${Locations[selectedLocationvalue]}'!`);
                 break;
             }
         }
@@ -73,12 +73,12 @@ export function uiSAVEDLOCATIONS(savedlocationsResult, Locations, player, coordA
                 counter = ++counter;
             }
             if (coordArray[i].includes("LocationHome:" + newLocationName)) {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 同じ名前が既に存在します`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f This name already exists please try again.`);
                 return paradoxui(player);
             }
             //Check to make sure they havent exceeded the max locations in config.js
             if (counter >= config.modules.setHome.max && config.modules.setHome.enabled) {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ${config.modules.setHome.max}　座標の保存回数を超えています`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You can only have ${config.modules.setHome.max} saved locations at a time!`);
                 return paradoxui(player);
             }
             continue;
@@ -96,7 +96,7 @@ export function uiSAVEDLOCATIONS(savedlocationsResult, Locations, player, coordA
         //Check to make sure there are no spaces in the name that has been entered.
         if (typeof newLocationName === "string" && newLocationName.includes(" ")) {
             doSave = false;
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 名前の間に空白を入れないで下さい`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f No spaces in names please!`);
             return paradoxui(player);
         }
         // Save which dimension they were in
@@ -109,13 +109,14 @@ export function uiSAVEDLOCATIONS(savedlocationsResult, Locations, player, coordA
             doSave = true;
         }
         if (player.dimension.id === "minecraft:the_end") {
-            doSave = true;
+            doSave = false;
+            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Not allowed to save a location in this dimension!`);
         }
         if (doSave === true) {
-            const decryptedLocationString = `座標:${newLocationName} X:${currentX} Y:${currentY} Z:${currentZ} ディメンション:${currentDimension}`;
+            const decryptedLocationString = `LocationHome:${newLocationName} X:${currentX} Y:${currentY} Z:${currentZ} Dimension:${currentDimension}`;
             const security = encryptString(decryptedLocationString, salt);
             player.addTag(security);
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f　新しく座標を保存しました！！`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f New Location has been saved.`);
         }
     }
     return paradoxui(player);
