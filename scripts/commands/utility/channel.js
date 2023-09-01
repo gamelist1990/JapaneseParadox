@@ -258,7 +258,7 @@ function onPlayerLeave(event) {
         }
         else {
             // If no other members, delete the channel
-            deleteChatChannel(channelName);
+            deleteChatChannel(channelName, channel.password);
             return;
         }
     }

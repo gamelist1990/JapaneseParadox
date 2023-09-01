@@ -96,7 +96,7 @@ export function uiSAVEDLOCATIONS(savedlocationsResult, Locations, player, coordA
         //Check to make sure there are no spaces in the name that has been entered.
         if (typeof newLocationName === "string" && newLocationName.includes(" ")) {
             doSave = false;
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 名前の間に空白を入れないで下さい`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 名前の間に空白を入れないで下さい!`);
             return paradoxui(player);
         }
         // Save which dimension they were in

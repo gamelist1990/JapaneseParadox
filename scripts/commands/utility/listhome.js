@@ -109,7 +109,7 @@ export function listhome(message, args) {
         sendMsgToPlayer(player, homeMessages);
     }
     else {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 座標が保存されていません`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 座標が保存されていません!`);
     }
     return;
 }

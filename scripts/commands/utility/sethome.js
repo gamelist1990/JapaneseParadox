@@ -53,7 +53,7 @@ export function sethome(message, args) {
     // Don't allow spaces
     if (args.length > 1 || args[0].trim().length === 0) {
         setHomeHelp(player, prefix);
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 名前の間に空白を入れないで下さい`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 名前の間に空白を入れないで下さい!`);
     }
     // Hash the coordinates for security
     const salt = world.getDynamicProperty("crypt");

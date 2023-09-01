@@ -82,7 +82,7 @@ async function handleGoHome(message, args) {
     }
     // Don't allow spaces
     if (length > 1) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 名前の間に空白を入れないで下さい`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 名前の間に空白を入れないで下さい!`);
     }
     // Hash the coordinates for security
     const salt = world.getDynamicProperty("crypt");

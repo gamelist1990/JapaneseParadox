@@ -62,7 +62,7 @@ export function locationHandler(player) {
         });
     }
     else {
-        sendMsgToPlayer(player, `§r§4[§6Paradox§4]§r セーブした座標は削除されました`);
+        sendMsgToPlayer(player, `§r§4[§6Paradox§4]§r セーブした座標は削除されました!`);
         return;
     }
 }
