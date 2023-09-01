@@ -82,7 +82,7 @@ export function banMessage(player) {
         });
     }
     // Notify staff that a player was banned
-    sendMsg("@a[tag=paradoxOpped]", [`§f§4[§6Paradox§4]§f ${player.name}はBANされました`, `§4[§6検知内容§4]§f: ${by || "§7N/A"}`, `§4[§6BAN理由§4]§f: ${reason || "§7N/A"}`]);
+    sendMsg("@a[tag=paradoxOpped]", [`§f§4[§6Paradox§4]§f${player.name}はBANされました`, `§4[§6検知内容§4]§f: ${by || "§7N/A"}`, `§4[§6BAN理由§4]§f: ${reason || "§7N/A"}`]);
 }
 /**
  * Returns the score of a player in the specified scoreboard objective.
@@ -156,7 +156,7 @@ export function resetTag(member) {
             member.removeTag(tag);
         }
     }
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${member.name} ランクをリセットしました！`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f${member.name} ランクをリセットしました！`);
 }
 /**
  * Fast UUID generator, RFC4122 version 4 compliant.

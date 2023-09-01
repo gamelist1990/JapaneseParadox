@@ -81,8 +81,8 @@ export function deop(message, args) {
         member.removeDynamicProperty("salt");
         member.removeTag("paradoxOpped");
         dynamicPropertyRegistry.delete(member.id);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${member.name}から管理者権限を取り消しました`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f${member.name}から管理者権限を取り消しました`);
         return sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f管理者権限が取り消されました`);
     }
-    return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ${member.name} 管理者権限がありません`);
+    return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f${member.name} 管理者権限がありません`);
 }

@@ -101,5 +101,5 @@ async function handleKick(message, args) {
         console.warn(`${new Date()} | ` + error);
         return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f I was unable to kick that player!`);
     });
-    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f has kicked ${member.name}§f. Reason: ${reason}`);
+    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f${player.name}§f has kicked ${member.name}§f. Reason: ${reason}`);
 }

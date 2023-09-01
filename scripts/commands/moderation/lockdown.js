@@ -72,7 +72,7 @@ async function handleLockdown(message, args) {
     }
     // If already locked down then unlock the server
     if (lockdownBoolean) {
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f　メンテナンスが完了しました`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§fメンテナンスが完了しました`);
         dynamicPropertyRegistry.set("lockdown_b", false);
         return world.setDynamicProperty("lockdown_b", false);
     }

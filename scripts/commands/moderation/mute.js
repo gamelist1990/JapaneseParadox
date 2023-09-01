@@ -110,6 +110,6 @@ async function handleMute(message, args) {
     }
     // If Education Edition is enabled then legitimately mute them
     member.runCommandAsync(`ability @s mute true`);
-    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f あなたは管理者にミュートされました. 理由: ${reason}`);
-    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f が ${member.name}をミュート状態にしました§f. 理由: ${reason}`);
+    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§fあなたは管理者にミュートされました. 理由: ${reason}`);
+    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f${player.name}§f が ${member.name}をミュート状態にしました§f. 理由: ${reason}`);
 }

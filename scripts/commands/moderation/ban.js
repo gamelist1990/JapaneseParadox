@@ -91,7 +91,7 @@ export function ban(message, args) {
         member.addTag("isBanned");
     }
     catch (error) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ユーザーをBANできませんでした! エラー内容: ${error}`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fユーザーをBANできませんでした! エラー内容: ${error}`);
     }
-    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§fが ${member.name}をBANしました§f. BAN理由: ${reason}`);
+    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f${player.name}§fが ${member.name}をBANしました§f. BAN理由: ${reason}`);
 }
