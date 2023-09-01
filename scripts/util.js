@@ -156,7 +156,7 @@ export function resetTag(member) {
             member.removeTag(tag);
         }
     }
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f${member.name} ランクをリセットしました！`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${member.name} ランクをリセットしました`);
 }
 /**
  * Fast UUID generator, RFC4122 version 4 compliant.
