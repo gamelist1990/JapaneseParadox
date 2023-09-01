@@ -12,7 +12,7 @@ function antifalla(id) {
         return;
     }
 
-    //exclude players who are in creative.
+    //exclude players who are in creative. Beta
     const gm = {
         excludeGameModes: [GameMode.creative, GameMode.spectator],
     };
