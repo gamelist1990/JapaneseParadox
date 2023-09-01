@@ -1,9 +1,7 @@
-import { world, GameMode, system } from "@minecraft/server";
+import { world, EntityQueryOptions, GameMode, system, Block } from "@minecraft/server";
 import { flag } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
-function isAir(block) {
-    return block?.typeId === "minecraft:air";
-}
+
 function antifalla(id) {
     // Get Dynamic Property
     const antifallABoolean = dynamicPropertyRegistry.get("antifalla_b");
@@ -17,6 +15,27 @@ function antifalla(id) {
         excludeGameModes: [GameMode.creative, GameMode.spectator],
     };
     const filteredPlayers = world.getPlayers(gm);
+    const airBlocksToCheck = new Set<{ dx: number; dy: number; dz: number }>([
+        //check for a half block that the player maybe standing on if its a lower slab
+        { dx: 0, dy: -0.5, dz: 0 },
+        { dx: 0, dy: -1, dz: 0 },
+        { dx: 1, dy: -1, dz: 0 },
+        { dx: -1, dy: -1, dz: 0 },
+        { dx: 0, dy: -1, dz: 1 },
+        { dx: 0, dy: -0.5, dz: 1 },
+        { dx: 0, dy: -1, dz: -1 },
+        { dx: 0, dy: -0.5, dz: -1 },
+        { dx: 1, dy: -1, dz: 1 },
+        { dx: 1, dy: -0.5, dz: 1 },
+        { dx: 1, dy: -1, dz: -1 },
+        { dx: 1, dy: -0.5, dz: -1 },
+        { dx: -1, dy: -1, dz: 1 },
+        { dx: -1, dy: -0.5, dz: 1 },
+        { dx: -1, dy: -1, dz: -1 },
+        { dx: -1, dy: -0.5, dz: -1 },
+    ]);
+
+    
     for (const player of filteredPlayers) {
         // Get unique ID
         const uniqueId = dynamicPropertyRegistry.get(player?.id);
@@ -26,29 +45,6 @@ function antifalla(id) {
         }
         const { x, y, z } = player.location;
         const vy = player.getVelocity().y;
-        const blocksToCheck = [
-            //check for a half block that the player maybe standing on if its a lower slab
-            { x: x, y: y - 0.5, z: z },
-            { x: x, y: y - 1, z: z },
-            { x: x + 1, y: y - 1, z: z },
-            { x: x + 1, y: y - 0.5, z: z },
-            { x: x + 1, y: y - 1, z: z },
-            { x: x - 1, y: y - 1, z: z },
-            { x: x - 1, y: y - 0.5, z: z },
-            { x: x, y: y - 1, z: z + 1 },
-            { x: x, y: y - 0.5, z: z + 1 },
-            { x: x, y: y - 1, z: z - 1 },
-            { x: x - 1, y: y - 1, z: z + 1 },
-            { x: x - 1, y: y - 0.5, z: z + 1 },
-            { x: x - 1, y: y - 1, z: z - 1 },
-            { x: x - 1, y: y - 0.5, z: z - 1 },
-            { x: x + 1, y: y - 1, z: z + 1 },
-            { x: x + 1, y: y - 0.5, z: z + 1 },
-            { x: x + 1, y: y - 1, z: z - 1 },
-            { x: x + 1, y: y - 0.5, z: z - 1 },
-        ];
-        const blocks = blocksToCheck.map((block) => player.dimension.getBlock(block));
-        const areAllBlocksAir = blocks.every(isAir);
         if (areAllBlocksAir && vy === 0) {
             flag(player, "AntiFall", "A", "Exploit", null, null, null, null, false);
         }
