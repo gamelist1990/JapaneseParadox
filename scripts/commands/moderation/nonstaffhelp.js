@@ -27,13 +27,13 @@ export function nonstaffhelp(message) {
             config.customcommands.tpr ? `§6${prefix}tp <相手の名前>§r - 他のプレイヤーにTP申請を送れます相手が承諾するとtpされます.` : `§6${prefix}tpr <name>§r - Command §4DISABLED§r.`,
             config.customcommands.ui ? `§6${prefix}ui§r - GUIを開けます` : `§6${prefix}ui§rでメニューを開けます！§r.`,
             config.customcommands.map ? `§6${prefix}map§r - で今いるバイオームがわかります` : `§6${prefix}map§rで今いるバイオームが分かります！§r.`,
-            `§6${prefix}ch cr <名前> [パスワード]§f - ${config.customcommands.channel ? `新しいチャットチャンネルを作成する` : textDisabled}`,
-            `§6${prefix}ch de <名前> [パスワード]§f - ${config.customcommands.channel ? `既存のチャットチャンネルを削除する！` : textDisabled}`,
-            `§6${prefix}ch join <名前> [パスワード]§f - ${config.customcommands.channel ? `既存のチャットチャンネルに参加する！` : textDisabled}`,
-            `§6${prefix}ch in <名前> <プレイヤー>§f - ${config.customcommands.channel ? `プレイヤーをチャットチャンネルに招待する！` : textDisabled}`,
-            `§6${prefix}ch ha <名前> <プレイヤー>§f - ${config.customcommands.channel ? `チャットチャンネルの所有権を譲渡する！` : textDisabled}`,
-            `§6${prefix}ch le§f - ${config.customcommands.channel ? `現在のチャットチャンネルから退出する！` : textDisabled}`,
-            `§6${prefix}ch me§f - ${config.customcommands.channel ? `現在のチャットチャンネルのメンバーを一覧表示します！` : textDisabled}`,
+            config.customcommands.channel ? `§6${prefix}新しいチャットチャンネルを作成する` : `§6${prefix}channel create <channel> [password?]§f - Command §4DISABLED§f.`,
+            config.customcommands.channel ? `§6${prefix}ch de <名前> [パスワード]§f .` : `§6${prefix}channel delete <channel> [password?]§f - Command §4DISABLED§f.`,
+            config.customcommands.channel ? `§6${prefix}ch join <名前> [パスワード]§f .` : `§6${prefix}channel join <channel> [password?]§f - Command §4DISABLED§f.`,
+            config.customcommands.channel ? `§6${prefix}ch in <名前> <プレイヤー>§f -` : `§6${prefix}channel invite <channel> <player>§f - Command §4DISABLED§f.`,
+            config.customcommands.channel ? `§6${prefix}ch ha <名前> <プレイヤー>§f .` : `§6${prefix}channel invite <channel> <player>§f - Command §4DISABLED§f.`,
+            config.customcommands.channel ? `§6${prefix}ch le§f - $` : `§6${prefix}channel invite <channel> <player>§f - Command §4DISABLED§f.`,
+            config.customcommands.channel ? `§6${prefix}ch me§f - :.` : `§6${prefix}channel leave§f - Command §4DISABLED§f.`,
 
         ]);
     }
