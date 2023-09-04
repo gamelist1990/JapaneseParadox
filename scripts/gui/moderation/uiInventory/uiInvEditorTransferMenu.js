@@ -4,10 +4,11 @@ import { uiItemEditorTransfer } from "./uiItemEditor";
 export function uiItemEditorTransferMenu(player, targetPlayer, itemSlot) {
     const itemEditor = new ModalFormData();
     itemEditor.title("§4インベントリ：アイテム移動§4");
-    itemEditor.toggle("アイテムを自分のインベントリにコピーする");
+    itemEditor.toggle("アイテムを自分のインベントリに移動させる");
     let onlineList = [];
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
     itemEditor.dropdown(`\n§fプレイヤーを選択して下さい§f\n\n以下のプレイヤーがオンラインです\n`, onlineList);
+    itemEditor.toggle("アイテムをコピー", false);
     itemEditor
         .show(player)
         .then((InvEditorUIResult) => {
