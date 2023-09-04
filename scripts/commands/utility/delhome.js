@@ -1,6 +1,6 @@
 import { world } from "@minecraft/server";
 import config from "../../data/config.js";
-import { decryptString, encryptString, getPrefix, sendMsgToPlayer } from "../../util.js";
+import { decryptString, getPrefix, sendMsgToPlayer } from "../../util.js";
 function delhomeHelp(player, prefix) {
     let commandStatus;
     if (!config.customcommands.delhome) {

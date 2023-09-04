@@ -1,7 +1,7 @@
 import { world } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
-import { decryptString, getPrefix, encryptString, sendMsgToPlayer, setTimer } from "../../util.js";
+import { decryptString, getPrefix, sendMsgToPlayer, setTimer } from "../../util.js";
 const cooldownTimer = new WeakMap();
 function dhms(ms) {
     const days = Math.floor(ms / (24 * 60 * 60 * 1000));
@@ -98,7 +98,7 @@ async function handleGoHome(message, args) {
     for (let i = 0; i < tagsLength; i++) {
         if (tags[i].startsWith("1337")) {
             // Decode it so we can verify it
-            tags[i] = decryptString(tags[i], String(salt));
+            tags[i] = decryptString(tags[i], salt);//壊れるかも..
         }
         if (tags[i].startsWith(args[0].toString() + " X", 13)) {
             // Split string into array

@@ -1,6 +1,6 @@
 import { world } from "@minecraft/server";
 import config from "../../data/config.js";
-import { decryptString, getPrefix, encryptString, sendMsgToPlayer } from "../../util.js";
+import { decryptString, getPrefix, sendMsgToPlayer } from "../../util.js";
 function listHomeHelp(player, prefix) {
     let commandStatus;
     if (!config.customcommands.listhome) {
