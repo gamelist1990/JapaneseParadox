@@ -11,6 +11,7 @@ import { modulesui } from "./guiHandler/guiHandlerModules/modulesui";
 import { prefixHandler } from "./guiHandler/results/prefix";
 import { statsHandler } from "./guiHandler/results/stats";
 import { inventoryHandler } from "./guiHandler/guiHandlerModeration/results/inventoryui";
+import { uiChatChannelMainMenu } from "./playerui/chatChannels/uiChatChannelsMenu";
 /**
  * @name paradoxui
  * @param {Player} player - Player object
@@ -40,6 +41,7 @@ async function handleParadoxUI(player) {
         maingui.button("TPリクエスト！", "textures/blocks/portal_placeholder");
         maingui.button("座標保存", "textures/items/compass_item");
         maingui.button("報告！", "textures/items/paper");
+        maingui.button("パーティー", "textures/ui/mute_off");
     }
     else {
         maingui.button("オペレーター", "textures/ui/op");
@@ -52,6 +54,7 @@ async function handleParadoxUI(player) {
         maingui.button("ユーザーログ", "textures/items/book_normal");
         maingui.button("報告！", "textures/items/paper");
         maingui.button("インベントリ確認", "textures/blocks/chest_front");
+        maingui.button("パーティー", "textures/ui/mute_off");
     }
     maingui
         .show(player)
@@ -71,6 +74,9 @@ async function handleParadoxUI(player) {
                 case 3:
                     reportHandler(player);
                     break;
+                case 4:
+                        uiChatChannelMainMenu(player);
+                        break;
                 default:
                     // Handle other selections for isUnique case
                     break;
@@ -107,6 +113,9 @@ async function handleParadoxUI(player) {
                     break;
                 case 9:
                     inventoryHandler(player);
+                    break;
+                case 10:
+                    uiChatChannelMainMenu(player);
                     break;
                 default:
                     // Handle other selections for non-isUnique case
