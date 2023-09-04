@@ -543,6 +543,22 @@ export function deleteChatChannel(channelName, password) {
     }
     return false;
 }
+//returns channel list along with if a password is required.
+export function listChatChannels() {
+    const channelList = [];
+
+    for (const channelName in chatChannels) {
+        const channel = chatChannels[channelName];
+        const hasPassword = channel.password ? "Yes" : "No";
+
+        channelList.push({
+            channelName,
+            hasPassword,
+        });
+    }
+
+    return channelList;
+}
 export const allscores = [
     "autoclickervl",
     "badpacketsvl",

@@ -1,23 +1,25 @@
-import { ModalFormData } from "@minecraft/server-ui";
-import { uiChatChannelCreate } from "./uiChatChannels";
-export function chatChannelsCreateMenuUI(player) {
-    const menu = new ModalFormData();
-    menu.title("§4Paradox - Chat Channels Create§4");
-    menu.textField("Channel Name: ", "Test");
-    menu.textField("Password:", "Password123");
-    menu.show(player)
-        .then((chatChannelsCreateResult) => {
-            uiChatChannelCreate(chatChannelsCreateResult, player);
-        })
-        .catch((error) => {
-            console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
-            if (error instanceof Error) {
-                const stackLines = error.stack.split("\n");
-                if (stackLines.length > 1) {
-                    const sourceInfo = stackLines;
-                    console.error("Error originated from:", sourceInfo[0]);
-                }
-            }
-        });
+import { Player } from "@minecraft/server";
+import { ActionFormData } from "@minecraft/server-ui";
+import { chatChannelsCreateMenuUI } from "./uiChatChannelsCreateMenu";
+import { ChatChannelsJoinMenuUI } from "./uiChatChannelsJoinMenu";
+export function uiChatChannelMainMenu(player) {
+    const menu = new ActionFormData();
+    menu.title("§4Paradox - Chat Channels Menu§4");
+    menu.button("Create A Channel");
+    menu.button("Join A Channel");
+    menu.button("Invite A Player");
+    menu.button("Leave A Channel");
+    menu.button("Delete A Channel");
+    menu.show(player).then((chatChannelsMenuUIResult) => {
+        switch (chatChannelsMenuUIResult.selection) {
+            case 0:
+                chatChannelsCreateMenuUI(player);
+                break;
+            case 1:
+                ChatChannelsJoinMenuUI(player);
+                break;
+            default:
+                break;
+        }
+    });
 }
