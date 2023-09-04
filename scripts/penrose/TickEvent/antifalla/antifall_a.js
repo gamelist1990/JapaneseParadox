@@ -1,4 +1,4 @@
-import { world, GameMode, system, } from "@minecraft/server";
+import { world, GameMode, system, Block } from "@minecraft/server";
 import { flag } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 

@@ -3,6 +3,8 @@ import { flag } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 // Store last safe location
 const lastSafeLocation = new Map();
+// Solids that are passable with conditions
+const passableSolids = new Set(["sand", "gravel", "concrete_powder"]);
 function onPlayerLogout(event) {
     // Remove the player's data from the map when they log off
     const playerName = event.playerId;
@@ -42,7 +44,7 @@ function antiphasea(id) {
                 blockType = player.dimension.getBlock(block);
             }
             catch { }
-            if (!blockType || player.hasTag("riding")) {
+            if (!blockType || player.hasTag("riding") || passableSolids.has(blockType.typeId.replace("minecraft:", ""))) {
                 return true;
             }
             return !blockType.isSolid();
