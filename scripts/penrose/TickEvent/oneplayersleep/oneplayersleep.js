@@ -7,7 +7,7 @@ async function queueSleep(player) {
     await Promise.all([player.runCommandAsync(`time set 126553000`), player.runCommandAsync(`weather clear`)]);
     const hotbarBoolean = dynamicPropertyRegistry.get("hotbar_b");
     if (hotbarBoolean === undefined || hotbarBoolean === false) {
-        player.runCommand(`title @a[tag=!vanish] おっはよ～！！`);
+        player.runCommand(`title @a[tag=!vanish] acrtonbar おっはよ～！！`);
     }
 }
 async function ops(opsId) {
