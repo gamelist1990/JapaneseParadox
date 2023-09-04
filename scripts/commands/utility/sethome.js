@@ -63,15 +63,6 @@ export function sethome(message, args) {
     const tags = player.getTags();
     const tagsLength = tags.length;
     for (let i = 0; i < tagsLength; i++) {
-        // 6f78 is temporary and will be removed
-        if (tags[i].startsWith("6f78")) {
-            // Remove old encryption
-            player.removeTag(tags[i]);
-            // Change to AES Encryption so we can abandon the old method
-            tags[i] = decryptString(tags[i], salt);
-            tags[i] = encryptString(tags[i], salt);
-            player.addTag(tags[i]);
-        }
         if (tags[i].startsWith("1337")) {
             // Decode it so we can verify if it already exists
             tags[i] = decryptString(tags[i], String(salt));

@@ -25,6 +25,7 @@ async function vanish() {
             if (player.getEffect(MinecraftEffectTypes.Invisibility) || player.getEffect(MinecraftEffectTypes.NightVision)) {
                 player.runCommandAsync(`effect @s clear`);
             }
+            player.triggerEvent("unvanish");
             // Use try/catch in case nobody has tag 'notify' as this will report 'no target selector'
             try {
                 sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f ${player.name} には未承認のパーミッションがあった為パーミッションを削除しました！`);
