@@ -569,7 +569,7 @@ export const allscores = [
     "gamemodevl",
     "spammervl",
     "namespoofvl",
-    "noslowvl",
+    "speedvl",
     "crashervl",
     "reachvl",
     "invalidsprintvl",

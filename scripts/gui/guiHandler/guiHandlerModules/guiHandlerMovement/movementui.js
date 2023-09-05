@@ -3,7 +3,7 @@ import { antiKnockBackHandler } from "./results/antiknockback";
 import { antiFallHandler } from "./results/antifall";
 import { antiFlyHandler } from "./results/antifly";
 import { invalidSprintHandler } from "./results/invalidsprint";
-import { noSlowAHandler } from "./results/noslowa";
+import { speedAHandler } from "./results/speeda";
 import { antiScaffoldAHandler } from "./results/antiscaffolda";
 import { antiJesusAHandler } from "./results/antijesusa";
 export function movementui(player) {
@@ -33,7 +33,7 @@ export function movementui(player) {
                 invalidSprintHandler(player);
                 break;
             case 4:
-                noSlowAHandler(player);
+                speedAHandler(player);
                 break;
             case 5:
                 antiScaffoldAHandler(player);
