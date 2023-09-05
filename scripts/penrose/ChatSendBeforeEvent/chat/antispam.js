@@ -4,7 +4,7 @@ import { sendMsgToPlayer } from "../../../util.js";
 const spamTime = 2 * 1000; // The time frame during which the player's messages will be counted.
 const offenseCount = 5; // Total strikes until you are kicked out.
 const strikeReset = 30 * 1000; // The time frame until the strike is reduced
-const lastChanceWarning = "Final warning: Continued rapid messaging will result in a ban.";
+const lastChanceWarning = "この行為を続けるとBANされます！！";
 const warningMessages = [
     "早すぎるメッセージの送信はお控えください",
     "あまり頻繁にメッセージを送ると、混乱が生じる可能性があります",

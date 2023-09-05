@@ -11,8 +11,8 @@ function isBlockInFrontAndBelowPlayer(blockLocation, playerLocation) {
     // You can adjust these thresholds based on your requirements
     // For example, you might want to consider a block in front and below if it's within a certain range.
     const xThreshold = 1.0;
-    const yThresholdFront = 0.5; // Consider the block in front if it's at a similar height
-    const yThresholdBelow = -0.5; // Consider the block below if it's a certain distance below the player
+    const yThresholdFront = -0.5; // Consider the block in front if it's at a similar height
+    const yThresholdBelow =  0.5; // Consider the block below if it's a certain distance below the player
     const zThreshold = 1.0;
 
     return dx < xThreshold && dy < yThresholdFront && dy < yThresholdBelow && dz < zThreshold;

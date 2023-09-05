@@ -50,6 +50,7 @@ export function modulesui(player) {
     modulesui.button("Xray誰がなんの鉱石手に入れたか分かる", "textures/blocks/diamond_ore");
     modulesui.button("ホットバーメッセージ", "textures/items/paper");
     modulesui.button("放置民キック", "textures/ui/keyboard_and_mouse_glyph_color");
+    modulesui.button("壁抜け検知", "textures/blocks/end_portal");
     modulesui
         .show(player)
         .then((ModulesUIResult) => {
