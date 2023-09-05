@@ -1,7 +1,6 @@
 import { Player } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { chatChannelsCreateMenuUI } from "./uiChatChannelsCreateMenu";
-import { ChatChannelsJoinMenuUI } from "./uiChatChannelsJoinMenu";
 export function uiChatChannelMainMenu(player) {
     const menu = new ActionFormData();
     menu.title("§4チャンネルメニュー！§4");

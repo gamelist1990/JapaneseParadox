@@ -1,4 +1,4 @@
-import { world, MinecraftBlockTypes, Vector3, BlockPlaceAfterEvent } from "@minecraft/server";
+import { world, MinecraftBlockTypes, } from "@minecraft/server";
 import { flag } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 

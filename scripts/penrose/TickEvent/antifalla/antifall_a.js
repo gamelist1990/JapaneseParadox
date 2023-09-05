@@ -1,4 +1,4 @@
-import { world, GameMode, system, Block } from "@minecraft/server";
+import { world, GameMode, system,  } from "@minecraft/server";
 import { flag } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 
@@ -18,7 +18,7 @@ function antifalla(id) {
     };
     const filteredPlayers = world.getPlayers(gm);
 
-    const airBlocksToCheck = new Set<{ dx, dy, dz }>([
+    const airBlocksToCheck = new Set([
         //check for a half block that the player maybe standing on if its a lower slab
         { dx: 0, dy: -0.5, dz: 0 },
         { dx: 0, dy: -1, dz: 0 },

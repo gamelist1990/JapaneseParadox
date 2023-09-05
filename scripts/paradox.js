@@ -65,8 +65,10 @@ import { DeathCoordinates } from "./penrose/EntityDieAfterEvent/death_coordinate
 import { onChannelLeave } from "./commands/utility/channel.js";
 // Custom
 import config from "./data/config.js";
+
 // WorldInitializeAfter Events
 Registry();
+
 // ChatSendBefore Events
 BadPackets1();
 SpammerA();
@@ -75,11 +77,13 @@ SpammerC();
 beforeAntiSpam();
 BeforePrefixCommand();
 beforeChatFilter();
+
 // ChatSendAfter Events
 AfterPrefixCommand();
 TpRequestListener();
 afterAntiSpam();
 afterChatFilter();
+
 // Tick Events
 ClearLag();
 BadPackets2();
@@ -113,25 +117,32 @@ if (config.customcommands.freeze || config.modules.antiKillAura || config.module
     freezeLeave();
     freezeJoin();
 }
+
 // BlockBreakAfter Events
 XrayA();
 NukerA();
+
 // playerSpawnAfter Events
 onJoin();
 GlobalBanList();
 hashCode();
 onJoinrules(); // GUI
+
 // BlockPlaceAfter Events
 ScaffoldA();
 IllegalItemsB();
 ReachA();
+
 // EntityHitEntityAfter Events
 ReachB();
 KillAura();
+
 // EntityDieAfter Events
 DeathCoordinates();
+
 // SystemBefore Events
 WatchDog();
+
 // playerLeaveAfter Events
 if (config.customcommands.channel === true) {
     onChannelLeave();
