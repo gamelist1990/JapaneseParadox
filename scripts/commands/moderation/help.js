@@ -27,7 +27,7 @@ export function help(message) {
     }
     const textDisabled = "Command §4DISABLED§f.";
     return sendMsgToPlayer(player, [
-        `§l§o§6[§4Paradoxコマンドヘルプ！§6]§r§o`,
+        `§f§4[§6Paradox§4]§fコマンド一覧`,
         ` `,
         `§l§o§6[§4管理者用§6]§r§o`,
         `§6${prefix}help§f - ヘルプページを表示します.`,

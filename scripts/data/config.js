@@ -210,8 +210,8 @@ export default {
         clearLag: {
             enabled: false,
             seconds: 0,
-            minutes: 10,
-            hours: 0,
+            minutes: 0,
+            hours: 2,
             days: 0,
         },
         illegalEnchantment: {
@@ -277,7 +277,7 @@ export default {
      * This is required for Realm users to gain Paradox-Op.
      *
      * Anyone else is welcome to use this if they like but
-     * レルムズで使用する場合はパスワードを設定してください！！
+     * レルムズで使用する場合はパスワードを設定してください！！必ず！！
      */
     encryption: {
         password: "",

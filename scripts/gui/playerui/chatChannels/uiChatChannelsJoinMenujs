@@ -5,17 +5,17 @@ import { uiChatChannelJoin } from "./uiChatChannels";
 
 export function ChatChannelsJoinMenuUI(player) {
     const menu = new ModalFormData();
-    menu.title("§4Paradox - Join A Channel§4");
+    menu.title("§4チャンネルに参加する§4");
     const channelsList = listChatChannels();
     const channelDropdownData = channelsList.map((channel) => ({
-        text: `${channel.channelName}, §fPassword: ${channel.hasPassword === "Yes" ? "§aYes" : "§cNo"}`,
+        text: `${channel.channelName}, §fパスワードを入力してね: ${channel.hasPassword === "Yes" ? "§ayes" : "§cno"}`,
         value: channel.channelName,
     }));
     if (channelDropdownData.length === 0) {
-        channelDropdownData.push({ text: "§6There are no existing channels", value: "" });
+        channelDropdownData.push({ text: "§6そのチャンネルは存在しません", value: "" });
     }
-    menu.dropdown(`\n§fSelect a channel:\n\n`, channelDropdownData);
-    menu.textField("Channel Password: ", "");
+    menu.dropdown(`\n§fチャンネルを選択:\n\n`, channelDropdownData);
+    menu.textField("チャンネルのパスワード！: ", "");
     menu.show(player)
         .then((chatChannelsJoinResult) => {
             uiChatChannelJoin(chatChannelsJoinResult, player, channelDropdownData);
