@@ -50,6 +50,6 @@ export function paradoxUI(message, args) {
         return paradoxuiHelp(player, prefix);
     }
     sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fチャット欄を閉じるとメニューが開きます`);
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f${player.name}§fがメニューを開きました§f!`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f${player.name}§fがメニューを開きました§f!!`);
     paradoxui(player);
 }
