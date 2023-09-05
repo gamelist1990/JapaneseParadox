@@ -8,7 +8,7 @@ export function speedAHandler(player) {
     const modulesspeedui = new ModalFormData();
     const speedABoolean = dynamicPropertyRegistry.get("speeda_b");
     modulesspeedui.title("§4早すぎるスピードを検知§4");
-    modulesspeedui.toggle("SpeedHACKを使ってる人を検知！！", speedABoolean);
+    modulesspeedui.toggle("SpeedHACKを使ってるプレイヤーを検知します！！", speedABoolean);
     modulesspeedui
         .show(player)
         .then((invalidsprintResult) => {
