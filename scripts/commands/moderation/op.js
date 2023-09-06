@@ -83,9 +83,9 @@ export function op(message, args) {
             sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f パスワードが違います. `);
         }
     }
-    else if (args.length === 1 && operatorHash === crypto?.(operatorSalt, config.encryption.password || operator.id)) {
+ else if (args.length >= 1 && operatorHash === crypto?.(operatorSalt, config.encryption.password || operator.id)) {
         // Operator wants to grant "Paradox-Op" to another player
-        const targetPlayerName = args[0];
+        const targetPlayerName = args.join(" "); // Combine all arguments into a single string
         // Try to find the player requested
         let targetPlayer;
         if (args.length) {

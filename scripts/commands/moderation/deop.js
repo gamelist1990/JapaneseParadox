@@ -1,13 +1,13 @@
-import { world } from "@minecraft/server";
+import { ChatSendAfterEvent, world } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { crypto, getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
+
 function deopHelp(player, prefix) {
     let commandStatus;
     if (!config.customcommands.deop) {
         commandStatus = "§6[§4DISABLED§6]§f";
-    }
-    else {
+    } else {
         commandStatus = "§6[§aENABLED§6]§f";
     }
     return sendMsgToPlayer(player, [
@@ -23,6 +23,7 @@ function deopHelp(player, prefix) {
         `        §4- §6Show command help§f`,
     ]);
 }
+
 /**
  * @name deop
  * @param {ChatSendAfterEvent} message - Message object
@@ -33,38 +34,48 @@ export function deop(message, args) {
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/moderation/op.js:30)");
     }
+
     const player = message.sender;
+
     // Get unique ID
     const uniqueId = dynamicPropertyRegistry.get(player?.id);
+
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません.`);
     }
+
     // Check for custom prefix
     const prefix = getPrefix(player);
+
     // Was help requested
     const argCheck = args[0];
     if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.deop) {
         return deopHelp(player, prefix);
     }
+
     // Are there arguements
     if (!args.length) {
         return deopHelp(player, prefix);
     }
+
     // try to find the player requested
     let member;
     if (args.length) {
+        const targetPlayerName = args.join(" "); // Combine all arguments into a single string
         const players = world.getPlayers();
         for (const pl of players) {
-            if (pl.name.toLowerCase().includes(args[0].toLowerCase().replace(/"|\\|@/g, ""))) {
+            if (pl.name.toLowerCase().includes(targetPlayerName.toLowerCase().replace(/"|\\|@/g, ""))) {
                 member = pl;
                 break;
             }
         }
     }
+
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが見つかりません`);
     }
+
     // Check for hash/salt and validate password from member
     const memberHash = member.getDynamicProperty("hash");
     const memberSalt = member.getDynamicProperty("salt");
@@ -72,10 +83,11 @@ export function deop(message, args) {
     try {
         // Use either the operator's ID or the encryption password as the key
         const memberKey = config.encryption.password ? config.encryption.password : member.id;
+
         // Generate the hash
         memberEncode = crypto(memberSalt, memberKey);
-    }
-    catch (error) { }
+    } catch (error) {}
+
     if (memberHash !== undefined && memberHash === memberEncode) {
         member.removeDynamicProperty("hash");
         member.removeDynamicProperty("salt");
