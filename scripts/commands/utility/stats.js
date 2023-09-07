@@ -87,7 +87,7 @@ async function handleStats(message, args) {
     ];
     switch (true) {
         case member.hasTag("freeze"):
-            reportBody.push(`§r§4[§6Paradox§4]§r §6${member.name}§r盲目が有効です`);
+            reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f は行動を制限されています ${member.hasTag("freezeAura") ? "AntiKillAura" : member.hasTag("freezeNukerA") ? "AntiNukerA" : member.hasTag("freezeScaffoldA") ? "AntiScaffoldA" : "Staff"}`);
             break;
         case member.hasTag("flying"):
             reportBody.push(`§r§4[§6Paradox§4]§r §6${member.name}§r飛行モードが有効です`);

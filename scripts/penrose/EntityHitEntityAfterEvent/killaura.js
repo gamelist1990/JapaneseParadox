@@ -81,7 +81,7 @@ function freeze(id) {
     }
     const filter = {
         tags: ["freezeAura"],
-        excludeTags: ["freezeNukerA"],
+        excludeTags: ["freezeNukerA", "freezeScaffoldA"],
     };
     const players = world.getPlayers(filter);
     for (const player of players) {

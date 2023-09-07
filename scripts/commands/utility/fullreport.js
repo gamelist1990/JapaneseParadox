@@ -73,8 +73,8 @@ async function handleFullReport(message, args) {
             `§r§4[§6Paradox§4]§r §6${member.name}§rは現在X= ${member.location.x.toFixed(0)} Y= ${member.location.y.toFixed(0)} Z= ${member.location.z.toFixed(0)}にいます`,
         ];
         switch (true) {
-            case member.hasTag("freeze"):
-                reportBody.push(`§r§4[§6Paradox§4]§r §6${member.name}§rフリーズが有効です`);
+            case member.hasTag("paradoxFreeze"):
+                reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f 行動が制限されています検知内容＝＞ ${member.hasTag("freezeAura") ? "AntiKillAura" : member.hasTag("freezeNukerA") ? "AntiNukerA" : member.hasTag("freezeScaffoldA") ? "AntiScaffoldA" : "Staff"}`);
                 break;
             case member.hasTag("flying"):
                 reportBody.push(`§r§4[§6Paradox§4]§r §6${member.name}§r飛べます`);

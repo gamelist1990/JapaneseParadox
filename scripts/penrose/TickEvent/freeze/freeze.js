@@ -1,10 +1,12 @@
 import { world, system, Vector } from "@minecraft/server";
 import { decryptString, encryptString, sendMsg, setTimer } from "../../../util";
 import { MinecraftEffectTypes } from "../../../node_modules/@minecraft/vanilla-data/lib/index";
+
 function freezePlayer(player) {
     // Record the player's original location
     const originalLocation = player.location;
     const originalDimension = player.dimension.id;
+
     setTimer(player.id);
     // Teleport the player to the freezing location
     player.teleport(new Vector(originalLocation.x, 245, originalLocation.z), {
@@ -14,19 +16,24 @@ function freezePlayer(player) {
         checkForBlocks: false,
         keepVelocity: false,
     });
+
     // Create prison around the player
     player.runCommand(`fill ${originalLocation.x + 2} ${245 + 2} ${originalLocation.z + 2} ${originalLocation.x - 2} ${245 - 1} ${originalLocation.z - 2} barrier [] hollow`);
+
     // Encrypt the data
     const encryptData = encryptString(`${originalLocation.x},${originalLocation.y},${originalLocation.z},${originalDimension.replace("minecraft:", "")}`, player.id);
     // Store original location and dimension in a tag
     player.addTag(`paradoxFreezeData:${encryptData}`);
 }
+
 function unfreezePlayer(player) {
     if (!player) {
         return; // Player object is undefined or null
     }
+
     // Retrieve the tag
     const freezeTag = player.getTags().find((tag) => tag.startsWith("paradoxFreezeData:"));
+
     if (freezeTag) {
         // Decrypt data
         const decryptData = decryptString(freezeTag.replace("paradoxFreezeData:", ""), player.id);
@@ -40,9 +47,12 @@ function unfreezePlayer(player) {
                 const originalY = parseFloat(locationAndDimension[1]);
                 const originalZ = parseFloat(locationAndDimension[2]);
                 const originalDimensionName = locationAndDimension[3];
+
                 player.removeTag(freezeTag);
+
                 // Remove the prison blocks
                 player.runCommand(`fill ${originalX + 2} ${245 + 2} ${originalZ + 2} ${originalX - 2} ${245 - 1} ${originalZ - 2} air [] hollow`);
+
                 setTimer(player.id);
                 // Teleport the player back to their original location
                 player.teleport(new Vector(originalX, originalY, originalZ), {
@@ -56,6 +66,7 @@ function unfreezePlayer(player) {
         }
     }
 }
+
 // Function to periodically check and freeze players
 const freezePlayers = () => {
     const filter = {
@@ -66,11 +77,12 @@ const freezePlayers = () => {
         const hasFreezeTag = player.hasTag("paradoxFreeze");
         const hasAuraTag = player.hasTag("freezeAura");
         const hasNukerTag = player.hasTag("freezeNukerA");
+        const hasScaffoldTag = player.hasTag("freezeScaffoldA");
+
         if (!hasFreezeTag) {
             // Player doesn't have the freeze tag, unfreeze them
             unfreezePlayer(player);
-        }
-        else {
+        } else {
             // Player has the freeze tag, freeze or update them
             let freezeDataTag = player.getTags().find((tag) => tag.startsWith("paradoxFreezeData:"));
             if (freezeDataTag) {
@@ -80,6 +92,7 @@ const freezePlayers = () => {
                 // Process data
                 const freezeData = freezeDataTag.split(":")[1];
                 const [originalX, originalY, originalZ, originalDimension] = freezeData.split(",").map((value, index) => (index === 3 ? value : parseFloat(value)));
+
                 // Check if the player has moved and teleport if necessary
                 const { x, y, z } = player.location;
                 if (Math.floor(x) !== Math.floor(originalX) || Math.floor(y) !== Math.floor(originalY) || Math.floor(z) !== Math.floor(originalZ) || player.dimension.id !== originalDimension) {
@@ -91,6 +104,7 @@ const freezePlayers = () => {
                         keepVelocity: false,
                     });
                 }
+
                 // Check and apply effects if not already present
                 const effects = [MinecraftEffectTypes.Blindness, MinecraftEffectTypes.MiningFatigue, MinecraftEffectTypes.Weakness, MinecraftEffectTypes.Slowness];
                 for (const typeEffect of effects) {
@@ -98,14 +112,23 @@ const freezePlayers = () => {
                         player.addEffect(typeEffect, 1000000, { amplifier: 255, showParticles: true });
                     }
                 }
-            }
-            else {
+            } else {
                 // Player has the freeze tag but no freeze data tag, freeze them
                 freezePlayer(player);
             }
-            // Display custom message if both aura and nuker tags exist
-            const title = hasAuraTag && hasNukerTag ? { subtitle: "§f検知内容＝＞ §4[§6KA§4]§f§4[§6NA§4]§f" } : { subtitle: "§f検知内容＝＞ §o§4[§6Command§4]§f" };
-            player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f 行動を禁止されました！!", {
+
+            const combinations = {
+                "111": "§f検知内容＝＞ §4[§6NA§4]§f§4[§6KA§4]§f§4[§6AS§4]§f", // Aura + Nuker + Scaffold
+                "110": "§f検知内容＝＞ §4[§6NA§4]§f§4[§6KA§4]§f", // Aura + Nuker
+                "101": "§f検知内容＝＞ §4[§6NA§4]§f§4[§6AS§4]§f", // Aura + Scaffold
+                "011": "§f検知内容＝＞ §4[§6KA§4]§f§4[§6AS§4]§f", // Nuker + Scaffold
+                "000": "§f検知内容＝＞ §4[§6Command§4]§f", // Other cases
+            };
+
+            const combinationKey = (hasAuraTag ? "1" : "0") + (hasNukerTag ? "1" : "0") + (hasScaffoldTag ? "1" : "0");
+            const title = { subtitle: combinations[combinationKey] || combinations["000"] };
+
+            player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f 行動が制限されました！", {
                 ...title,
                 fadeInDuration: 0,
                 fadeOutDuration: 0,
@@ -113,6 +136,7 @@ const freezePlayers = () => {
             });
         }
     }
+
     // Unfreeze players who no longer have the "paradoxFreeze" tag
     const clearFilter = {
         excludeTags: ["paradoxFreeze"],
@@ -124,6 +148,7 @@ const freezePlayers = () => {
         }
     }
 };
+
 // Subscribe to the playerLeave event to handle frozen players leaving
 export const freezeLeave = () => {
     world.afterEvents.playerLeave.subscribe((event) => {
@@ -132,11 +157,13 @@ export const freezeLeave = () => {
             .getPlayers()
             .find((player) => player.id === playerId)
             ?.hasTag("paradoxFreeze");
+
         if (hasFreezeTag) {
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${event.playerName}§f 行動を禁止されたままワールドを離れました`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${event.playerName}§f was frozen and left the server.`);
         }
     });
 };
+
 // Subscribe to the playerJoin event to handle frozen players returning
 export const freezeJoin = () => {
     world.afterEvents.playerJoin.subscribe((event) => {
@@ -145,10 +172,12 @@ export const freezeJoin = () => {
             .getPlayers()
             .find((player) => player.id === playerId)
             ?.hasTag("paradoxFreeze");
+
         if (hasFreezeTag) {
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${event.playerName}§f は凍結され、サーバーに戻されました`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${event.playerName}§f was frozen and returned to the server.`);
         }
     });
 };
+
 // Run the freezePlayers function every 3 seconds
 export const freeze = system.runInterval(freezePlayers, 60); // 20 ticks = 1 second
