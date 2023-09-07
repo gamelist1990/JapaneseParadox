@@ -1,7 +1,7 @@
-import {  Player, world } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsgToPlayer } from "../../util";
-import { ActionFormData, ModalFormResponse } from "@minecraft/server-ui";
+import { ActionFormData, } from "@minecraft/server-ui";
 import { uiInvEditorMenu } from "./uiInventory/uiInvEditorMainMenu.js";
 
 /**
