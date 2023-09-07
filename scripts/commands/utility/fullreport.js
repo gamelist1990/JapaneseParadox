@@ -71,6 +71,7 @@ async function handleFullReport(message, args) {
             `§r§4[§6Paradox§4]§r §6${member.name}§rのゲームモードは ${getGamemode(member)}です`,
             `§r§4[§6Paradox§4]§r §6${member.name}§rのプレイヤーIDは【 ${member.id} 】です`,
             `§r§4[§6Paradox§4]§r §6${member.name}§rは現在X= ${member.location.x.toFixed(0)} Y= ${member.location.y.toFixed(0)} Z= ${member.location.z.toFixed(0)}にいます`,
+            `§r§4[§6Paradox§4]§r §6${member.name}§rのスコアは【|| ${member.getScore(member)} ||】です`,
         ];
         switch (true) {
             case member.hasTag("paradoxFreeze"):
