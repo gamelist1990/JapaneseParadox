@@ -1,10 +1,9 @@
-import { Player } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
-import { chatChannelsCreateMenuUI } from "./uiChatChannelsCreateMenu";
-import { ChatChannelsJoinMenuUI } from "./uiChatChannelsJoinMenu";
-import { ChatChannelsInviteMenuUI } from "./uiChatChannelsInviteMenu";
-import { chatChannelsLeaveMenuUI } from "./uiChatChannelsLeaveMenu";
-export function uiChatChannelMainMenu(player) {
+import { chatChannelsCreateMenuUI } from "../../playerui/chatChannels/uiChatChannelsCreateMenu";
+import { ChatChannelsJoinMenuUI } from "../../playerui/chatChannels/uiChatChannelsJoinMenu";
+import { ChatChannelsInviteMenuUI } from "../../playerui/chatChannels/uiChatChannelsInviteMenu";
+import { chatChannelsLeaveMenuUI } from "../../playerui/chatChannels/uiChatChannelsLeaveMenu";
+export function chatChannelMainMenu(player) {
     const menu = new ActionFormData();
     menu.title("§4チャンネルメニュー！§4");
     menu.button("チャンネルを作る");

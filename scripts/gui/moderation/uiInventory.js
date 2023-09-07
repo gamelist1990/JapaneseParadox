@@ -1,8 +1,9 @@
-import { world } from "@minecraft/server";
+import {  Player, world } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsgToPlayer } from "../../util";
-import { ActionFormData } from "@minecraft/server-ui";
+import { ActionFormData, ModalFormResponse } from "@minecraft/server-ui";
 import { uiInvEditorMenu } from "./uiInventory/uiInvEditorMainMenu.js";
+
 /**
  * Handles the result of a modal form used for managing player inventories.
  *
@@ -24,6 +25,7 @@ export function uiINVENTORY(inventoryUIResult, onlineList, player) {
         }
     });
 }
+
 async function handleUIInventory(inventoryUIResult, onlineList, player) {
     if (!inventoryUIResult || inventoryUIResult.canceled) {
         // Handle canceled form or undefined result
@@ -42,24 +44,26 @@ async function handleUIInventory(inventoryUIResult, onlineList, player) {
     const uniqueId = dynamicPropertyRegistry.get(player?.id);
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f あなたは管理者ではありません`);
     }
+
     // Are they online?
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか使用できません`);
     }
     const inv = member.getComponent("inventory");
     const container = inv.container;
     const itemArray = [];
+
     const maxSlots = 36; // Maximum number of slots in the player's inventory
+
     // Loop through the inventory and add items to the itemArray
     for (let i = 0; i < maxSlots; i++) {
         const item = container.getItem(i);
         if (item?.typeId) {
             itemArray.push(i, item.typeId.replace("minecraft:", ""), item.amount, item.typeId.replace("minecraft:", ""));
-        }
-        else {
-            itemArray.push(i, "無し", 0, "ui/slots_bg");
+        } else {
+            itemArray.push(i, "empty", 0, "ui/slots_bg");
         }
     }
     // Map of all items/blocks and their texture paths
@@ -79,7 +83,7 @@ async function handleUIInventory(inventoryUIResult, onlineList, player) {
         ["acacia_trapdoor", "blocks/acacia_trapdoor"],
         ["acacia_wall_sign", "items/sign_acacia"],
         ["activator_rail", "blocks/rail_activator"],
-        ["air", ""],
+        ["air", "items/barrier"],
         ["allow", "blocks/build_allow"],
         ["amethyst_block", "blocks/amethyst_block"],
         ["amethyst_cluster", "blocks/amethyst_cluster"],
@@ -817,6 +821,7 @@ async function handleUIInventory(inventoryUIResult, onlineList, player) {
         ["yellow_glazed_terracotta", "blocks/glazed_terracotta_yellow"],
         ["yellow_shulker_box", "blocks/shulker_top_yellow"],
         ["yellow_wool", "blocks/wool_coloured_yellow"],
+
         //items these have had the blocks excluded
         ["acacia_boat", "items/boat_acacia"],
         ["acacia_chest_boat", "items/acacia_chest_boat"],

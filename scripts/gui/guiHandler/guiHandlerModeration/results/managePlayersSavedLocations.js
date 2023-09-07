@@ -4,10 +4,10 @@ import { uiManagePlayerSavedLocations } from "../../../moderation/uiManagePlayer
 
 export function managePlayerSavedLocationsHandler(player) {
     const managePlayerSavedLocationsUI = new ModalFormData();
-    managePlayerSavedLocationsUI.title("§4Paradox - Players Saved Locations§4");
+    managePlayerSavedLocationsUI.title("§4ユーザーの座標を管理§4");
     let onlineList = [];
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    managePlayerSavedLocationsUI.dropdown(`\n§fSelect a player:§f\n\nPlayer's Online\n`, onlineList);
+    managePlayerSavedLocationsUI.dropdown(`\n§fプレイヤーを選択§f\n\n以下のプレイヤーがオンラインです\n`, onlineList);
     managePlayerSavedLocationsUI
         .show(player)
         .then((managePlayerSavedLocationsUIResult) => {

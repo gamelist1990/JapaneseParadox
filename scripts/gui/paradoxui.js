@@ -11,8 +11,8 @@ import { modulesui } from "./guiHandler/guiHandlerModules/modulesui";
 import { prefixHandler } from "./guiHandler/results/prefix";
 import { statsHandler } from "./guiHandler/results/stats";
 import { inventoryHandler } from "./guiHandler/guiHandlerModeration/results/inventoryui";
-import { uiChatChannelMainMenu } from "./playerui/chatChannels/uiChatChannelsMenu";
 import { managePlayerSavedLocationsHandler } from "./guiHandler/guiHandlerModeration/results/managePlayersSavedLocations";
+import { ChatChannelMainMenu } from "./guiHandler/results/ChatChannelsMenu";
 /**
  * @name paradoxui
  * @param {Player} player - Player object
@@ -61,86 +61,86 @@ async function handleParadoxUI(player) {
     maingui
         .show(player)
         .then((result) => {
-        const isUnique = uniqueId !== player.name;
-        if (isUnique) {
-            switch (result.selection) {
-                case 0:
-                    opHandler(player, uniqueId, salt, hash);
-                    break;
-                case 1:
-                    tprHandler(player);
-                    break;
-                case 2:
-                    locationHandler(player);
-                    break;
-                case 3:
-                    reportHandler(player);
-                    break;
-                case 4:
-                    reportHandler(player);
+            const isUnique = uniqueId !== player.name;
+            if (isUnique) {
+                switch (result.selection) {
+                    case 0:
+                        opHandler(player, uniqueId, salt, hash);
                         break;
-                default:
-                    // Handle other selections for isUnique case
-                    break;
+                    case 1:
+                        tprHandler(player);
+                        break;
+                    case 2:
+                        locationHandler(player);
+                        break;
+                    case 3:
+                        reportHandler(player);
+                        break;
+                    case 4:
+                        reportHandler(player);
+                        break;
+                    default:
+                        // Handle other selections for isUnique case
+                        break;
+                }
             }
-        }
-        else {
-            switch (result.selection) {
-                case 0:
-                    opHandler(player, uniqueId, salt, hash);
-                    break;
-                case 1:
-                    deopHandler(player);
-                    break;
-                case 2:
-                    moderationui(player);
-                    break;
-                case 3:
-                    modulesui(player);
-                    break;
-                case 4:
-                    prefixHandler(player);
-                    break;
-                case 5:
-                    tprHandler(player);
-                    break;
-                case 6:
-                    locationHandler(player);
-                    break;
-                case 7:
-                    statsHandler(player);
-                    break;
-                case 8:
-                    reportHandler(player);
-                    break;
-                case 9:
-                    inventoryHandler(player);
-                    break;
-                case 10:
-                    uiChatChannelMainMenu(player);
-                    break;
-                case 11:
-                    managePlayerSavedLocationsHandler(player);
-                    break; 
-                    
-                default:
-                    // Handle other selections for non-isUnique case
-                    break;
+            else {
+                switch (result.selection) {
+                    case 0:
+                        opHandler(player, uniqueId, salt, hash);
+                        break;
+                    case 1:
+                        deopHandler(player);
+                        break;
+                    case 2:
+                        moderationui(player);
+                        break;
+                    case 3:
+                        modulesui(player);
+                        break;
+                    case 4:
+                        prefixHandler(player);
+                        break;
+                    case 5:
+                        tprHandler(player);
+                        break;
+                    case 6:
+                        locationHandler(player);
+                        break;
+                    case 7:
+                        statsHandler(player);
+                        break;
+                    case 8:
+                        reportHandler(player);
+                        break;
+                    case 9:
+                        inventoryHandler(player);
+                        break;
+                    case 10:
+                        ChatChannelMainMenu(player);
+                        break;
+                    case 11:
+                        managePlayerSavedLocationsHandler(player);
+                        break;
+
+                    default:
+                        // Handle other selections for non-isUnique case
+                        break;
+                }
             }
-        }
-        if (result.canceled && result.cancelationReason === "UserBusy") {
-            paradoxui(player);
-        }
-    })
+            if (result.canceled && result.cancelationReason === "UserBusy") {
+                paradoxui(player);
+            }
+        })
         .catch((error) => {
-        console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
-        if (error instanceof Error) {
-            const stackLines = error.stack.split("\n");
-            if (stackLines.length > 1) {
-                const sourceInfo = stackLines;
-                console.error("Error originated from:", sourceInfo[0]);
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
+            if (error instanceof Error) {
+                const stackLines = error.stack.split("\n");
+                if (stackLines.length > 1) {
+                    const sourceInfo = stackLines;
+                    console.error("Error originated from:", sourceInfo[0]);
+                }
             }
-        }
-    });
+        });
 }

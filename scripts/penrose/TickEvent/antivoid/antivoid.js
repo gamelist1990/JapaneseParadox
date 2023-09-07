@@ -1,4 +1,4 @@
-import { world, EntityQueryOptions, GameMode, system } from "@minecraft/server";
+import { world, GameMode, system } from "@minecraft/server";
 //import { flag } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 var savedValue;

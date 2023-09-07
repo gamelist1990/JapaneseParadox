@@ -92,7 +92,7 @@ export function rank(message, args) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 存在しないプレイヤーです`);
     }
 
     // check if array contains the string 'reset'
@@ -114,8 +114,8 @@ export function rank(message, args) {
     }
 
     if (player === member) {
-        return sendMsg("@a[tag=paradoxOpped]", `${player.name} has changed their rank`);
+        return sendMsg("@a[tag=paradoxOpped]", `${player.name} ランクを変更しました`);
     }
 
-    sendMsg("@a[tag=paradoxOpped]", `${player.name} has changed ${member.name}'s rank!`);
+    sendMsg("@a[tag=paradoxOpped]", `${player.name} が ${member.name}'のランクを変更しました`);
 }

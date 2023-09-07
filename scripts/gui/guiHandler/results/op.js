@@ -15,7 +15,7 @@ export function opHandler(player, uniqueId, salt, hash) {
     else if (!config.encryption.password) {
         opgui = new ActionFormData();
         opgui.title("§4管理者§4");
-                opgui.button("OP権限取得", "textures/ui/op");
+    opgui.button("OP権限取得", "textures/ui/op");
     }
     else if (config.encryption.password) {
         opgui = new ModalFormData();

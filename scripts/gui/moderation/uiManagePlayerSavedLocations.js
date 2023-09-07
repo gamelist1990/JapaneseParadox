@@ -1,8 +1,8 @@
-import {  world } from "@minecraft/server";
-import { ModalFormData,  } from "@minecraft/server-ui";
+import { world } from "@minecraft/server";
+import { ModalFormData, } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry";
 import { decryptString, sendMsgToPlayer } from "../../util";
-import { moderationui } from "../guiHandler/guiHandlerModeration/moderationui";
+//import { moderationui } from "../guiHandler/guiHandlerModeration/moderationui";
 import { paradoxui } from "../paradoxui";
 
 export function uiManagePlayerSavedLocations(managePlayerSavedLocationsUIResult, onlineList, player) {
@@ -32,12 +32,12 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
     const uniqueId = dynamicPropertyRegistry.get(player?.id);
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
     }
 
     // Are they online?
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fプレイヤーが見つかりません`);
     }
 
     //Grab the selected player saved locations.
@@ -74,15 +74,15 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
         So if there is no data we push a line to keep the array with at least 1 value.
         If there are saved locations then it will continue as normal.
         */
-        Locations.push("This player has not saved a Location");
+        Locations.push("このプレイヤーは座標を保存していません");
     }
     /*no we have the selected player and have the locations in an array we will build a UI
     to show the player, where they can then remove the location if needed.
     */
     const managePlayerSavedLocationsUI = new ModalFormData();
-    managePlayerSavedLocationsUI.title(`§4Paradox - §6${member.name}'s §4Locations`);
-    managePlayerSavedLocationsUI.dropdown(`\n§fSelect a Location:§f\n\nSaved Location's\n`, Locations);
-    managePlayerSavedLocationsUI.toggle("Delete", false);
+    managePlayerSavedLocationsUI.title(`§4§6${member.name}'の座標保存一覧を表示しています`);
+    managePlayerSavedLocationsUI.dropdown(`\n§f消去した座標を選択してください:§f\n\n保存されている座標\n`, Locations);
+    managePlayerSavedLocationsUI.toggle("消去", false);
     managePlayerSavedLocationsUI
         .show(player)
         .then((managePlayerSavedLocationsUIResult) => {
@@ -101,7 +101,7 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
                     }
                     if (tags[i].startsWith("LocationHome:" && Locations[selectedLocationvalue] + " X", 13)) {
                         member.removeTag(encryptedString);
-                        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Successfully deleted home '${Locations[selectedLocationvalue]}'!`);
+                        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ${member.name}の座標を消去しました||消去した座標=> '${Locations[selectedLocationvalue]}'!`);
                         break;
                     }
                 }

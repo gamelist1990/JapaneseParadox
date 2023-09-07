@@ -13,18 +13,18 @@ export function prefixHandler(player) {
     prefixui
         .show(player)
         .then((prefixResult) => {
-        //Prefix logic
-        uiPREFIX(prefixResult, onlineList, player);
-    })
+            //Prefix logic
+            uiPREFIX(prefixResult, onlineList, player);
+        })
         .catch((error) => {
-        console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
-        if (error instanceof Error) {
-            const stackLines = error.stack.split("\n");
-            if (stackLines.length > 1) {
-                const sourceInfo = stackLines;
-                console.error("Error originated from:", sourceInfo[0]);
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
+            if (error instanceof Error) {
+                const stackLines = error.stack.split("\n");
+                if (stackLines.length > 1) {
+                    const sourceInfo = stackLines;
+                    console.error("Error originated from:", sourceInfo[0]);
+                }
             }
-        }
-    });
+        });
 }
