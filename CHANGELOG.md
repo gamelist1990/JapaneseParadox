@@ -1,4 +1,5 @@
 # Changelog
+## [v日本語版paradox v3.3.4] Paradox v3.3.4-Beta  Japanese version update!!
 
 ## [v日本語版paradox v3.3.3] Paradox v3.3.4  Japanese version update!!
 
