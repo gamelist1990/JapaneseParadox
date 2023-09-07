@@ -1,6 +1,9 @@
 import { Player } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { chatChannelsCreateMenuUI } from "./uiChatChannelsCreateMenu";
+import { ChatChannelsJoinMenuUI } from "./uiChatChannelsJoinMenu";
+import { ChatChannelsInviteMenuUI } from "./uiChatChannelsInviteMenu";
+import { chatChannelsLeaveMenuUI } from "./uiChatChannelsLeaveMenu";
 export function uiChatChannelMainMenu(player) {
     const menu = new ActionFormData();
     menu.title("§4チャンネルメニュー！§4");
@@ -16,6 +19,12 @@ export function uiChatChannelMainMenu(player) {
                 break;
             case 1:
                 ChatChannelsJoinMenuUI(player);
+                break;
+            case 2:
+                ChatChannelsInviteMenuUI(player);
+                break;
+            case 3:
+                chatChannelsLeaveMenuUI(player);
                 break;
             default:
                 break;
