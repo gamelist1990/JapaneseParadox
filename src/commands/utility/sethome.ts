@@ -79,7 +79,7 @@ export function sethome(message: ChatSendAfterEvent, args: string[]) {
         }
         if (tags[i].startsWith(args[0].toString() + " X", 13)) {
             verify = true;
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f【'${args[0]}'】同じ名前の座標があります`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f'${args[0]}'同じ名前の座標があります`);
             break;
         }
         if (tags[i].startsWith("LocationHome:")) {

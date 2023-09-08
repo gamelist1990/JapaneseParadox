@@ -100,7 +100,7 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
                     }
                     if (tags[i].startsWith("LocationHome:" && Locations[selectedLocationvalue as number] + " X", 13)) {
                         member.removeTag(encryptedString);
-                        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ${member.name}の座標を消去しました　消去した座標＝＞ 【'${Locations[selectedLocationvalue as number]}'】!`);
+                        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ${member.name}の座標を消去しました　消去した座標＝＞ '${Locations[selectedLocationvalue as number]}'!`);
                         break;
                     }
                 }

@@ -165,7 +165,7 @@ export function resetTag(member: Player) {
             member.removeTag(tag);
         }
     }
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${member.name} のランクをリセットしました`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${member.name} ランクをリセット`);
 }
 
 /**
@@ -602,7 +602,7 @@ export function deleteChatChannel(channelName: string, password?: string): boole
         membersArray.forEach((thisMember) => {
             const thisPlayer = getPlayerById(thisMember);
             // Let members know that this channel no longer exists
-            sendMsgToPlayer(thisPlayer, `§f§4[§6Paradox§4]§f '${channelName}' は解散した.`);
+            sendMsgToPlayer(thisPlayer, `§f§4[§6Paradox§4]§f '${channelName}' has been disbanded.`);
             playerChannelMap[thisMember] = null;
         });
 
@@ -631,6 +631,11 @@ export function listChatChannels(): { channelName: string; hasPassword: string }
     }
 
     return channelList;
+}
+// Function to check if a password is required for a given channel name
+export function isPasswordRequired(channelName: string): boolean {
+    const channel = chatChannels[channelName];
+    return !!channel && !!channel.password;
 }
 
 export const allscores: string[] = [

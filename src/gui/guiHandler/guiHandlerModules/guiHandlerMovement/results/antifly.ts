@@ -8,7 +8,7 @@ export function antiFlyHandler(player: Player) {
     const modulesantiflyui = new ModalFormData();
     const flyABoolean = dynamicPropertyRegistry.get("flya_b") as boolean;
     modulesantiflyui.title("§4メニュー：Anti Fly§4");
-    modulesantiflyui.toggle("よく飛んでるハエ【C】を検知します", flyABoolean);
+    modulesantiflyui.toggle("よく飛んでるhackerを検知します", flyABoolean);
     modulesantiflyui
         .show(player)
         .then((antiflyResult) => {

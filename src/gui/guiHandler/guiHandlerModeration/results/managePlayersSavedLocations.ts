@@ -7,7 +7,7 @@ export function managePlayerSavedLocationsHandler(player: Player) {
     managePlayerSavedLocationsUI.title("§4座標管理§4");
     let onlineList: string[] = [];
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    managePlayerSavedLocationsUI.dropdown(`\n§f指定したプレイヤーの座標を削除できます【追加できません】§f\n\n以下のプレイヤーがオンラインです\n`, onlineList);
+    managePlayerSavedLocationsUI.dropdown(`\n§f指定したプレイヤーの座標を削除できます[追加できません]§f\n\n以下のプレイヤーがオンラインです\n`, onlineList);
     managePlayerSavedLocationsUI
         .show(player)
         .then((managePlayerSavedLocationsUIResult) => {
