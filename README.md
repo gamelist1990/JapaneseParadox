@@ -2,8 +2,7 @@
   <img src="https://i.imgur.com/ZS38i7c.png" alt="Paradox AntiCheat Logo">
   <br><br>
   <div>
-    <em>Paradox japanese v.3.3.3　<h1>original
-      => "https://github.com/Pete9xi/Paradox_AntiCheat/tree/main"</h1></em>
+    <em>Updated for 1.20.10</em>
     <br>
     Paradox AntiCheat is a fork of Scythe AntiCheat, which was released under the GPLv3 License. Paradox was created to fix some differences within Scythe and to provide a more reliable and effective anti-cheat solution for Minecraft Bedrock. All original commit history pertaining to Scythe still exists within this project and is free to review.
   </div>
@@ -62,11 +61,12 @@
       <li>Edit the <code>config.js</code> file located at <code>/scripts/data/config.js</code>.</li>
       <li>Scroll down to the <code>encryption</code> section.</li>
       <li>Inside <code>encryption</code>, find <code>password</code>.</li>
-      <li>Enter your chosen password:</li>
-    </ol>
-    <pre><code class="language-javascript">encryption: {
+      <li>Enter your chosen password:
+        <pre><code class="language-javascript">encryption: {
     password: "mypassword",
 }</code></pre>
+      </li>
+    </ol>
     <ol type="a" start="5">
       <li>Keep your password safe and confidential.</li>
     </ol>
@@ -79,7 +79,11 @@
       <li>Once granted, you'll have Paradox AntiCheat features.</li>
       <li>To give Paradox-Op permissions to others, use <code>&lt;prefix&gt;op &lt;player&gt;</code>.</li>
       <li>Learn more by entering <code>&lt;prefix&gt;op help</code>.</li>
-    </ol>
+      <li>For Bedrock Dedicated Server (BDS), add the following to the <code>server.properties</code> file:
+        <pre><code>op-permission-level=2
+#min=2
+#max=4</code></pre>
+      </li>
   </li>
 </ol>
 <p>Note: If you're using a password (Realm owners), use <code>&lt;prefix&gt;op &lt;password&gt;</code> for permission.</p>

@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\functions",
+    "\\functions\\checks",
+    "\\src",
+    "\\src\\gui",
+    "\\src\\gui\\PlayerSpawnAfterEvent",
+    "\\src\\gui\\PlayerSpawnAfterEvent\\rules",
+    "\\src\\gui\\showrules"
+  ],
+  "PreviewInSolutionExplorer": false
+}
