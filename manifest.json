@@ -3,7 +3,7 @@
     "header": {
         "name": "Paradox日本語版!!",
         "description": "Paradoxv3.3.4.1 Beta 日本語版です！！編集者：こう君",
-        "uuid": "0b9c3761-e4ba-402d-ae00-fec098ef18ba",
+        "uuid": "63d4e143-31bc-4178-9955-7381485b7366",
         "version": [3, 3, 3],
         "min_engine_version": [1, 20, 10]
     },
@@ -15,14 +15,14 @@
     "modules": [
         {
             "type": "data",
-            "uuid": "8637e7b7-340f-40ba-816f-dd87ff44b97e",
+            "uuid": "8b1948e9-9746-4039-97e3-1ee61103a5bd",
             "version": [1, 0, 0]
         },
         {
             "description": "Paradox AntiCheat Gametest Features",
             "language": "javascript",
             "type": "script",
-            "uuid": "8abbc147-2d85-4748-bad5-a3f58cfe9ea0",
+            "uuid": "a90a77e3-6bed-4c21-8d4b-fc84c3304525",
             "version": [0, 0, 1],
             "entry": "scripts/paradox.js"
         }
