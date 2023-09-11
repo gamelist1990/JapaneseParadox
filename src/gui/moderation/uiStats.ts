@@ -46,7 +46,9 @@ export function uiSTATS(statsResult: ModalFormResponse, onlineList: string[], pl
 
     switch (true) {
         case member.hasTag("paradoxFreeze"):
-            reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f フリーズ　検知内容＝＞ ${member.hasTag("freezeAura") ? "AntiKillAura" : member.hasTag("freezeNukerA") ? "AntiNukerA" : member.hasTag("freezeScaffoldA") ? "AntiScaffoldA" : "Staff"}`);
+            reportBody.push(
+                `§f§4[§6Paradox§4]§f §6${member.name}§f フリーズ　検知内容＝＞ ${member.hasTag("freezeAura") ? "AntiKillAura" : member.hasTag("freezeNukerA") ? "AntiNukerA" : member.hasTag("freezeScaffoldA") ? "AntiScaffoldA" : "Staff"}`
+            );
             break;
         case member.hasTag("flying"):
             reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f 飛行有効`);
@@ -57,7 +59,7 @@ export function uiSTATS(statsResult: ModalFormResponse, onlineList: string[], pl
     }
 
     allObjectives.forEach((objective) => {
-        const score = ScoreManager.getScore(objective, member);
+        const score = ScoreManager.ScoreManager.getscore(objective, member);
         if (score > 0) {
             reportBody.push(`§f§4[§6${objective.replace("vl", "").toUpperCase()}§4]§f number of Violations: ${score}\n`);
         }

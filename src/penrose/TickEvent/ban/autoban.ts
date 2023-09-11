@@ -36,7 +36,7 @@ function autoban(id: number) {
             return;
         }
         scores.forEach((score) => {
-            const playerScore = ScoreManager.getScore(score, player);
+            const playerScore = ScoreManager.ScoreManager.getscore(score, player);
             if (playerScore > 1000) {
                 const reReason = score.replace("vl", "").toUpperCase() + " 検知内容＝＞: " + playerScore;
                 return rip(player, reReason);

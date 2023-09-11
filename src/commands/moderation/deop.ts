@@ -1,7 +1,8 @@
 import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
-import { crypto, getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
+import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
+import { EncryptionManager } from "../../classes/EncryptionManager.js";
 
 function deopHelp(player: Player, prefix: string) {
     let commandStatus: string;
@@ -42,7 +43,7 @@ export function deop(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
     }
 
     // Check for custom prefix
@@ -73,7 +74,7 @@ export function deop(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ユーザーが見つかりません`);
     }
 
     // Check for hash/salt and validate password from member
@@ -85,7 +86,7 @@ export function deop(message: ChatSendAfterEvent, args: string[]) {
         const memberKey = config.encryption.password ? config.encryption.password : member.id;
 
         // Generate the hash
-        memberEncode = crypto(memberSalt, memberKey);
+        memberEncode = EncryptionManager.hashWithSalt(memberSalt as string, memberKey);
     } catch (error) {}
 
     if (memberHash !== undefined && memberHash === memberEncode) {

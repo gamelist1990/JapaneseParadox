@@ -1,7 +1,8 @@
 import { world, EntityQueryOptions, system } from "@minecraft/server";
 import config from "../../../data/config.js";
-import { crypto, sendMsg } from "../../../util.js";
+import {  sendMsg } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
+import { EncryptionManager } from "../../../classes/EncryptionManager.js";
 
 function verifypermission() {
     const filter: EntityQueryOptions = {
@@ -28,7 +29,7 @@ function verifypermission() {
         const key = config.encryption.password ? config.encryption.password : player.id;
 
         // Generate the hash
-        const encode = crypto?.(salt, key);
+        const encode = EncryptionManager.hashWithSalt(salt as string, key);
         if (encode === hash) {
             // Make sure their unique ID exists in case of a reload
             if (dynamicPropertyRegistry.has(player.id) === false) {

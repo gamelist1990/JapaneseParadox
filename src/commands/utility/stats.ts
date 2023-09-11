@@ -115,75 +115,74 @@ async function handleStats(message: ChatSendAfterEvent, args: string[]) {
     }
 
     let violationsFound = 0;
-        let vlCount = 0;
-        let divider = false;
-        ScoreManager.allscores.forEach((objective) => {
-            vlCount++;
-            const score = ScoreManager.getScore(objective, member);
-            if (score > 0) {
-                violationsFound++;
-                if (violationsFound === 1) {
-                    divider = true;
-                    reportBody.push(`§f§4[§6Paradox§4]§4 ----------------------------------§f`);
-                }
-                reportBody.push(`§f§4[§6Paradox§4]§f §f§4[§6${objective.replace("vl", "").toUpperCase()}§4]§f: ${score}回検知されています`);
-            }
-            if (vlCount === ScoreManager.allscores.length && divider === true) {
+    let vlCount = 0;
+    let divider = false;
+    ScoreManager.allscores.forEach((objective) => {
+        vlCount++;
+        const score = ScoreManager.ScoreManager.getscore(objective, member);
+        if (score > 0) {
+            violationsFound++;
+            if (violationsFound === 1) {
+                divider = true;
                 reportBody.push(`§f§4[§6Paradox§4]§4 ----------------------------------§f`);
             }
-        });
-
-        const equipment = member.getComponent("equipment_inventory") as EntityEquipmentInventoryComponent;
-        const helmet = equipment.getEquipment("head" as EquipmentSlot);
-        const chest = equipment.getEquipment("chest" as EquipmentSlot);
-        const legs = equipment.getEquipment("legs" as EquipmentSlot);
-        const feet = equipment.getEquipment("feet" as EquipmentSlot);
-        const mainhand = equipment.getEquipment("mainhand" as EquipmentSlot);
-        const offhand = equipment.getEquipment("offhand" as EquipmentSlot);
-
-        const materialColors: { [key: string]: string } = {
-            golden: "§6", // gold
-            iron: "§7", // light gray
-            diamond: "§b", // aqua
-            leather: "§e", // yellow
-            chainmail: "§8", // dark gray
-            turtle: "§a", // green
-            netherite: "§4", // dark red
-            elytra: "§5", // purple
-            none: "§f", // white
-        };
-
-        for (const [verification, armorType] of [
-            [helmet, "帽子"],
-            [chest, "服"],
-            [legs, "ズボン"],
-            [feet, "靴"],
-            [mainhand, "メインハンド"],
-            [offhand, "オフハンド"],
-        ]) {
-            if (!(verification instanceof ItemStack)) {
-                continue;
-            }
-            const enchantedEquipment = verification.getComponent("enchantments") as ItemEnchantsComponent;
-            const enchantList = enchantedEquipment.enchantments;
-            if (!enchantList) {
-                continue;
-            }
-            let isEnchanted = false;
-            for (const enchant in MinecraftEnchantmentTypes) {
-                const enchantNumber = enchantList.hasEnchantment(MinecraftEnchantmentTypes[enchant as keyof typeof MinecraftEnchantmentTypes]);
-                if (enchantNumber > 0) {
-                    isEnchanted = true;
-                }
-            }
-            let materialType = verification.typeId.split(":")[1].replace(/_\w+/, "");
-            if (armorType === "Mainhand" || armorType === "Offhand") {
-                materialType = verification.typeId.split(":")[1];
-            }
-            const materialColor = materialColors[materialType] || materialColors["none"];
-            reportBody.push(`§f§4[§6Paradox§4]§f ${armorType}: ${isEnchanted ? "§aエンチャ有§f" : "§4エンチャ無§f"} || ${materialColor}${materialType}`);
+            reportBody.push(`§f§4[§6Paradox§4]§f §f§4[§6${objective.replace("vl", "").toUpperCase()}§4]§f: ${score}回検知されています`);
         }
+        if (vlCount === ScoreManager.allscores.length && divider === true) {
+            reportBody.push(`§f§4[§6Paradox§4]§4 ----------------------------------§f`);
+        }
+    });
 
-        sendMsgToPlayer(player, reportBody);
+    const equipment = member.getComponent("equipment_inventory") as EntityEquipmentInventoryComponent;
+    const helmet = equipment.getEquipment("head" as EquipmentSlot);
+    const chest = equipment.getEquipment("chest" as EquipmentSlot);
+    const legs = equipment.getEquipment("legs" as EquipmentSlot);
+    const feet = equipment.getEquipment("feet" as EquipmentSlot);
+    const mainhand = equipment.getEquipment("mainhand" as EquipmentSlot);
+    const offhand = equipment.getEquipment("offhand" as EquipmentSlot);
+
+    const materialColors: { [key: string]: string } = {
+        golden: "§6", // gold
+        iron: "§7", // light gray
+        diamond: "§b", // aqua
+        leather: "§e", // yellow
+        chainmail: "§8", // dark gray
+        turtle: "§a", // green
+        netherite: "§4", // dark red
+        elytra: "§5", // purple
+        none: "§f", // white
+    };
+
+    for (const [verification, armorType] of [
+        [helmet, "帽子"],
+        [chest, "服"],
+        [legs, "ズボン"],
+        [feet, "靴"],
+        [mainhand, "メインハンド"],
+        [offhand, "オフハンド"],
+    ]) {
+        if (!(verification instanceof ItemStack)) {
+            continue;
+        }
+        const enchantedEquipment = verification.getComponent("enchantments") as ItemEnchantsComponent;
+        const enchantList = enchantedEquipment.enchantments;
+        if (!enchantList) {
+            continue;
+        }
+        let isEnchanted = false;
+        for (const enchant in MinecraftEnchantmentTypes) {
+            const enchantNumber = enchantList.hasEnchantment(MinecraftEnchantmentTypes[enchant as keyof typeof MinecraftEnchantmentTypes]);
+            if (enchantNumber > 0) {
+                isEnchanted = true;
+            }
+        }
+        let materialType = verification.typeId.split(":")[1].replace(/_\w+/, "");
+        if (armorType === "Mainhand" || armorType === "Offhand") {
+            materialType = verification.typeId.split(":")[1];
+        }
+        const materialColor = materialColors[materialType] || materialColors["none"];
+        reportBody.push(`§f§4[§6Paradox§4]§f ${armorType}: ${isEnchanted ? "§aエンチャ有§f" : "§4エンチャ無§f"} || ${materialColor}${materialType}`);
     }
 
+    sendMsgToPlayer(player, reportBody);
+}

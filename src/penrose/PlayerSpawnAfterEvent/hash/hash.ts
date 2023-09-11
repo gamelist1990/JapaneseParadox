@@ -1,7 +1,7 @@
 import { PlayerSpawnAfterEvent, world } from "@minecraft/server";
-import { crypto } from "../../../util";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry";
 import config from "../../../data/config";
+import { EncryptionManager } from "../../../classes/EncryptionManager";
 
 function verification(object: PlayerSpawnAfterEvent) {
     // Properties from class
@@ -19,7 +19,7 @@ function verification(object: PlayerSpawnAfterEvent) {
     const key = config.encryption.password ? config.encryption.password : player.id;
 
     // Generate the hash
-    const encode = crypto?.(salt, key);
+    const encode = EncryptionManager.hashWithSalt(salt as string, key);
     if (encode === hash) {
         // Store as an element using player scoreboard id to uniquely identify them
         dynamicPropertyRegistry.set(player.id, player.name);
