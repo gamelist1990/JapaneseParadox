@@ -1,6 +1,8 @@
 import { world } from "@minecraft/server";
-import { chatChannels, decryptString, getPlayerById, getPlayerChannel, sendMsg } from "../../../util.js";
+import { sendMsg } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
+import { ChatChannelManager } from "../../../classes/ChatChannelManager.js";
+import { EncryptionManager } from "../../../classes/EncryptionManager.js";
 
 const afterChatFilter = () => {
     // Subscribe to the 'afterChat' event
@@ -12,11 +14,11 @@ const afterChatFilter = () => {
         const chatRanksBoolean = dynamicPropertyRegistry.get("chatranks_b");
 
         // Get the channel name associated with the player
-        const channelName = getPlayerChannel(player.id);
+        const channelName = ChatChannelManager.getPlayerChannel(player.id);
 
         if (chatRanksBoolean === true) {
             // Format the chat message
-            const formattedMessage = decryptString(message, player.id);
+            const formattedMessage = EncryptionManager.decryptString(message, player.id);
             msg.message = formattedMessage;
 
             // Set 'sendToTargets' flag to false
@@ -25,12 +27,12 @@ const afterChatFilter = () => {
             if (!msg.sendToTargets) {
                 if (channelName) {
                     // Retrieve player objects of members in the same channel
-                    const channelMembers = chatChannels[channelName].members;
+                    const channelMembers = ChatChannelManager.getChatChannelByName(channelName).members;
                     const targetPlayers = [];
 
                     // Iterate through channel members
                     for (const memberID of channelMembers) {
-                        const player = getPlayerById(memberID);
+                        const player = ChatChannelManager.getPlayerById(memberID);
                         if (player !== null) {
                             targetPlayers.push(player.name);
                         }
@@ -61,16 +63,16 @@ const afterChatFilter = () => {
             msg.sendToTargets = false;
 
             // Format the chat message
-            const formattedMessage = decryptString(message, player.id);
+            const formattedMessage = EncryptionManager.decryptString(message, player.id);
             msg.message = formattedMessage;
 
             // Retrieve player objects of members in the same channel
-            const channelMembers = chatChannels[channelName].members;
+            const channelMembers = ChatChannelManager.getChatChannelByName(channelName).members;
             const targetPlayers = [];
 
             // Iterate through channel members
             for (const memberID of channelMembers) {
-                const player = getPlayerById(memberID);
+                const player = ChatChannelManager.getPlayerById(memberID);
                 if (player !== null) {
                     targetPlayers.push(player.name);
                 }

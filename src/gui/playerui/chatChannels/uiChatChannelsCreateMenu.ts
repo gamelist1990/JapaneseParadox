@@ -3,9 +3,9 @@ import { ModalFormData } from "@minecraft/server-ui";
 import { uiChatChannelCreate } from "./uiChatChannels";
 export function chatChannelsCreateMenuUI(player: Player) {
     const menu = new ModalFormData();
-    menu.title("§4メニュー：チャンネル作成§4");
-    menu.textField("チャンネル名前: ", "Test");
-    menu.textField("パスワード:", "Password123");
+    menu.title("§4Paradox - Chat Channels Create§4");
+    menu.textField("Channel Name: ", "Test");
+    menu.textField("Password:", "Password123");
     menu.show(player)
         .then((chatChannelsCreateResult) => {
             uiChatChannelCreate(chatChannelsCreateResult, player);

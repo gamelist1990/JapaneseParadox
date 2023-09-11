@@ -1,6 +1,8 @@
 import { world } from "@minecraft/server";
-import { encryptString, getPlayerChannel, sendMsgToPlayer } from "../../../util.js";
+import { sendMsgToPlayer } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
+import { ChatChannelManager } from "../../../classes/ChatChannelManager.js";
+import { EncryptionManager } from "../../../classes/EncryptionManager.js";
 
 const beforeChatFilter = () => {
     // Subscribe to the 'beforeChat' event
@@ -10,7 +12,7 @@ const beforeChatFilter = () => {
         // Retrieve the 'chatranks_b' dynamic property
         const chatRanksBoolean = dynamicPropertyRegistry.get("chatranks_b");
         // Get the channel name associated with the player
-        const channelName = getPlayerChannel(player.id);
+        const channelName = ChatChannelManager.getPlayerChannel(player.id);
 
         // Check if chat ranks are enabled
         if (!msg.sendToTargets && chatRanksBoolean === true) {
@@ -29,13 +31,13 @@ const beforeChatFilter = () => {
             // Format the chat message with the rank
             const formattedMessage = `§4[§6${rank}§4] §7${player.name}: §r${message}`;
             // Encrypt and update the message
-            msg.message = encryptString(channelName ? `§4[§6${channelName}§4] §7${player.name}: §r${message}` : formattedMessage, player.id);
+            msg.message = EncryptionManager.encryptString(channelName ? `§4[§6${channelName}§4] §7${player.name}: §r${message}` : formattedMessage, player.id);
             msg.sendToTargets = true; // Send the message to targets
         } else if (!msg.sendToTargets && channelName) {
             // Format the chat message for channel
             const formattedMessage = `§4[§6${channelName}§4] §f<${player.name}> §r${message}`;
             // Encrypt and update the message
-            msg.message = encryptString(formattedMessage, player.id);
+            msg.message = EncryptionManager.encryptString(formattedMessage, player.id);
             msg.sendToTargets = true; // Send the message to targets
         }
     });

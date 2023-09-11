@@ -2,8 +2,8 @@ import { ChatSendAfterEvent, EntityEquipmentInventoryComponent, EquipmentSlot, I
 import { MinecraftEnchantmentTypes } from "../../node_modules/@minecraft/vanilla-data/lib/index";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
-import { allscores, getGamemode, getPrefix, getScore, sendMsgToPlayer } from "../../util.js";
-
+import { getGamemode, getPrefix, sendMsgToPlayer } from "../../util.js";
+import { ScoreManager } from "../../classes/ScoreManager";
 function fullReportHelp(player: Player, prefix: string) {
     let commandStatus: string;
     if (!config.customcommands.fullreport) {
@@ -85,7 +85,9 @@ async function handleFullReport(message: ChatSendAfterEvent, args: string[]) {
         switch (true) {
             case member.hasTag("paradoxFreeze"):
                 reportBody.push(
-                    `§f§4[§6Paradox§4]§f §6${member.name}§f 行動が制限されています検知内容＝＞ ${member.hasTag("freezeAura") ? "AntiKillAura" : member.hasTag("freezeNukerA") ? "AntiNukerA" : member.hasTag("freezeScaffoldA") ? "AntiScaffoldA" : "Staff"}`
+                    `§f§4[§6Paradox§4]§f §6${member.name}§f 行動が制限されています検知内容＝＞ ${
+                        member.hasTag("freezeAura") ? "AntiKillAura" : member.hasTag("freezeNukerA") ? "AntiNukerA" : member.hasTag("freezeScaffoldA") ? "AntiScaffoldA" : "Staff"
+                    }`
                 );
                 break;
             case member.hasTag("flying"):
@@ -99,9 +101,9 @@ async function handleFullReport(message: ChatSendAfterEvent, args: string[]) {
         let violationsFound = 0;
         let vlCount = 0;
         let divider = false;
-        allscores.forEach((objective) => {
+        ScoreManager.allscores.forEach((objective) => {
             vlCount++;
-            const score = getScore(objective, member);
+            const score = ScoreManager.getScore(objective, member);
             if (score > 0) {
                 violationsFound++;
                 if (violationsFound === 1) {
@@ -110,7 +112,7 @@ async function handleFullReport(message: ChatSendAfterEvent, args: string[]) {
                 }
                 reportBody.push(`§f§4[§6Paradox§4]§f §f§4[§6${objective.replace("vl", "").toUpperCase()}§4]§f: ${score}回検知されています`);
             }
-            if (vlCount === allscores.length && divider === true) {
+            if (vlCount === ScoreManager.allscores.length && divider === true) {
                 reportBody.push(`§f§4[§6Paradox§4]§4 ----------------------------------§f`);
             }
         });

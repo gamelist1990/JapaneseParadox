@@ -1,9 +1,8 @@
 import { Player, system, world } from "@minecraft/server";
 import { kickablePlayers } from "../../../kickcheck";
-import { allscores, getScore } from "../../../util";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry";
 import config from "../../../data/config";
-
+import { ScoreManager } from "../../../classes/ScoreManager";
 const configTicks: number = config.modules.autoBan.banHammerInterval;
 function rip(player: Player, reason: string) {
     // Tag with reason and by who
@@ -26,7 +25,7 @@ function autoban(id: number) {
         system.clearRun(id);
         return;
     }
-    const scores = allscores;
+    const scores = ScoreManager.allscores;
 
     const players = world.getPlayers();
     players.forEach((player) => {
@@ -37,7 +36,7 @@ function autoban(id: number) {
             return;
         }
         scores.forEach((score) => {
-            const playerScore = getScore(score, player);
+            const playerScore = ScoreManager.getScore(score, player);
             if (playerScore > 1000) {
                 const reReason = score.replace("vl", "").toUpperCase() + " 検知内容＝＞: " + playerScore;
                 return rip(player, reReason);

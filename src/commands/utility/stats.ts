@@ -2,7 +2,8 @@ import { ChatSendAfterEvent, EntityEquipmentInventoryComponent, EquipmentSlot, I
 import { MinecraftEnchantmentTypes } from "../../node_modules/@minecraft/vanilla-data/lib/index";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
-import { getPrefix, sendMsgToPlayer, getGamemode, allscores, getScore } from "../../util.js";
+import { getPrefix, sendMsgToPlayer, getGamemode } from "../../util.js";
+import { ScoreManager } from "../../classes/ScoreManager";
 
 function statsHelp(player: Player, prefix: string) {
     let commandStatus: string;
@@ -57,7 +58,7 @@ async function handleStats(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません.`);
     }
 
     // Check for custom prefix
@@ -75,7 +76,7 @@ async function handleStats(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!player.hasTag("notify")) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f チートログを有効にしてね！.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f チートログを有効にしてください.`);
     }
 
     // try to find the player requested
@@ -89,96 +90,100 @@ async function handleStats(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが見つかりません!`);
     }
 
     const reportBody = [
-        `\n§r§4[§6Paradox§4]§r §6${member.name}のユーザーログを取得しました§r`,
-        `§r§4[§6Paradox§4]§r §6${member.name}§rは${getGamemode(member)}です`,
-        `§r§4[§6Paradox§4]§r §6${member.name}§rは現在 X= ${member.location.x.toFixed(0)} Y= ${member.location.y.toFixed(0)} Z= ${member.location.z.toFixed(0)}にいます`,
+        `\n§r§4[§6Paradox§4]§r 現在オンラインのプレイヤーログを収集しました §6${member.name}§r`,
+        `§r§4[§6Paradox§4]§r §6${member.name}§rのゲームモードは ${getGamemode(member)}です`,
+        `§r§4[§6Paradox§4]§r §6${member.name}§rのプレイヤーIDは【 ${member.id} 】です`,
+        `§f§4[§6Paradox§4]§f §6${member.name}§f is currently at X= ${member.location.x.toFixed(0)} Y= ${member.location.y.toFixed(0)} Z= ${member.location.z.toFixed(0)}`,
     ];
 
     switch (true) {
         case member.hasTag("paradoxFreeze"):
-            reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f 行動が制限されています ${member.hasTag("freezeAura") ? "AntiKillAura" : member.hasTag("freezeNukerA") ? "AntiNukerA" : member.hasTag("freezeScaffoldA") ? "AntiScaffoldA" : "Staff"}`);
+            reportBody.push(
+                `§f§4[§6Paradox§4]§f §6${member.name}§f 行動が制限されています検知内容＝＞ ${member.hasTag("freezeAura") ? "AntiKillAura" : member.hasTag("freezeNukerA") ? "AntiNukerA" : member.hasTag("freezeScaffoldA") ? "AntiScaffoldA" : "Staff"}`
+            );
             break;
         case member.hasTag("flying"):
-            reportBody.push(`§r§4[§6Paradox§4]§r §6${member.name}§r飛行モードが有効です`);
+            reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f飛べます`);
             break;
         case member.hasTag("vanish"):
-            reportBody.push(`§r§4[§6Paradox§4]§r §6${member.name}§r透明化が有効です`);
+            reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f透明化が有効です`);
             break;
     }
 
     let violationsFound = 0;
-    let vlCount = 0;
-    let divider = false;
-    allscores.forEach((objective) => {
-        vlCount++;
-        const score = getScore(objective, member);
-        if (score > 0) {
-            violationsFound++;
-            if (violationsFound === 1) {
-                divider = true;
+        let vlCount = 0;
+        let divider = false;
+        ScoreManager.allscores.forEach((objective) => {
+            vlCount++;
+            const score = ScoreManager.getScore(objective, member);
+            if (score > 0) {
+                violationsFound++;
+                if (violationsFound === 1) {
+                    divider = true;
+                    reportBody.push(`§f§4[§6Paradox§4]§4 ----------------------------------§f`);
+                }
+                reportBody.push(`§f§4[§6Paradox§4]§f §f§4[§6${objective.replace("vl", "").toUpperCase()}§4]§f: ${score}回検知されています`);
+            }
+            if (vlCount === ScoreManager.allscores.length && divider === true) {
                 reportBody.push(`§f§4[§6Paradox§4]§4 ----------------------------------§f`);
             }
-            reportBody.push(`§r§4[§6Paradox§4]§r §r§4[§6${objective.replace("vl", "").toUpperCase()}§4]§r ${score}回検知されています`);
-        }
-        if (vlCount === allscores.length && divider === true) {
-            reportBody.push(`§f§4[§6Paradox§4]§4 ----------------------------------§f`);
-        }
-    });
+        });
 
-    const equipment = member.getComponent("equipment_inventory") as EntityEquipmentInventoryComponent;
-    const helmet = equipment.getEquipment("head" as EquipmentSlot);
-    const chest = equipment.getEquipment("chest" as EquipmentSlot);
-    const legs = equipment.getEquipment("legs" as EquipmentSlot);
-    const feet = equipment.getEquipment("feet" as EquipmentSlot);
-    const mainhand = equipment.getEquipment("mainhand" as EquipmentSlot);
-    const offhand = equipment.getEquipment("offhand" as EquipmentSlot);
+        const equipment = member.getComponent("equipment_inventory") as EntityEquipmentInventoryComponent;
+        const helmet = equipment.getEquipment("head" as EquipmentSlot);
+        const chest = equipment.getEquipment("chest" as EquipmentSlot);
+        const legs = equipment.getEquipment("legs" as EquipmentSlot);
+        const feet = equipment.getEquipment("feet" as EquipmentSlot);
+        const mainhand = equipment.getEquipment("mainhand" as EquipmentSlot);
+        const offhand = equipment.getEquipment("offhand" as EquipmentSlot);
 
-    const materialColors: { [key: string]: string } = {
-        golden: "§6", // gold
-        iron: "§7", // light gray
-        diamond: "§b", // aqua
-        leather: "§e", // yellow
-        chainmail: "§8", // dark gray
-        turtle: "§a", // green
-        netherite: "§4", // dark red
-        elytra: "§5", // purple
-        none: "§f", // white
-    };
+        const materialColors: { [key: string]: string } = {
+            golden: "§6", // gold
+            iron: "§7", // light gray
+            diamond: "§b", // aqua
+            leather: "§e", // yellow
+            chainmail: "§8", // dark gray
+            turtle: "§a", // green
+            netherite: "§4", // dark red
+            elytra: "§5", // purple
+            none: "§f", // white
+        };
 
-    for (const [verification, armorType] of [
-        [helmet, "帽子"],
-        [chest, "服"],
-        [legs, "ズボン"],
-        [feet, "靴"],
-        [mainhand, "メインハンド"],
-        [offhand, "オフハンド"],
-    ]) {
-        if (!(verification instanceof ItemStack)) {
-            continue;
-        }
-        const enchantedEquipment = verification.getComponent("enchantments") as ItemEnchantsComponent;
-        const enchantList = enchantedEquipment.enchantments;
-        if (!enchantList) {
-            continue;
-        }
-        let isEnchanted = false;
-        for (const enchant in MinecraftEnchantmentTypes) {
-            const enchantNumber = enchantList.hasEnchantment(MinecraftEnchantmentTypes[enchant as keyof typeof MinecraftEnchantmentTypes]);
-            if (enchantNumber > 0) {
-                isEnchanted = true;
+        for (const [verification, armorType] of [
+            [helmet, "帽子"],
+            [chest, "服"],
+            [legs, "ズボン"],
+            [feet, "靴"],
+            [mainhand, "メインハンド"],
+            [offhand, "オフハンド"],
+        ]) {
+            if (!(verification instanceof ItemStack)) {
+                continue;
             }
+            const enchantedEquipment = verification.getComponent("enchantments") as ItemEnchantsComponent;
+            const enchantList = enchantedEquipment.enchantments;
+            if (!enchantList) {
+                continue;
+            }
+            let isEnchanted = false;
+            for (const enchant in MinecraftEnchantmentTypes) {
+                const enchantNumber = enchantList.hasEnchantment(MinecraftEnchantmentTypes[enchant as keyof typeof MinecraftEnchantmentTypes]);
+                if (enchantNumber > 0) {
+                    isEnchanted = true;
+                }
+            }
+            let materialType = verification.typeId.split(":")[1].replace(/_\w+/, "");
+            if (armorType === "Mainhand" || armorType === "Offhand") {
+                materialType = verification.typeId.split(":")[1];
+            }
+            const materialColor = materialColors[materialType] || materialColors["none"];
+            reportBody.push(`§f§4[§6Paradox§4]§f ${armorType}: ${isEnchanted ? "§aエンチャ有§f" : "§4エンチャ無§f"} || ${materialColor}${materialType}`);
         }
-        let materialType = verification.typeId.split(":")[1].replace(/_\w+/, "");
-        if (armorType === "Mainhand" || armorType === "Offhand") {
-            materialType = verification.typeId.split(":")[1];
-        }
-        const materialColor = materialColors[materialType] || materialColors["none"];
-        reportBody.push(`§r§4[§6Paradox§4]§r ${armorType}: ${isEnchanted ? "§aエンチャ有§r" : "§4エンチャ無§r"} || ${materialColor}${materialType}`);
+
+        sendMsgToPlayer(player, reportBody);
     }
 
-    sendMsgToPlayer(player, reportBody);
-}

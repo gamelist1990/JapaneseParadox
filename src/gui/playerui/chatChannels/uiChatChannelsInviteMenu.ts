@@ -1,25 +1,25 @@
 import { Player, world } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
-import { listChatChannels } from "../../../util";
 import { uiChatChannelInvite } from "./uiChatChannels";
+import { ChatChannelManager } from "../../../classes/ChatChannelManager";
 
 export function ChatChannelsInviteMenuUI(player: Player) {
     const menu = new ModalFormData();
-    menu.title("§4メニュー：招待§4");
-    const channelsList = listChatChannels();
+    menu.title("§4Paradox - Invite A Player§4");
+    const channelsList = ChatChannelManager.listChatChannels();
     //Get the current channels
     const channelDropdownData = channelsList.map((channel) => ({
-        text: `${channel.channelName}, §fパスワード: ${channel.hasPassword === "Yes" ? "§aYes" : "§cNo"}`,
+        text: `${channel.channelName}, §fPassword: ${channel.hasPassword === true ? "§aYes" : "§cNo"}`,
         value: channel.channelName,
     }));
     if (channelDropdownData.length === 0) {
-        channelDropdownData.push({ text: "§6既存のチャンネルはない", value: "" });
+        channelDropdownData.push({ text: "§6There are no existing channels", value: "" });
     }
     //Get the current players online
     let onlineList: string[] = [];
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    menu.dropdown(`\n§f指定したプレイヤーを招待:§f\n\nプレイヤーがオンラインです\n`, onlineList);
-    menu.dropdown(`\n§f招待するチャンネル:\n\n`, channelDropdownData);
+    menu.dropdown(`\n§fSelect a player to invite:§f\n\nPlayer's Online\n`, onlineList);
+    menu.dropdown(`\n§fSelect a channel:\n\n`, channelDropdownData);
     //menu.textField("Channel Password: ", "");
     menu.show(player)
         .then((chatChannelsInviteResult) => {

@@ -1,19 +1,19 @@
 import { Player } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
-import { listChatChannels } from "../../../util";
 import { uiChatChannelLeave } from "./uiChatChannels";
+import { ChatChannelManager } from "../../../classes/ChatChannelManager";
 export function chatChannelsLeaveMenuUI(player: Player) {
     const menu = new ModalFormData();
-    const channelsList = listChatChannels();
+    const channelsList = ChatChannelManager.listChatChannels();
     const channelDropdownData = channelsList.map((channel) => ({
-        text: `${channel.channelName}, §fパスワード: ${channel.hasPassword === "Yes" ? "§aYes" : "§cNo"}`,
+        text: `${channel.channelName}, §fPassword: ${channel.hasPassword === true ? "§aYes" : "§cNo"}`,
         value: channel.channelName,
     }));
     if (channelDropdownData.length === 0) {
-        channelDropdownData.push({ text: "§6既存のチャンネルはない", value: "" });
+        channelDropdownData.push({ text: "§6There are no existing channels", value: "" });
     }
-    menu.title("§4メニュー：チャンネルから抜ける§4");
-    menu.dropdown(`\n§fチャンネルを選択:\n\n`, channelDropdownData);
+    menu.title("§4Paradox - Chat Channels Leave§4");
+    menu.dropdown(`\n§fSelect a channel:\n\n`, channelDropdownData);
     menu.show(player)
         .then((chatChannelsLeaveResult) => {
             uiChatChannelLeave(chatChannelsLeaveResult, player, channelDropdownData);

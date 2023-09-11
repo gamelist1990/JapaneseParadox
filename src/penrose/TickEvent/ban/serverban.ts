@@ -1,6 +1,7 @@
 import { world, EntityQueryOptions, system } from "@minecraft/server";
-import { allscores, banMessage, getScore, sendMsg, sendMsgToPlayer, setScore } from "../../../util.js";
 import { queueUnban } from "../../../commands/moderation/unban.js";
+import { banMessage, sendMsg, sendMsgToPlayer } from "../../../util.js";
+import { ScoreManager } from "../../../classes/ScoreManager.js";
 
 function serverban() {
     const filter: EntityQueryOptions = {
@@ -28,13 +29,13 @@ function serverban() {
             // Remove player from queue
             queueUnban.delete(player.name);
             //clear violations
-            const scores = allscores;
+            const scores = ScoreManager.allscores;
             scores.forEach((objective) => {
-                const score = getScore(objective, player);
+                const score = ScoreManager.getScore(objective, player);
                 //if the player has a violation then we reset the score.
                 if (score > 0) {
                     //reset the score
-                    setScore(player, objective, 0);
+                    ScoreManager.setScore(player, objective, 0);
                 }
             });
 

@@ -1,21 +1,21 @@
 import { Player } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
-import { listChatChannels } from "../../../util";
 import { uiChatChannelJoin } from "./uiChatChannels";
+import { ChatChannelManager } from "../../../classes/ChatChannelManager";
 
 export function ChatChannelsJoinMenuUI(player: Player) {
     const menu = new ModalFormData();
-    menu.title("§4メニュー：参加§4");
-    const channelsList = listChatChannels();
+    menu.title("§4Paradox - Join A Channel§4");
+    const channelsList = ChatChannelManager.listChatChannels();
     const channelDropdownData = channelsList.map((channel) => ({
-        text: `${channel.channelName}, §fパスワード: ${channel.hasPassword === "Yes" ? "§aYes" : "§cNo"}`,
+        text: `${channel.channelName}, §fPassword: ${channel.hasPassword === true ? "§aYes" : "§cNo"}`,
         value: channel.channelName,
     }));
     if (channelDropdownData.length === 0) {
-        channelDropdownData.push({ text: "§6既存のチャンネルはない", value: "" });
+        channelDropdownData.push({ text: "§6There are no existing channels", value: "" });
     }
-    menu.dropdown(`\n§fチャンネルを選択:\n\n`, channelDropdownData);
-    menu.textField("パスワード: ", "");
+    menu.dropdown(`\n§fSelect a channel:\n\n`, channelDropdownData);
+    menu.textField("Channel Password: ", "");
     menu.show(player)
         .then((chatChannelsJoinResult) => {
             uiChatChannelJoin(chatChannelsJoinResult, player, channelDropdownData);
