@@ -31,7 +31,7 @@ function serverban() {
             //clear violations
             const scores = ScoreManager.allscores;
             scores.forEach((objective) => {
-                const score = ScoreManager.ScoreManager.getscore(objective, player);
+                const score = ScoreManager.getScore(objective, player);
                 //if the player has a violation then we reset the score.
                 if (score > 0) {
                     //reset the score

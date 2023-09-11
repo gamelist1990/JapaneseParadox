@@ -2,7 +2,6 @@ import { ChatSendAfterEvent, Player } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix,  sendMsg, sendMsgToPlayer } from "../../util.js";
-import { ScaffoldA } from "../../penrose/BlockPlaceAfterEvent/scaffold/scaffold_a.js";
 import { ScoreManager } from "../../classes/ScoreManager.js";
 
 function removeCBEHelp(player: Player, prefix: string, commandblocksscore: number) {

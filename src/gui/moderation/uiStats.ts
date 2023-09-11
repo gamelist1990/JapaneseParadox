@@ -59,7 +59,7 @@ export function uiSTATS(statsResult: ModalFormResponse, onlineList: string[], pl
     }
 
     allObjectives.forEach((objective) => {
-        const score = ScoreManager.ScoreManager.getscore(objective, member);
+        const score = ScoreManager.getScore(objective, member);
         if (score > 0) {
             reportBody.push(`§f§4[§6${objective.replace("vl", "").toUpperCase()}§4]§f number of Violations: ${score}\n`);
         }

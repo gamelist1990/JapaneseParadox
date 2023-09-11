@@ -119,7 +119,7 @@ async function handleStats(message: ChatSendAfterEvent, args: string[]) {
     let divider = false;
     ScoreManager.allscores.forEach((objective) => {
         vlCount++;
-        const score = ScoreManager.ScoreManager.getscore(objective, member);
+        const score = ScoreManager.getScore(objective, member);
         if (score > 0) {
             violationsFound++;
             if (violationsFound === 1) {
