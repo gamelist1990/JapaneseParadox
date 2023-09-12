@@ -23,7 +23,7 @@ function freeze(id: number) {
             player.removeTag("freezeScaffoldA");
             return;
         }
-        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]違法なツールを検知したためフリーズされました", { subtitle: "§f検知内容＝＞ §4[§6AntiScaffoldA§4]§f", fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 60 });
+        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f 違法な動き検知しました!", { subtitle: "§f検知内容＝＞ §4[§6AntiScaffoldA§4]§f", fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 60 });
     }
 }
 
@@ -39,7 +39,7 @@ function isBlockInFrontAndBelowPlayer(blockLocation: Vector3, playerLocation: Ve
     const yThreshold = -0.5; // Consider the block below and front if it's a certain distance between the player
     const zThreshold = -0.5;
 
-    return dx <= xThreshold && dy >= yThreshold && dy <= yThreshold && dz >= zThreshold;
+    return dx <= xThreshold && dy <= yThreshold && dz >= zThreshold;
 }
 
 async function scaffolda(object: BlockPlaceAfterEvent) {
@@ -76,6 +76,14 @@ async function scaffolda(object: BlockPlaceAfterEvent) {
         if (rot.x % 1 === 0) {
             dimension.getBlock(blockLocation).setType(MinecraftBlockTypes.air);
             flag(player, "Scaffold", "A", "Placement", null, null, null, null, false);
+            const hasFreezeTag = player.hasTag("paradoxFreeze");
+            const hasScaffoldFreeze = player.hasTag("freezeScaffoldA");
+            if (!hasFreezeTag) {
+                player.addTag("paradoxFreeze");
+            }
+            if (!hasScaffoldFreeze) {
+                player.addTag("freezeScaffoldA");
+            }
         }
     }
 }
