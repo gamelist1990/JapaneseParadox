@@ -3,8 +3,8 @@
     "minecraft:entity": {
         "description": {
             "identifier": "minecraft:camel",
-            "is_spawnable": false,
-            "is_summonable": false,
+            "is_spawnable": true,
+            "is_summonable": true,
             "is_experimental": false
         },
         "component_groups": {
@@ -178,6 +178,7 @@
                 "hard_distance": 6,
                 "max_distance": 10
             },
+            "minecraft:balloonable": {},
             "minecraft:type_family": {
                 "family": ["camel", "mob"]
             },

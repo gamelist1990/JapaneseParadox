@@ -3,8 +3,8 @@
     "minecraft:entity": {
         "description": {
             "identifier": "minecraft:hoglin",
-            "is_spawnable": false,
-            "is_summonable": false,
+            "is_spawnable": true,
+            "is_summonable": true,
             "is_experimental": false
         },
         "component_groups": {
@@ -45,7 +45,7 @@
             "become_zombie": {
                 "minecraft:transformation": {
                     "into": "minecraft:zoglin",
-                    "transformation_sound": "converted_to_zombified",
+                    "transformation_sound": "mob.hoglin.converted_to_zombified",
                     "keep_level": true
                 }
             },

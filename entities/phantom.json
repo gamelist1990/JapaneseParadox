@@ -10,8 +10,8 @@
         },
         "description": {
             "identifier": "minecraft:phantom",
-            "is_spawnable": false,
-            "is_summonable": false,
+            "is_spawnable": true,
+            "is_summonable": true,
             "is_experimental": false
         },
         "component_groups": {

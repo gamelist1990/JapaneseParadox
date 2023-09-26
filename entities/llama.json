@@ -3,8 +3,8 @@
     "minecraft:entity": {
         "description": {
             "identifier": "minecraft:llama",
-            "is_spawnable": false,
-            "is_summonable": false,
+            "is_spawnable": true,
+            "is_summonable": true,
             "is_experimental": false
         },
         "component_groups": {
@@ -419,6 +419,11 @@
             "minecraft:behavior.panic": {
                 "priority": 4,
                 "speed_multiplier": 1.2
+            },
+            "minecraft:behavior.tempt": {
+                "priority": 5,
+                "speed_multiplier": 1.2,
+                "items": ["hay_block"]
             },
             "minecraft:behavior.random_stroll": {
                 "priority": 6,

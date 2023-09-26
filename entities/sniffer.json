@@ -3,8 +3,8 @@
     "minecraft:entity": {
         "description": {
             "identifier": "minecraft:sniffer",
-            "is_spawnable": false,
-            "is_summonable": false,
+            "is_spawnable": true,
+            "is_summonable": true,
             "is_experimental": true
         },
         "component_groups": {
@@ -195,6 +195,7 @@
                 "hard_distance": 6,
                 "max_distance": 10
             },
+            "minecraft:balloonable": {},
             "minecraft:type_family": {
                 "family": ["sniffer", "mob"]
             },
