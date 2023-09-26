@@ -1,4 +1,4 @@
-import { Player, Vector3 } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { PlayerManager } from "./PlayerManager";
 import { sendMsgToPlayer } from "../util";
 
@@ -83,7 +83,7 @@ export class ChatChannelManager {
      * @param password The channel password (optional).
      * @returns The new channel name if the switch is successful, or a string indicating an error.
      */
-    public static switchChatChannel(playerName: string, channelName: string, password?: string): string | boolean | Vector3 {
+    public static switchChatChannel(playerName: string, channelName: string, password?: string): string | boolean {
         const channel = this.chatChannels[channelName];
         if (channel) {
             if (channel.password && password !== channel.password) {
@@ -136,7 +136,7 @@ export class ChatChannelManager {
             membersArray.forEach((thisMember) => {
                 const thisPlayer: Player | null = this.getPlayerById(thisMember);
                 // Let members know that this channel no longer exists
-                sendMsgToPlayer(thisPlayer, `§f§4[§6Paradox§4]§f '${channelName}' has been disbanded.`);
+                sendMsgToPlayer(thisPlayer, `§f§4[§6Paradox§4]§f '§7${channelName}§f' has been disbanded.`);
                 this.playerChannelMap[thisMember] = null;
             });
 

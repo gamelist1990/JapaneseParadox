@@ -1,4 +1,4 @@
-import { Player, world,  } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 
 /**
  * A utility class for managing player scores.

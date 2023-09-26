@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, Player, world, Vector3 } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3, world } from "@minecraft/server";
 import config from "../../data/config.js";
 import { Hotbar } from "../../penrose/TickEvent/hotbar/hotbar.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";

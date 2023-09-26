@@ -1,5 +1,5 @@
 import { ActionFormData } from "@minecraft/server-ui";
-import { Player, Vector3 } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { gamemodesHandler } from "./results/gamemodes";
 import { movementui } from "./guiHandlerMovement/movementui";
 import { antiKillAuraHandler } from "./results/antikillaura";
@@ -9,7 +9,6 @@ import { antiSpamHandler } from "./results/antispam";
 import { antiAutoClickerHandler } from "./results/antiautoclicker";
 import { badPacketsHandler } from "./results/badpackets";
 import { bedrockValidationHandler } from "./results/bedrockvalidation";
-import { antiCrasherHandler } from "./results/anticrasher";
 import { antiEnchantedArmorHandler } from "./results/enchantedarmor";
 import { illegalItemsHandler } from "./results/illegalitems";
 import { lagClearHandler } from "./results/lagclear";
@@ -38,7 +37,6 @@ export function modulesui(player: Player) {
     modulesui.button("AutoCliker検知", "textures/ui/cursor_gamecore");
     modulesui.button("Badpackets検知", "textures/ui/upload_glyph");
     modulesui.button("Bedrock Validationを設定", "textures/blocks/bedrock");
-    modulesui.button("Anti Crasher検知", "textures/ui/Ping_Red");
     modulesui.button("エンチャントアーマーを無効化", "textures/items/diamond_leggings");
     modulesui.button("禁止アイテムを検知", "textures/items/netherite_pickaxe");
     modulesui.button("サーバー最適化", "textures/ui/interact");
@@ -85,48 +83,45 @@ export function modulesui(player: Player) {
                     bedrockValidationHandler(player);
                     break;
                 case 9:
-                    antiCrasherHandler(player);
-                    break;
-                case 10:
                     antiEnchantedArmorHandler(player);
                     break;
-                case 11:
+                case 10:
                     illegalItemsHandler(player);
                     break;
-                case 12:
+                case 11:
                     lagClearHandler(player);
                     break;
-                case 13:
+                case 12:
                     nameSpoofHandler(player);
                     break;
-                case 14:
+                case 13:
                     opsHandler(player);
                     break;
-                case 15:
+                case 14:
                     commandBlocksHandler(player);
                     break;
-                case 16:
+                case 15:
                     reachHandler(player);
                     break;
-                case 17:
+                case 16:
                     salvageHandler(player);
                     break;
-                case 18:
+                case 17:
                     spammersHandler(player);
                     break;
-                case 19:
+                case 18:
                     worldBorderHandler(player);
                     break;
-                case 20:
+                case 19:
                     xrayHandler(player);
                     break;
-                case 21:
+                case 20:
                     hotbarHandler(player);
                     break;
-                case 22:
+                case 21:
                     afkHandler(player);
                     break;
-                case 23:
+                case 22:
                     antiPhaseAHandler(player);
                     break;
                 default:

@@ -1,4 +1,4 @@
-import { Player, Vector3 } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 import { uiItemEditorRepair } from "./uiItemEditor";
 export function uiItemEditorRepairMenu(player: Player, targetPlayer: Player, itemSlot: number) {

@@ -1,6 +1,6 @@
-import { Player, world, Vector3 } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
-import { ScaffoldA } from "../../penrose/BlockPlaceAfterEvent/scaffold/scaffold_a.js";
+import { ScaffoldA } from "../../penrose/PlayerPlaceBlockAfterEvent/scaffold/scaffold_a.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
@@ -39,21 +39,21 @@ async function handleUIAntiScaffold(antiscaffoldResult: ModalFormResponse, playe
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to configure Anti Scaffold`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限を取得してください`);
     }
 
     if (AntiScaffoldToggle === true) {
         // Allow
         dynamicPropertyRegistry.set("antiscaffolda_b", true);
         world.setDynamicProperty("antiscaffolda_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6AntiScaffoldA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました＝＞ §6AntiScaffoldA§f!`);
         ScaffoldA();
     }
     if (AntiScaffoldToggle === false) {
         // Deny
         dynamicPropertyRegistry.set("antiscaffolda_b", false);
         world.setDynamicProperty("antiscaffolda_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4AntiScaffoldA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ §4AntiScaffoldA§f!`);
     }
 
     //show the main ui to the player once complete.

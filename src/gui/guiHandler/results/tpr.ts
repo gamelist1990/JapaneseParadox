@@ -1,4 +1,4 @@
-import { Player, world, Vector3 } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server-ui";
 import { getTeleportRequests } from "../../../commands/utility/tpr";
 import { uiTPR } from "../../moderation/uiTpr";

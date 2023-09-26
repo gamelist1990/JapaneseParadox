@@ -83,6 +83,7 @@ export default {
         afk: true,
         antiphasea: true,
         channel: true,
+        pvp: true,
     },
     modules: {
         badpackets1: {

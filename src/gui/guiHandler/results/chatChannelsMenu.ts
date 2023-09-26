@@ -1,4 +1,4 @@
-import { Player, Vector3 } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { chatChannelsCreateMenuUI } from "../../playerui/chatChannels/uiChatChannelsCreateMenu";
 import { ChatChannelsJoinMenuUI } from "../../playerui/chatChannels/uiChatChannelsJoinMenu";

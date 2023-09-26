@@ -1,4 +1,4 @@
-import { Player, world, Vector3 } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import config from "../../../data/config";
 import { uiOP } from "../../moderation/uiOp";

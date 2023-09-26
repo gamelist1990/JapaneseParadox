@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, Player, world, ItemStack, Vector3 } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, world, ItemStack } from "@minecraft/server";
 import { MinecraftItemTypes } from "../../node_modules/@minecraft/vanilla-data/lib/index";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";

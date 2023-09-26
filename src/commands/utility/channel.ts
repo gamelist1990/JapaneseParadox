@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, Player, PlayerLeaveAfterEvent, world, Vector3 } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, PlayerLeaveAfterEvent, world } from "@minecraft/server";
 import { getPrefix, sendMsgToPlayer } from "../../util.js";
 import config from "../../data/config.js";
 import { ChatChannelManager } from "../../classes/ChatChannelManager.js";

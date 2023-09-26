@@ -1,4 +1,4 @@
-import { PlayerSpawnAfterEvent, world, Vector3 } from "@minecraft/server";
+import { PlayerSpawnAfterEvent, world } from "@minecraft/server";
 import { ShowRules } from "../../showrules/showrules.js";
 import { dynamicPropertyRegistry } from "../../../penrose/WorldInitializeAfterEvent/registry.js";
 

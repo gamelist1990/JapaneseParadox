@@ -1,4 +1,4 @@
-import { Player, world, Vector3 } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { ActionFormData, ActionFormResponse, ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
 import { sendMsgToPlayer } from "../../../util";
 import { chatChannelMainMenu } from "../../guiHandler/results/chatChannelsMenu";

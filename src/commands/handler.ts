@@ -41,7 +41,6 @@ import { spammerA } from "./settings/spammera.js";
 import { spammerB } from "./settings/spammerb.js";
 import { spammerC } from "./settings/spammerc.js";
 import { antispam } from "./settings/antispam.js";
-import { crasherA } from "./settings/crashera.js";
 import { namespoofA } from "./settings/namespoofa.js";
 import { namespoofB } from "./settings/namespoofb.js";
 import { reachA } from "./settings/reacha.js";
@@ -86,6 +85,7 @@ import { biome } from "./utility/biome.js";
 import { afk } from "./settings/afk.js";
 import { antiphaseA } from "./settings/antiphasea.js";
 import { chatChannel } from "./utility/channel.js";
+import { pvp } from "./utility/pvp.js";
 
 const commandDefinitions: Record<string, (data: Player | ChatSendAfterEvent, args: string[], fullArgs: string) => void> = Object.setPrototypeOf(
     {
@@ -126,7 +126,6 @@ const commandDefinitions: Record<string, (data: Player | ChatSendAfterEvent, arg
         spammerb: spammerB,
         spammerc: spammerC,
         antispam: antispam,
-        crashera: crasherA,
         namespoofa: namespoofA,
         namespoofb: namespoofB,
         reacha: reachA,
@@ -183,6 +182,8 @@ const commandDefinitions: Record<string, (data: Player | ChatSendAfterEvent, arg
         list: fullreport,
         van: vanish,
         ch: chatChannel,
+        pvp: pvp,
+        
     },
     null
 );

@@ -1,5 +1,5 @@
 import { ActionFormData } from "@minecraft/server-ui";
-import { Player, Vector3 } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { uiInvEditorMenu } from "./uiInvEditorMainMenu";
 export function uiInvEditorHelpMenu(player: Player, targetPlayer: Player, itemSlot: number) {
     const helpMenu = new ActionFormData();

@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, Player, world, Vector3 } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
 import config from "../../data/config";
 import { getPrefix, sendMsgToPlayer, setTimer } from "../../util";
 import { EncryptionManager } from "../../classes/EncryptionManager";

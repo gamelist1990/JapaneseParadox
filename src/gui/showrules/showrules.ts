@@ -1,4 +1,4 @@
-import { world, EntityQueryOptions, system, PlayerLeaveAfterEvent, Vector3 } from "@minecraft/server";
+import { world, EntityQueryOptions, system, PlayerLeaveAfterEvent } from "@minecraft/server";
 import config from "../../data/config.js";
 import { sendMsgToPlayer } from "../../util.js";
 import { MessageFormData } from "@minecraft/server-ui";

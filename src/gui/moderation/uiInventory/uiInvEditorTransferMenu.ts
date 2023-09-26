@@ -1,4 +1,4 @@
-import { Player, world, Vector3 } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 import { uiItemEditorTransfer } from "./uiItemEditor";
 export function uiItemEditorTransferMenu(player: Player, targetPlayer: Player, itemSlot: number) {

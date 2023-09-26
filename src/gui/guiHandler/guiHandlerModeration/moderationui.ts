@@ -1,5 +1,5 @@
 import { ActionFormData } from "@minecraft/server-ui";
-import { Player, Vector3 } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { banHandler } from "./results/ban";
 import { unbanHandler } from "./results/unban";
 import { rulesHandler } from "./results/rules";

@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, Player, Vector3 } from "@minecraft/server";
+import { ChatSendAfterEvent, Player } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
@@ -62,7 +62,7 @@ async function handleEnchantedArmor(message: ChatSendAfterEvent, args: string[])
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
     }
 
     const encharmorscore = ScoreManager.getScore("encharmor", player);
@@ -79,11 +79,11 @@ async function handleEnchantedArmor(message: ChatSendAfterEvent, args: string[])
     if (encharmorscore <= 0) {
         // Allow
         player.runCommand(`scoreboard players set paradox:config encharmor 1`);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6Anti Enchanted Armor§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました＝＞ §6Anti Enchanted Armor§f!`);
     } else if (encharmorscore >= 1) {
         // Deny
         player.runCommand(`scoreboard players set paradox:config encharmor 0`);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4Anti Enchanted Armor§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ §4Anti Enchanted Armor§f!`);
     }
     return player.runCommand(`scoreboard players operation @a encharmor = paradox:config encharmor`);
 }

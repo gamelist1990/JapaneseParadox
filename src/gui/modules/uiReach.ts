@@ -1,10 +1,10 @@
-import { Player, world, Vector3 } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
-import { ReachA } from "../../penrose/BlockPlaceAfterEvent/reach/reach_a.js";
 import { ReachB } from "../../penrose/EntityHitEntityAfterEvent/reach_b.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
+import { BeforeReachA } from "../../penrose/PlayerPlaceBlockBeforeEvent/reach/reach_a.js";
 
 export function uiREACH(reachResult: ModalFormResponse, player: Player) {
     if (!reachResult || reachResult.canceled) {
@@ -21,33 +21,33 @@ export function uiREACH(reachResult: ModalFormResponse, player: Player) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to configure Reach`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限を取得してください`);
     }
     if (ReachAToggle === true && reachABoolean === false) {
         // Allow
         dynamicPropertyRegistry.set("reacha_b", true);
         world.setDynamicProperty("reacha_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6ReachA§f!`);
-        ReachA();
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました＝＞ §6ReachA§f!`);
+        BeforeReachA();
     }
     if (ReachAToggle === false && reachABoolean === true) {
         // Deny
         dynamicPropertyRegistry.set("reacha_b", false);
         world.setDynamicProperty("reacha_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4ReachA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ §4ReachA§f!`);
     }
     if (ReachBToggle === true && reachBBoolean === false) {
         // Allow
         dynamicPropertyRegistry.set("reachb_b", true);
         world.setDynamicProperty("reachb_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6ReachB§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました §6ReachB§f!`);
         ReachB();
     }
     if (ReachBToggle === false && reachBBoolean === true) {
         // Deny
         dynamicPropertyRegistry.set("reachb_b", false);
         world.setDynamicProperty("reachb_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4ReachB§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました §4ReachB§f!`);
     }
 
     //show the main ui to the player once complete.

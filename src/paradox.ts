@@ -36,7 +36,8 @@ import { AFK } from "./penrose/TickEvent/afk/afk.js";
 import { AntiPhaseA } from "./penrose/TickEvent/phase/phase_a.js";
 // Import PlayerBlockBreakAfter Events
 import { XrayA } from "./penrose/PlayerBreakBlockAfterEvent/xray/xray_a.js";
-import { NukerA } from "./penrose/PlayerBreakBlockAfterEvent/nuker/nuker_a.js";
+// Import PlayerBlockBreakBefore Events
+import { BeforeNukerA } from "./penrose/PlayerBreakBlockBeforeEvent/nuker/nuker_a.js";
 // Import PlayerSpawnAfter Events
 import { onJoin } from "./penrose/PlayerSpawnAfterEvent/onjoin/onjoin.js";
 import { GlobalBanList } from "./penrose/PlayerSpawnAfterEvent/ban/globalbanlist.js";
@@ -45,10 +46,12 @@ import { onJoinrules } from "./gui/PlayerSpawnAfterEvent/rules/rules.js";
 // Import PlayerBlockPlaceAfter Events
 import { ScaffoldA } from "./penrose/PlayerPlaceBlockAfterEvent/scaffold/scaffold_a.js";
 import { IllegalItemsB } from "./penrose/PlayerPlaceBlockAfterEvent/illegalitems/illegalitems_b.js";
-import { ReachA } from "./penrose/PlayerPlaceBlockAfterEvent/reach/reach_a.js";
+// Import PlayerBlockPlaceAfter Events
+import { BeforeReachA } from "./penrose/PlayerPlaceBlockBeforeEvent/reach/reach_a.js";
 // Import EntityHitEntityAfter Events
 import { ReachB } from "./penrose/EntityHitEntityAfterEvent/reach_b.js";
 import { KillAura } from "./penrose/EntityHitEntityAfterEvent/killaura.js";
+import { PVP } from "./penrose/EntityHitEntityAfterEvent/pvpManager.js";
 // Import WorldInitializeAfter Events
 import { Registry } from "./penrose/WorldInitializeAfterEvent/registry.js";
 // Import SystemBefore Events
@@ -118,7 +121,9 @@ if (config.customcommands.freeze || config.modules.antiKillAura || config.module
 
 // PlayerBlockBreakAfter Events
 XrayA();
-NukerA();
+
+// PlayerBlockBreakBefore Events
+BeforeNukerA();
 
 // playerSpawnAfter Events
 onJoin();
@@ -129,11 +134,16 @@ onJoinrules(); // GUI
 // PlayerBlockPlaceAfter Events
 ScaffoldA();
 IllegalItemsB();
-ReachA();
+
+// PlayerBlockPlaceBefore Events
+BeforeReachA();
 
 // EntityHitEntityAfter Events
 ReachB();
 KillAura();
+if (config.customcommands.pvp === true) {
+    PVP();
+}
 
 // EntityDieAfter Events
 DeathCoordinates();

@@ -1,4 +1,4 @@
-import { EntityInventoryComponent, Player, ItemEnchantsComponent, Enchantment, ItemDurabilityComponent, Vector3 } from "@minecraft/server";
+import { EntityInventoryComponent, Player, ItemEnchantsComponent, Enchantment, ItemDurabilityComponent } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { uiInvEditorMenu } from "./uiInvEditorMainMenu";
 export function uiItemEditorStats(player: Player, targetPlayer: Player, itemSlot: number) {
