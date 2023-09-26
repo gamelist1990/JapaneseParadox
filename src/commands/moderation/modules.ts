@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, Player } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3, } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsgToPlayer } from "../../util.js";
@@ -111,7 +111,7 @@ export function modules(message: ChatSendAfterEvent, args: string[]) {
     const worldBorderNetherNumber = dynamicPropertyRegistry.get("worldborder_nether_n");
     const worldBorderEndNumber = dynamicPropertyRegistry.get("worldborder_end_n");
 
-    const status = (b: string | number | boolean) => (b ? "§a有効" : "§4無効");
+    const status = (b: string | number | boolean | Vector3 | Vector3) => (b ? "§a有効" : "§4無効");
 
     sendMsgToPlayer(player, [
         `§f§4[§6Paradox§4]§f List Of Modules:`,

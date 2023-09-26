@@ -1,4 +1,4 @@
-import { Player, world } from "@minecraft/server";
+import { Player, world, Vector3 } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { OPS } from "../../penrose/TickEvent/oneplayersleep/oneplayersleep.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";

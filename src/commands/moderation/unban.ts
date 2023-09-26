@@ -1,6 +1,6 @@
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import config from "../../data/config.js";
-import { ChatSendAfterEvent, Player } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3 } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 
 export const queueUnban = new Set<string>();

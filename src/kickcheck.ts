@@ -1,4 +1,4 @@
-import { Entity, world } from "@minecraft/server";
+import { Entity, world, Vector3 } from "@minecraft/server";
 
 export const kickablePlayers = new WeakSet<Entity>();
 

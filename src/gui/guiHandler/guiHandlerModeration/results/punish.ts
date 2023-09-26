@@ -1,4 +1,4 @@
-import { Player, world } from "@minecraft/server";
+import { Player, world, Vector3 } from "@minecraft/server";
 import { MessageFormData, ModalFormData } from "@minecraft/server-ui";
 import { uiPUNISH } from "../../../moderation/uiPunish";
 import { paradoxui } from "../../../paradoxui";

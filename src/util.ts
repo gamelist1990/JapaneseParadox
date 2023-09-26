@@ -1,4 +1,4 @@
-import { GameMode, Player, PlayerLeaveAfterEvent, Vector, world } from "@minecraft/server";
+import { GameMode, Player, PlayerLeaveAfterEvent, Vector, world, Vector3 } from "@minecraft/server";
 import config from "./data/config.js";
 import { kickablePlayers } from "./kickcheck.js";
 import { ScoreManager } from "./classes/ScoreManager.js";

@@ -1,9 +1,9 @@
-import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, world, Vector3 } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 
-function flyHelp(player: Player, prefix: string | number | boolean) {
+function flyHelp(player: Player, prefix: string | number | boolean | Vector3) {
     let commandStatus: string;
     if (!config.customcommands.fly) {
         commandStatus = "§6[§4DISABLED§6]§f";

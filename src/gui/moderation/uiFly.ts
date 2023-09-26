@@ -1,4 +1,4 @@
-import { Player, world } from "@minecraft/server";
+import { Player, world, Vector3 } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";

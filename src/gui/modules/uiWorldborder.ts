@@ -1,4 +1,4 @@
-import { Player, world } from "@minecraft/server";
+import { Player, world, Vector3 } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { WorldBorder } from "../../penrose/TickEvent/worldborder/worldborder.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";

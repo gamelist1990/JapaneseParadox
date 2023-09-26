@@ -1,4 +1,4 @@
-import { world, Player, ChatSendAfterEvent, EntityInventoryComponent } from "@minecraft/server";
+import { world, Player, ChatSendAfterEvent, EntityInventoryComponent, Vector3 } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
@@ -119,4 +119,3 @@ async function handlePunish(message: ChatSendAfterEvent, args: string[]) {
     // Use try/catch in case nobody has tag 'notify' as this will report 'no target selector'
     return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§fが ${member.name}のインベントリを全て消去した§f`);
 }
-

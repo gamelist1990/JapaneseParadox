@@ -1,4 +1,4 @@
-import { Player, world } from "@minecraft/server";
+import { Player, world, Vector3 } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { NamespoofA } from "../../penrose/TickEvent/namespoof/namespoof_a.js";
 import { NamespoofB } from "../../penrose/TickEvent/namespoof/namespoof_b.js";

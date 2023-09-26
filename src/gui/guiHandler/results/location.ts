@@ -1,4 +1,4 @@
-import { Player, world } from "@minecraft/server";
+import { Player, world, Vector3 } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 import { sendMsgToPlayer } from "../../../util";
 import config from "../../../data/config";
@@ -44,11 +44,11 @@ export function locationHandler(player: Player) {
         */
         Locations.push("保存されている座標はありません");
     }
-   savedlocationsui.title("§4座標保存§4");
-   savedlocationsui.dropdown(`\n§r座標を選択してください新しく座標を作る際日本語では無く英語またはローマ字で保存してください例:home,ie,kouenn,niwa,等§r\n\n以下の座標が保存されています\n`, Locations);
-   savedlocationsui.toggle("選択した座標にTP【使う時オン】", false);
-   savedlocationsui.toggle("選択した座標を削除します【消すときだけオンにしてね】", false);
-   savedlocationsui.textField("ここの下に名前を入れると今いる座標が保存されます【例:home】", "");
+    savedlocationsui.title("§4座標保存§4");
+    savedlocationsui.dropdown(`\n§r座標を選択してください新しく座標を作る際日本語では無く英語またはローマ字で保存してください例:home,ie,kouenn,niwa,等§r\n\n以下の座標が保存されています\n`, Locations);
+    savedlocationsui.toggle("選択した座標にTP【使う時オン】", false);
+    savedlocationsui.toggle("選択した座標を削除します【消すときだけオンにしてね】", false);
+    savedlocationsui.textField("ここの下に名前を入れると今いる座標が保存されます【例:home】", "");
     if (config.customcommands.sethome === true && config.customcommands.delhome === true && config.customcommands.listhome === true && config.customcommands.gohome === true) {
         savedlocationsui
             .show(player)

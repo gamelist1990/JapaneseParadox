@@ -1,6 +1,6 @@
 import { getPrefix, sendMsgToPlayer } from "../../util.js";
 import config from "../../data/config.js";
-import { ChatSendAfterEvent, Player } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3 } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 
 function resetPrefix(player: Player) {

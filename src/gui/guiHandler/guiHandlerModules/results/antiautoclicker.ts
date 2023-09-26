@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Player, Vector3 } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../../../penrose/WorldInitializeAfterEvent/registry";
 import { uiANTIAUTOCLICKER } from "../../../modules/uiAntiAutoClicker";
 import { ModalFormData } from "@minecraft/server-ui";

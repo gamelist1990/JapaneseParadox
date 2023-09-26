@@ -1,7 +1,7 @@
-import { ChatSendAfterEvent, Player } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3 } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
-import { getPrefix,  sendMsg, sendMsgToPlayer } from "../../util.js";
+import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import { ScoreManager } from "../../classes/ScoreManager.js";
 
 function overrideCBEHelp(player: Player, prefix: string, cmdsscore: number) {

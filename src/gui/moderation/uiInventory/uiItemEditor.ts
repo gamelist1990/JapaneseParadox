@@ -1,4 +1,4 @@
-import { EntityInventoryComponent, Player, world, ItemStack, Enchantment, ItemEnchantsComponent, ItemDurabilityComponent } from "@minecraft/server";
+import { EntityInventoryComponent, Player, world, ItemStack, Enchantment, ItemEnchantsComponent, ItemDurabilityComponent, Vector3 } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { sendMsgToPlayer } from "../../../util";
 import { uiInvEditorMenu } from "./uiInvEditorMainMenu";

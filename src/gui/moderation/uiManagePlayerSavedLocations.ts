@@ -1,4 +1,4 @@
-import { Player, world } from "@minecraft/server";
+import { Player, world, Vector3 } from "@minecraft/server";
 import { ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry";
 import { sendMsgToPlayer } from "../../util";
@@ -107,7 +107,7 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
                 }
                 return paradoxui(player);
             }
-        return paradoxui(player);
+            return paradoxui(player);
         })
         .catch((error) => {
             console.error("Paradox Unhandled Rejection: ", error);

@@ -1,4 +1,4 @@
-import { Player, world } from "@minecraft/server";
+import { Player, world, Vector3 } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { SpammerA } from "../../penrose/ChatSendBeforeEvent/spammer/spammer_a.js";
 import { SpammerB } from "../../penrose/ChatSendBeforeEvent/spammer/spammer_b.js";

@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, ChatSendBeforeEvent, Player } from "@minecraft/server";
+import { ChatSendAfterEvent, ChatSendBeforeEvent, Player, Vector3 } from "@minecraft/server";
 import config from "../data/config.js";
 import { sendMsgToPlayer } from "../util.js";
 

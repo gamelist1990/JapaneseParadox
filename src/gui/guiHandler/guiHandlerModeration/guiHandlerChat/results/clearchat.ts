@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Player, Vector3 } from "@minecraft/server";
 import { MessageFormData } from "@minecraft/server-ui";
 import { uiCLEARCHAT } from "../../../../moderation/uiClearchat";
 import { paradoxui } from "../../../../paradoxui";

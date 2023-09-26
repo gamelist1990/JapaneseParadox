@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Player, Vector3 } from "@minecraft/server";
 import { sendMsg } from "../../util";
 import { paradoxui } from "../paradoxui";
 export function uiCLEARCHAT(player: Player) {

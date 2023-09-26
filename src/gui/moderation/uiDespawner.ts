@@ -1,4 +1,4 @@
-import { EntityItemComponent, EntityQueryOptions, Player, world } from "@minecraft/server";
+import { EntityItemComponent, EntityQueryOptions, Player, world, Vector3 } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsgToPlayer } from "../../util";

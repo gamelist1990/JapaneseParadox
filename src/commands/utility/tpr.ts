@@ -1,6 +1,6 @@
-import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, world, Vector3 } from "@minecraft/server";
 import config from "../../data/config";
-import {  getPrefix, sendMsgToPlayer, setTimer } from "../../util";
+import { getPrefix, sendMsgToPlayer, setTimer } from "../../util";
 import { EncryptionManager } from "../../classes/EncryptionManager";
 
 interface TeleportRequest {
@@ -96,7 +96,7 @@ function teleportRequestHandler({ sender, message }: ChatSendAfterEvent) {
 function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
     const { sender, message } = object;
 
-    const lowercaseMessage =EncryptionManager.decryptString(message, sender.id).toLowerCase();
+    const lowercaseMessage = EncryptionManager.decryptString(message, sender.id).toLowerCase();
     // Extract the response from the decrypted string
     const refChar = lowercaseMessage.split("§r");
     const extractedPhrase = refChar[1];
@@ -118,8 +118,8 @@ function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
 
     const request = teleportRequests[requestIndex];
     if (Date.now() >= request.expiresAt) {
-         sendMsgToPlayer(request.requester, "§f§4[§6Paradox§4]§f テレポート要求の有効期限が切れました。もう一度やり直してください。");
-         sendMsgToPlayer(request.target, "§f§4[§6Paradox§4]§f テレポート要求の有効期限が切れました。もう一度やり直してください。");
+        sendMsgToPlayer(request.requester, "§f§4[§6Paradox§4]§f テレポート要求の有効期限が切れました。もう一度やり直してください。");
+        sendMsgToPlayer(request.target, "§f§4[§6Paradox§4]§f テレポート要求の有効期限が切れました。もう一度やり直してください。");
         teleportRequests.splice(requestIndex, 1);
         return;
     }
@@ -127,7 +127,7 @@ function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
     if (isApprovalRequest) {
         setTimer(request.requester.id);
         request.requester.teleport(request.target.location, { dimension: request.target.dimension, rotation: { x: 0, y: 0 }, facingLocation: { x: 0, y: 0, z: 0 }, checkForBlocks: false, keepVelocity: false });
-         sendMsgToPlayer(request.requester, `§f§4[§6Paradox§4]§f${request.target.name}がTPを許可しました`);
+        sendMsgToPlayer(request.requester, `§f§4[§6Paradox§4]§f${request.target.name}がTPを許可しました`);
     } else {
         sendMsgToPlayer(request.requester, `§f§4[§6Paradox§4]§f${request.target.name}がTPを拒否しました`);
     }

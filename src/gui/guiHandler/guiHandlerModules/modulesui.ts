@@ -1,5 +1,5 @@
 import { ActionFormData } from "@minecraft/server-ui";
-import { Player } from "@minecraft/server";
+import { Player, Vector3 } from "@minecraft/server";
 import { gamemodesHandler } from "./results/gamemodes";
 import { movementui } from "./guiHandlerMovement/movementui";
 import { antiKillAuraHandler } from "./results/antikillaura";

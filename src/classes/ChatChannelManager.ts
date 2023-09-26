@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Player, Vector3 } from "@minecraft/server";
 import { PlayerManager } from "./PlayerManager";
 import { sendMsgToPlayer } from "../util";
 
@@ -83,7 +83,7 @@ export class ChatChannelManager {
      * @param password The channel password (optional).
      * @returns The new channel name if the switch is successful, or a string indicating an error.
      */
-    public static switchChatChannel(playerName: string, channelName: string, password?: string): string | boolean {
+    public static switchChatChannel(playerName: string, channelName: string, password?: string): string | boolean | Vector3 {
         const channel = this.chatChannels[channelName];
         if (channel) {
             if (channel.password && password !== channel.password) {

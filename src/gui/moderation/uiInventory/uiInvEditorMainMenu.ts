@@ -1,5 +1,5 @@
 import { ActionFormData } from "@minecraft/server-ui";
-import { Player, EntityInventoryComponent } from "@minecraft/server";
+import { Player, EntityInventoryComponent, Vector3 } from "@minecraft/server";
 import { uiItemEditorEnchantmentsMenu } from "./uiItemEditorEnchantmentsMenu";
 import { uiItemEditorNameMenu } from "./uiInvEditorNameMenu";
 import { uiItemEditorReplaceMenu } from "./uiInvEditorReplaceMenu";

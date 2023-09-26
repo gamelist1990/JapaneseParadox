@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Player, Vector3 } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../penrose/WorldInitializeAfterEvent/registry";
 import versionFile from "../version.js";
@@ -39,27 +39,27 @@ async function handleParadoxUI(player: Player) {
     const hash = player.getDynamicProperty("hash");
     const salt = player.getDynamicProperty("salt");
     const uniqueId = dynamicPropertyRegistry.get(player?.id);
-   maingui.title("§4メニュー§4");
-   maingui.body("§eこのメニューではTPリクエストや座標を保存そして報告機能が使えます！§e\n" + "§fVersion: §2" + versionFile.version);
+    maingui.title("§4メニュー§4");
+    maingui.body("§eこのメニューではTPリクエストや座標を保存そして報告機能が使えます！§e\n" + "§fVersion: §2" + versionFile.version);
     if (uniqueId !== player.name) {
-         maingui.button("管理者", "textures/ui/op");
-         maingui.button("TPリクエスト！", "textures/blocks/portal_placeholder");
-         maingui.button("座標保存", "textures/items/compass_item");
-         maingui.button("報告！", "textures/items/paper");
-         maingui.button("制作途中【一時的に報告に置き換わります】", "textures/ui/mute_off");
+        maingui.button("管理者", "textures/ui/op");
+        maingui.button("TPリクエスト！", "textures/blocks/portal_placeholder");
+        maingui.button("座標保存", "textures/items/compass_item");
+        maingui.button("報告！", "textures/items/paper");
+        maingui.button("制作途中【一時的に報告に置き換わります】", "textures/ui/mute_off");
     } else {
-         maingui.button("オペレーター", "textures/ui/op");
-         maingui.button("権限剝奪", "textures/items/ender_pearl");
-         maingui.button("管理者メニュー", "textures/items/book_normal");
-         maingui.button("アンチチート設定", "textures/blocks/command_block");
-         maingui.button("起動文字変更", "textures/ui/UpdateGlyph");
-         maingui.button("TPリクエスト", "textures/blocks/portal_placeholder");
-         maingui.button("座標保存", "textures/items/compass_item");
-         maingui.button("ユーザーログ", "textures/items/book_normal");
-         maingui.button("報告！", "textures/items/paper");
-         maingui.button("インベントリ確認", "textures/blocks/chest_front");
-         maingui.button("パーティー", "textures/ui/mute_off");
-         maingui.button("ユーザーの座標管理", "textures/items/compass_item");
+        maingui.button("オペレーター", "textures/ui/op");
+        maingui.button("権限剝奪", "textures/items/ender_pearl");
+        maingui.button("管理者メニュー", "textures/items/book_normal");
+        maingui.button("アンチチート設定", "textures/blocks/command_block");
+        maingui.button("起動文字変更", "textures/ui/UpdateGlyph");
+        maingui.button("TPリクエスト", "textures/blocks/portal_placeholder");
+        maingui.button("座標保存", "textures/items/compass_item");
+        maingui.button("ユーザーログ", "textures/items/book_normal");
+        maingui.button("報告！", "textures/items/paper");
+        maingui.button("インベントリ確認", "textures/blocks/chest_front");
+        maingui.button("パーティー", "textures/ui/mute_off");
+        maingui.button("ユーザーの座標管理", "textures/items/compass_item");
     }
     maingui
         .show(player)

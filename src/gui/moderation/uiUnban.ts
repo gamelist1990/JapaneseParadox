@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Player, Vector3 } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { queueUnban } from "../../commands/moderation/unban.js";
 //import config from "../../data/config.js";

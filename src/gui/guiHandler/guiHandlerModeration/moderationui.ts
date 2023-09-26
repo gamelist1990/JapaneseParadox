@@ -1,5 +1,5 @@
 import { ActionFormData } from "@minecraft/server-ui";
-import { Player } from "@minecraft/server";
+import { Player, Vector3 } from "@minecraft/server";
 import { banHandler } from "./results/ban";
 import { unbanHandler } from "./results/unban";
 import { rulesHandler } from "./results/rules";
@@ -19,7 +19,7 @@ import { inventoryHandler } from "./results/inventoryui";
 export function moderationui(player: Player) {
     //new window for Moderation
     const moderationui = new ActionFormData();
-　　moderationui.title("§4管理者メニュー§4");
+    moderationui.title("§4管理者メニュー§4");
     moderationui.button("Ban", "textures/ui/hammer_l");
     moderationui.button("Ban解除", "textures/ui/check");
     moderationui.button("ルール", "textures/items/book_writable");

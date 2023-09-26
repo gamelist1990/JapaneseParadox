@@ -1,4 +1,4 @@
-import { EntityInventoryComponent, Player, world } from "@minecraft/server";
+import { EntityInventoryComponent, Player, world, Vector3 } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsgToPlayer } from "../../util";
 import { ActionFormData, ModalFormResponse } from "@minecraft/server-ui";

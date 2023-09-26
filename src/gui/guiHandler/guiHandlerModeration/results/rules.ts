@@ -1,7 +1,7 @@
 import { ModalFormData } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../../../penrose/WorldInitializeAfterEvent/registry";
 import { uiRULES } from "../../../moderation/uiRules";
-import { Player } from "@minecraft/server";
+import { Player, Vector3 } from "@minecraft/server";
 
 export function rulesHandler(player: Player) {
     //show rules ui

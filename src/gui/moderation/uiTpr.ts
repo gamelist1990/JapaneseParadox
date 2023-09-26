@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, world, Vector3 } from "@minecraft/server";
 import { TeleportRequestHandler } from "../../commands/utility/tpr";
 import { sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui";
