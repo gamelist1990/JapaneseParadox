@@ -1,4 +1,4 @@
-import { Player, world, Vector3 } from "@minecraft/server";
+import { Player, world, } from "@minecraft/server";
 
 /**
  * PlayerManager class for managing players.

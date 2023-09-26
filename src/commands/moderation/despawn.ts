@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, EntityItemComponent, EntityQueryOptions, Player, world, Vector3 } from "@minecraft/server";
+import { ChatSendAfterEvent, EntityItemComponent, EntityQueryOptions, Player, world,  } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsgToPlayer } from "../../util.js";

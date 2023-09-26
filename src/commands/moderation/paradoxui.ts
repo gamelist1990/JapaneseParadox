@@ -1,6 +1,6 @@
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import config from "../../data/config.js";
-import { ChatSendAfterEvent, Player, Vector3 } from "@minecraft/server";
+import { ChatSendAfterEvent, Player } from "@minecraft/server";
 import { paradoxui } from "../../gui/paradoxui.js";
 import { ShowRules } from "../../gui/showrules/showrules.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
