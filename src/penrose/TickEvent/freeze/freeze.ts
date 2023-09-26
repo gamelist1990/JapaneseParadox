@@ -1,5 +1,5 @@
 import { world, Player, system, EntityQueryOptions, Vector } from "@minecraft/server";
-import {  sendMsg, setTimer } from "../../../util";
+import { sendMsg, setTimer } from "../../../util";
 import { MinecraftEffectTypes } from "../../../node_modules/@minecraft/vanilla-data/lib/index";
 import { EncryptionManager } from "../../../classes/EncryptionManager";
 
@@ -129,7 +129,7 @@ const freezePlayers = () => {
             const combinationKey = (hasAuraTag ? "1" : "0") + (hasNukerTag ? "1" : "0") + (hasScaffoldTag ? "1" : "0");
             const title = { subtitle: combinations[combinationKey] || combinations["000"] };
 
-            player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]違法なツールを検知したためフリーズされました", {
+            player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f 違法な動きを検知しました", {
                 ...title,
                 fadeInDuration: 0,
                 fadeOutDuration: 0,

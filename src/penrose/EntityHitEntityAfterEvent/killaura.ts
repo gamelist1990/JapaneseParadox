@@ -73,14 +73,14 @@ function killaura(obj: EntityHitEntityAfterEvent) {
     if (angleBoolean) {
         // Entity is facing hitEntity at an angle greater than 90 degrees
         flag(damagingEntity, "KillAura", "A", "Combat", null, null, null, null, false);
-        // Blindness
-        damagingEntity.addEffect(MinecraftEffectTypes.Blindness, 1000000, { amplifier: 255, showParticles: true });
-        // Mining Fatigue
-        damagingEntity.addEffect(MinecraftEffectTypes.MiningFatigue, 1000000, { amplifier: 255, showParticles: true });
-        // Weakness
-        damagingEntity.addEffect(MinecraftEffectTypes.Weakness, 1000000, { amplifier: 255, showParticles: true });
-        // Slowness
-        damagingEntity.addEffect(MinecraftEffectTypes.Slowness, 1000000, { amplifier: 255, showParticles: true });
+
+        // Add Effects
+        const effectsToAdd = [MinecraftEffectTypes.Blindness, MinecraftEffectTypes.MiningFatigue, MinecraftEffectTypes.Weakness, MinecraftEffectTypes.Slowness];
+
+        for (const effectType of effectsToAdd) {
+            damagingEntity.addEffect(effectType, 1000000, { amplifier: 255, showParticles: true });
+        }
+
         const boolean = damagingEntity.hasTag("paradoxFreeze");
         const hasAuraFreeze = damagingEntity.hasTag("freezeAura");
         if (!boolean) {
@@ -113,7 +113,7 @@ function freeze(id: number) {
             player.removeTag("freezeAura");
             return;
         }
-        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]違法なツールを検知したためフリーズされました", { subtitle: "§f検知内容＝＞ §4[§6AntiKillAura§4]§f", fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 60 });
+        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f 違法な動きを検知しました", { subtitle: "§f検知内容＝＞ §4[§6AntiKillAura§4]§f", fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 60 });
     }
 }
 

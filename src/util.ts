@@ -28,24 +28,25 @@ world.afterEvents.playerLeave.subscribe(onPlayerLogout);
  * @param {boolean} shouldTP - Whever to tp the player to itself.
  */
 export function flag(player: Player, check: string, checkType: string, hackType: string, item: string, stack: number, debugName: string, debug: string, shouldTP: boolean) {
-    if (shouldTP && check !== "Crasher") {
+    if (shouldTP) {
         player.teleport(new Vector(player.location.x, player.location.y, player.location.z), { dimension: player.dimension, rotation: { x: 0, y: 0 }, facingLocation: { x: 0, y: 0, z: 0 }, checkForBlocks: false, keepVelocity: false });
-    } else if (shouldTP && check === "Crasher") {
-        player.teleport({ x: 30000000, y: 30000000, z: 30000000 }, { dimension: player.dimension, rotation: { x: 0, y: 0 }, facingLocation: { x: 0, y: 0, z: 0 }, checkForBlocks: false, keepVelocity: false });
     }
 
     ScoreManager.setScore(player, `${check.toLowerCase()}vl`, 1, true);
 
     if (debug) {
-        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f ${player.name} §6has failed §7(${hackType}) §4${check}/${checkType} §7(${debugName}=${debug})§4. VL= ${ScoreManager.getScore(check.toLowerCase() + "vl", player)}`);
+        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f ${player.name} §6 §7(${hackType}) §4${check}/${checkType} §7(${debugName}=${debug})§4を検知しました！！. 検知回数＝＞ ${ScoreManager.getScore(check.toLowerCase() + "vl", player)}`);
     } else if (item && stack) {
-        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f ${player.name} §6has failed §7(${hackType}) §4${check}/${checkType} §7(${item.replace("minecraft:", "")}=${stack})§4. VL= ${ScoreManager.getScore(check.toLowerCase() + "vl", player)}`);
+        sendMsg(
+            "@a[tag=notify]",
+            `§f§4[§6Paradox§4]§f ${player.name} §6 §7(${hackType}) §4${check}/${checkType} §7(${item.replace("minecraft:", "")}=${stack})§4を検知しました！！. 検知回数＝＞ ${ScoreManager.getScore(check.toLowerCase() + "vl", player)}`
+        );
     } else {
-        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f ${player.name} §6has failed §7(${hackType}) §4${check}/${checkType}. VL= ${ScoreManager.getScore(check.toLowerCase() + "vl", player)}`);
+        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f ${player.name} §6 §7(${hackType}) §4${check}/${checkType}を検知しました！！. 検知回数＝＞ ${ScoreManager.getScore(check.toLowerCase() + "vl", player)}`);
     }
 
     if (check === "Namespoof") {
-        player.runCommandAsync(`kick "${player.name}" §f\n\n§4[§6Paradox§4]§f You have illegal characters in your name!`).catch(() => {
+        player.runCommandAsync(`kick "${player.name}" §f\n\n§4[§6Paradox§4]§f あなたの名前には違法な文字が含まれています`).catch(() => {
             // If we can't kick them with /kick, then we instantly despawn them
             kickablePlayers.add(player);
             player.triggerEvent("paradox:kick");
@@ -74,13 +75,13 @@ export function banMessage(player: Player) {
     }
 
     if (config.modules.banAppeal.enabled === true) {
-        player.runCommandAsync(`kick "${player.name}" §f\n§l§4YOU ARE BANNED!§r\n§4[§6Banned By§4]§f: ${by || "§7N/A"}\n§4[§6Reason§4]§f: ${reason || "§7N/A"}\n§b${config.modules.banAppeal.discordLink}`).catch(() => {
+        player.runCommandAsync(`kick "${player.name}" §f\n§l§4サーバーから追放されました！！!§r\n§4[§6検知内容§4]§f: ${by || "§7N/A"}\n§4[§6BAN理由§4]§f: ${reason || "§7N/A"}\n§b${config.modules.banAppeal.discordLink}`).catch(() => {
             // If we can't kick them with /kick, then we instantly despawn them
             kickablePlayers.add(player);
             player.triggerEvent("paradox:kick");
         });
     } else {
-        player.runCommandAsync(`kick "${player.name}" §f\n§l§4YOU ARE BANNED!\n§r\n§4[§6Banned By§4]§f: ${by || "§7N/A"}\n§4[§6Reason§4]§f: ${reason || "§7N/A"}`).catch(() => {
+        player.runCommandAsync(`kick "${player.name}" §f\n§l§4あなたはサーバーから追放されました\n§r\n§4[§6検知内容§4]§f: ${by || "§7N/A"}\n§4[§6BAN理由§4]§f: ${reason || "§7N/A"}`).catch(() => {
             // If we can't kick them with /kick, then we instantly despawn them
             kickablePlayers.add(player);
             player.triggerEvent("paradox:kick");
@@ -88,7 +89,7 @@ export function banMessage(player: Player) {
     }
 
     // Notify staff that a player was banned
-    sendMsg("@a[tag=paradoxOpped]", [`§f§4[§6Paradox§4]§f ${player.name} has been banned!`, `§4[§6Banned By§4]§f: ${by || "§7N/A"}`, `§4[§6Reason§4]§f: ${reason || "§7N/A"}`]);
+    sendMsg("@a[tag=paradoxOpped]", [`§f§4[§6Paradox§4]§f ${player.name}はBANされました`, `§4[§6検知内容§4]§f: ${by || "§7N/A"}`, `§4[§6BAN理由§4]§f: ${reason || "§7N/A"}`]);
 }
 
 /**
@@ -125,7 +126,7 @@ export function resetTag(member: Player) {
             member.removeTag(tag);
         }
     }
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${member.name} has reset their rank`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${member.name} のランクをリセットしました`);
 }
 
 /**

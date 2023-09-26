@@ -1,4 +1,4 @@
-import { world, BlockBreakAfterEvent, system, EntityQueryOptions, PlayerLeaveAfterEvent, EntityInventoryComponent, ItemEnchantsComponent } from "@minecraft/server";
+import { world, PlayerBreakBlockAfterEvent, system, EntityQueryOptions, PlayerLeaveAfterEvent, EntityInventoryComponent, ItemEnchantsComponent } from "@minecraft/server";
 import { flag } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 import { MinecraftEffectTypes } from "../../../node_modules/@minecraft/vanilla-data/lib/index.js";
@@ -13,13 +13,13 @@ function onPlayerLogout(event: PlayerLeaveAfterEvent): void {
     breakCounter.delete(playerName);
 }
 
-async function nukera(object: BlockBreakAfterEvent): Promise<void> {
+async function nukera(object: PlayerBreakBlockAfterEvent): Promise<void> {
     const antiNukerABoolean = dynamicPropertyRegistry.get("antinukera_b");
     if (antiNukerABoolean === false) {
         lastBreakTime.clear();
         breakCounter.clear();
         world.afterEvents.playerLeave.unsubscribe(onPlayerLogout);
-        world.afterEvents.blockBreak.unsubscribe(nukera);
+        world.afterEvents.playerBreakBlock.unsubscribe(nukera);
         return;
     }
 
@@ -166,6 +166,7 @@ async function nukera(object: BlockBreakAfterEvent): Promise<void> {
         "minecraft:azalea",
         "minecraft:sweet_berry_bush",
         "minecraft:sweet_berries",
+        "minecraft:snow_layer",
     ];
 
     const efficiencyLevels: Record<number, number> = {
@@ -204,10 +205,11 @@ async function nukera(object: BlockBreakAfterEvent): Promise<void> {
             player.runCommandAsync(`kill @e[x=${x},y=${y},z=${z},r=10,c=1,type=item]`);
 
             // Apply effects or actions for three or more consecutive block breaks
-            player.addEffect(MinecraftEffectTypes.Blindness, 1000000, { amplifier: 255, showParticles: true });
-            player.addEffect(MinecraftEffectTypes.MiningFatigue, 1000000, { amplifier: 255, showParticles: true });
-            player.addEffect(MinecraftEffectTypes.Weakness, 1000000, { amplifier: 255, showParticles: true });
-            player.addEffect(MinecraftEffectTypes.Slowness, 1000000, { amplifier: 255, showParticles: true });
+            const effectsToAdd = [MinecraftEffectTypes.Blindness, MinecraftEffectTypes.MiningFatigue, MinecraftEffectTypes.Weakness, MinecraftEffectTypes.Slowness];
+
+            for (const effectType of effectsToAdd) {
+                player.addEffect(effectType, 1000000, { amplifier: 255, showParticles: true });
+            }
 
             const hasFreezeTag = player.hasTag("paradoxFreeze");
             const hasNukerFreeze = player.hasTag("freezeNukerA");
@@ -248,12 +250,12 @@ function freeze(id: number) {
             player.removeTag("freezeNukerA");
             return;
         }
-        player.onScreenDisplay.setTitle("§f§4[§6server§4]§f違法なツールを検知したためフリーズされました", { subtitle: "§f検知内容＝＞ §4[§6AntiNukerA§4]§f", fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 60 });
+        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f 違法な動きを検知しました", { subtitle: "§f検知内容＝＞ §4[§6AntiNukerA§4]§f", fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 60 });
     }
 }
 
 const NukerA = () => {
-    world.afterEvents.blockBreak.subscribe((object) => {
+    world.afterEvents.playerBreakBlock.subscribe((object) => {
         nukera(object).catch((error) => {
             console.error("Paradox Unhandled Rejection: ", error);
             // Extract stack trace information

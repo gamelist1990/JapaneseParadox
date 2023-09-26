@@ -1,6 +1,6 @@
 import { world, EntityQueryOptions, system } from "@minecraft/server";
-import { queueUnban } from "../../../commands/moderation/unban.js";
 import { banMessage, sendMsg, sendMsgToPlayer } from "../../../util.js";
+import { queueUnban } from "../../../commands/moderation/unban.js";
 import { ScoreManager } from "../../../classes/ScoreManager.js";
 
 function serverban() {

@@ -3,6 +3,7 @@ import { kickablePlayers } from "../../../kickcheck";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry";
 import config from "../../../data/config";
 import { ScoreManager } from "../../../classes/ScoreManager";
+
 const configTicks: number = config.modules.autoBan.banHammerInterval;
 function rip(player: Player, reason: string) {
     // Tag with reason and by who
@@ -37,8 +38,8 @@ function autoban(id: number) {
         }
         scores.forEach((score) => {
             const playerScore = ScoreManager.getScore(score, player);
-            if (playerScore > 1000) {
-                const reReason = score.replace("vl", "").toUpperCase() + " 検知内容＝＞: " + playerScore;
+            if (playerScore > 50) {
+                const reReason = score.replace("vl", "").toUpperCase() + " Violations: " + playerScore;
                 return rip(player, reReason);
             }
         });

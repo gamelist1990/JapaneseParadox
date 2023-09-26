@@ -35,7 +35,7 @@ function noperms() {
         // Generate the hash
         const encode = EncryptionManager.hashWithSalt(salt as string, key);
         entity.removeTag("paradoxOpped");
-        if (encode === hash) {
+        if (encode && encode === hash) {
             entity.removeDynamicProperty("hash");
             entity.removeDynamicProperty("salt");
             dynamicPropertyRegistry.delete(entity.id);
