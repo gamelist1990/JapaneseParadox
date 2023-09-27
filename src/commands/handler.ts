@@ -172,6 +172,17 @@ const commandDefinitions: Record<string, (data: Player | ChatSendAfterEvent, arg
         antiphasea: antiphaseA,
         channel: chatChannel,
         pvp: pvp,
+        //custom
+        map: biome,
+        tp: TeleportRequestHandler,
+        ui: paradoxUI,
+        tpl: listhome,
+        tpg: gohome,
+        tps: sethome,
+        tpd: delhome,
+        list: fullreport,
+        van: vanish,
+        ch: chatChannel,
     },
     null
 );
@@ -184,8 +195,7 @@ const commandDefinitions: Record<string, (data: Player | ChatSendAfterEvent, arg
 
 export function commandHandler(player: Player, message: ChatSendBeforeEvent): Promise<void> | void {
     if (config.debug) {
-        console.warn(`${new Date()} | did run command handler`);
-    }
+        console.warn(`${new Date()} | ${player.name}がコマンドを実行`);    }
 
     // checks if the message starts with our prefix, if not exit
     if (!message.message.startsWith(config.customcommands.prefix)) return void 0;
@@ -194,14 +204,14 @@ export function commandHandler(player: Player, message: ChatSendBeforeEvent): Pr
 
     const commandName = args.shift().toLowerCase();
 
-    if (config.debug) console.warn(`${new Date()} | "${player.name}" used the command: ${config.customcommands.prefix}${commandName} ${args.join(" ")}`);
+    if (config.debug) console.warn(`${new Date()} | "${player.name}"が以下のコマンドを実行しました: ${config.customcommands.prefix}${commandName} ${args.join(" ")}`);
 
     if (!(commandName in commandDefinitions)) {
         message.cancel = true;
         message.sendToTargets = true;
         message.setTargets([]);
         message.message = "";
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f The command §7${config.customcommands.prefix}${commandName}§f does not exist. Try again!`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  ${config.customcommands.prefix}${commandName} そのコマンドは存在しません！！`);
     }
 
     // Do not broadcast any message to any targets

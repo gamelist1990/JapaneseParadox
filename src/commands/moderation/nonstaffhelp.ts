@@ -1,6 +1,6 @@
 import { getPrefix, sendMsgToPlayer } from "../../util.js";
 import config from "../../data/config.js";
-import { ChatSendAfterEvent } from "@minecraft/server";
+import { ChatSendAfterEvent,  } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 
 /**
@@ -24,21 +24,15 @@ export function nonstaffhelp(message: ChatSendAfterEvent) {
     // Make sure the user has permissions to run the command
     if (uniqueId === undefined) {
         return sendMsgToPlayer(player, [
-            `§l§o§6[§4Non-Staff Commands§6]§r§o`,
-            config.customcommands.report ? `§6${prefix}report <username>§f - Report suspicious players to staff.` : `§6${prefix}report <username>§f - Command §4DISABLED§f.`,
-            config.customcommands.sethome ? `§6${prefix}sethome <name>§f - Saves current coordinates as home.` : `§6${prefix}sethome <name>§f - Command §4DISABLED§f.`,
-            config.customcommands.gohome ? `§6${prefix}gohome <name>§f - Teleport back to saved home coordinates.` : `§6${prefix}gohome <name>§f - Command §4DISABLED§f.`,
-            config.customcommands.listhome ? `§6${prefix}listhome§f - Shows your list of saved locations.` : `§6${prefix}listhome§f - Command §4DISABLED§f.`,
-            config.customcommands.delhome ? `§6${prefix}delhome <name>§f - Deletes a saved location from list.` : `§6${prefix}delhome <name>§f - Command §4DISABLED§f.`,
-            config.customcommands.tpr ? `§6${prefix}tpr <name>§f - Will send requests to tp to players.` : `§6${prefix}tpr <name>§f - Command §4DISABLED§f.`,
-            config.customcommands.channel ? `§6${prefix}channel create <channel> [password?]§f - Create a new chat channel (with optional password).` : `§6${prefix}channel create <channel> [password?]§f - Command §4DISABLED§f.`,
-            config.customcommands.channel ? `§6${prefix}channel delete <channel> [password?]§f - Delete an existing chat channel (with optional password).` : `§6${prefix}channel delete <channel> [password?]§f - Command §4DISABLED§f.`,
-            config.customcommands.channel ? `§6${prefix}channel join <channel> [password?]§f - Join an existing chat channel (with optional password).` : `§6${prefix}channel join <channel> [password?]§f - Command §4DISABLED§f.`,
-            config.customcommands.channel ? `§6${prefix}channel invite <channel> <player>§f - Invite a player to join your chat channel.` : `§6${prefix}channel invite <channel> <player>§f - Command §4DISABLED§f.`,
-            config.customcommands.channel ? `§6${prefix}channel handover <channel> <player>§f - Transfer ownership of a chat channel..` : `§6${prefix}channel invite <channel> <player>§f - Command §4DISABLED§f.`,
-            config.customcommands.channel ? `§6${prefix}channel members§f - List members of the current chat channel.` : `§6${prefix}channel members§f - Command §4DISABLED§f.`,
-            config.customcommands.channel ? `§6${prefix}channel leave§f - Leave the current chat channel.` : `§6${prefix}channel leave§f - Command §4DISABLED§f.`,
-            config.customcommands.pvp ? `§6${prefix}pvp§f - Enable or disable PvP mode.` : `§6${prefix}pvp§f - Command §4DISABLED§f.`,
+            `§l§6[§4コマンドリスト！！§6]§r`,
+            config.customcommands.report ? `§6${prefix}report <名前> <荒らし>§r - 荒らしがいた場合これで報告できます.` : `§6${prefix}report <username>§r - Command §4DISABLED§r.`,
+            config.customcommands.sethome ? `§6${prefix}tps <家の名前>§r - 自分の家の座標を保存します.` : `§6${prefix}sethome <name>§r - Command §4DISABLED§r.`,
+            config.customcommands.gohome ? `§6${prefix}tpg <家の名前>§r - sethomeで設定した家にTPできます.` : `§6${prefix}gohome <name>§r - Command §4DISABLED§r.`,
+            config.customcommands.listhome ? `§6${prefix}tpl §r - 自分の作った拠点リストを見れます.` : `§6${prefix}listhome§r - Command §4DISABLED§r.`,
+            config.customcommands.delhome ? `§6${prefix}tpd <家の名前>§r - 家の名前を入れた拠点の座標が削除されます.` : `§6${prefix}delhome <name>§r - Command §4DISABLED§r.`,
+            config.customcommands.tpr ? `§6${prefix}tp <相手の名前>§r - 他のプレイヤーにTP申請を送れます相手が承諾するとtpされます.` : `§6${prefix}tpr <name>§r - Command §4DISABLED§r.`,
+            config.customcommands.paradoxiu ? `§6${prefix}ui§r - GUIを開けます` : `§6${prefix}ui§rでメニューを開けます！§r.`,
+            config.customcommands.biome ? `§6${prefix}map§r - で今いるバイオームがわかります` : `§6${prefix}map§rで今いるバイオームが分かります！§r.`,
         ]);
     }
 }
