@@ -278,6 +278,6 @@ export default {
      * レルムズで使用する場合必ずパスワードを設定してね
      */
     encryption: {
-        password: "HACKERBANLOL",
+        password: "",
     },
 };
