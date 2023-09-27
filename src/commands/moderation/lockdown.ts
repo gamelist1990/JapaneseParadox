@@ -4,7 +4,7 @@ import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import { EncryptionManager } from "../../classes/EncryptionManager.js";
 
-function lockdownHelp(player: Player, prefix: string, lockdownBoolean: string | number | boolean | Vector3 | Vector3) {
+function lockdownHelp(player: Player, prefix: string, lockdownBoolean: string | number | boolean | Vector3) {
     let commandStatus: string;
     if (!config.customcommands.lockdown) {
         commandStatus = "§6[§4DISABLED§6]§f";
@@ -64,7 +64,7 @@ async function handleLockdown(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Get Dynamic Property Boolean
@@ -81,13 +81,13 @@ async function handleLockdown(message: ChatSendAfterEvent, args: string[]) {
 
     // If already locked down then unlock the server
     if (lockdownBoolean) {
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f メンテナンスが終了しました`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f Server is no longer in lockdown!`);
         dynamicPropertyRegistry.set("lockdown_b", false);
         return world.setDynamicProperty("lockdown_b", false);
     }
 
     // Default reason for locking it down
-    const reason = "現在メンテナンス中です進行状況はDiscordで聞いてください";
+    const reason = "Under Maintenance! Sorry for the inconvenience.";
 
     // Lock it down
     const players = world.getPlayers();
@@ -112,7 +112,7 @@ async function handleLockdown(message: ChatSendAfterEvent, args: string[]) {
         });
     }
     // Shutting it down
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f メンテナンス状態です!`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f Server is in lockdown!`);
     dynamicPropertyRegistry.set("lockdown_b", true);
     return world.setDynamicProperty("lockdown_b", true);
 }

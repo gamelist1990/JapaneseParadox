@@ -58,7 +58,7 @@ export function hotbar(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Get Dynamic Property Boolean
@@ -91,20 +91,20 @@ export function hotbar(message: ChatSendAfterEvent, args: string[]) {
         } else {
             config.modules.hotbar.message = configMessageBackup.get(dummy);
         }
-        sendMsg("@a[tag=paradoxOpped]", `${player.name} 以下の機能が有効です！＝＞ §6Hotbar`);
+        sendMsg("@a[tag=paradoxOpped]", `§7${player.name}§f has enabled §6Hotbar`);
         Hotbar();
     } else if (hotbarBoolean === true && args.length === 1 && args[0].toLowerCase() === "disable") {
         // Deny
         dynamicPropertyRegistry.set("hotbar_b", false);
         world.setDynamicProperty("hotbar_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `${player.name} 以下の機能が無効です！＝＞ §6Hotbar`);
+        sendMsg("@a[tag=paradoxOpped]", `§7${player.name}§f has disabled §6Hotbar`);
     } else if ((hotbarBoolean === true && args.length >= 1) || (hotbarBoolean === true && !args.length)) {
         if (args.length >= 1) {
             config.modules.hotbar.message = args.join(" ");
         } else {
             config.modules.hotbar.message = configMessageBackup.get(dummy);
         }
-        sendMsg("@a[tag=paradoxOpped]", `${player.name}  §6Hotbar§rを更新しました`);
+        sendMsg("@a[tag=paradoxOpped]", `§7${player.name}§f has updated §6Hotbar`);
     } else {
         return hotbarHelp(player, prefix, hotbarBoolean);
     }

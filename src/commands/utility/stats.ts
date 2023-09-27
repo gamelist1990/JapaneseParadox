@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, EntityEquipmentInventoryComponent, EquipmentSlot, ItemEnchantsComponent, ItemStack, Player, world } from "@minecraft/server";
+import { ChatSendAfterEvent, EntityEquippableComponent, EquipmentSlot, ItemEnchantsComponent, ItemStack, Player, world } from "@minecraft/server";
 import { MinecraftEnchantmentTypes } from "../../node_modules/@minecraft/vanilla-data/lib/index";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
@@ -58,7 +58,7 @@ async function handleStats(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -76,7 +76,7 @@ async function handleStats(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!player.hasTag("notify")) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f チートログを有効にしてください.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to enable cheat notifications.`);
     }
 
     // try to find the player requested
@@ -90,27 +90,24 @@ async function handleStats(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが見つかりません!`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
     const reportBody = [
-        `\n§r§4[§6Paradox§4]§r 現在オンラインのプレイヤーログを収集しました §6${member.name}§r`,
-        `§r§4[§6Paradox§4]§r §6${member.name}§rのゲームモードは ${getGamemode(member)}です`,
-        `§r§4[§6Paradox§4]§r §6${member.name}§rのプレイヤーIDは【 ${member.id} 】です`,
-        `§f§4[§6Paradox§4]§f §6${member.name}§f is currently at X= ${member.location.x.toFixed(0)} Y= ${member.location.y.toFixed(0)} Z= ${member.location.z.toFixed(0)}`,
+        `\n§f§4[§6Paradox§4]§f Getting all Paradox Logs from: §6${member.name}§f`,
+        `§f§4[§6Paradox§4]§f §6${member.name}§f is in Gamemode: §7${getGamemode(member)}§f`,
+        `§f§4[§6Paradox§4]§f §6${member.name}§f is currently at X= §7${member.location.x.toFixed(0)}§f Y= §7${member.location.y.toFixed(0)}§f Z= §7${member.location.z.toFixed(0)}§f`,
     ];
 
     switch (true) {
         case member.hasTag("paradoxFreeze"):
-            reportBody.push(
-                `§f§4[§6Paradox§4]§f §6${member.name}§f 行動が制限されています検知内容＝＞ ${member.hasTag("freezeAura") ? "AntiKillAura" : member.hasTag("freezeNukerA") ? "AntiNukerA" : member.hasTag("freezeScaffoldA") ? "AntiScaffoldA" : "Staff"}`
-            );
+            reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f is frozen by ${member.hasTag("freezeAura") ? "AntiKillAura" : member.hasTag("freezeNukerA") ? "AntiNukerA" : member.hasTag("freezeScaffoldA") ? "AntiScaffoldA" : "Staff"}`);
             break;
         case member.hasTag("flying"):
-            reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f飛べます`);
+            reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f is flying`);
             break;
         case member.hasTag("vanish"):
-            reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f透明化が有効です`);
+            reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f is vanished`);
             break;
     }
 
@@ -126,20 +123,20 @@ async function handleStats(message: ChatSendAfterEvent, args: string[]) {
                 divider = true;
                 reportBody.push(`§f§4[§6Paradox§4]§4 ----------------------------------§f`);
             }
-            reportBody.push(`§f§4[§6Paradox§4]§f §f§4[§6${objective.replace("vl", "").toUpperCase()}§4]§f: ${score}回検知されています`);
+            reportBody.push(`§f§4[§6Paradox§4]§f §f§4[§6${objective.replace("vl", "").toUpperCase()}§4]§f Violations: ${score}`);
         }
         if (vlCount === ScoreManager.allscores.length && divider === true) {
             reportBody.push(`§f§4[§6Paradox§4]§4 ----------------------------------§f`);
         }
     });
 
-    const equipment = member.getComponent("equipment_inventory") as EntityEquipmentInventoryComponent;
-    const helmet = equipment.getEquipment("head" as EquipmentSlot);
-    const chest = equipment.getEquipment("chest" as EquipmentSlot);
-    const legs = equipment.getEquipment("legs" as EquipmentSlot);
-    const feet = equipment.getEquipment("feet" as EquipmentSlot);
-    const mainhand = equipment.getEquipment("mainhand" as EquipmentSlot);
-    const offhand = equipment.getEquipment("offhand" as EquipmentSlot);
+    const equipment = member.getComponent("equippable") as EntityEquippableComponent;
+    const helmet = equipment.getEquipment(EquipmentSlot.Head);
+    const chest = equipment.getEquipment(EquipmentSlot.Chest);
+    const legs = equipment.getEquipment(EquipmentSlot.Legs);
+    const feet = equipment.getEquipment(EquipmentSlot.Feet);
+    const mainhand = equipment.getEquipment(EquipmentSlot.Mainhand);
+    const offhand = equipment.getEquipment(EquipmentSlot.Offhand);
 
     const materialColors: { [key: string]: string } = {
         golden: "§6", // gold
@@ -154,12 +151,12 @@ async function handleStats(message: ChatSendAfterEvent, args: string[]) {
     };
 
     for (const [verification, armorType] of [
-        [helmet, "帽子"],
-        [chest, "服"],
-        [legs, "ズボン"],
-        [feet, "靴"],
-        [mainhand, "メインハンド"],
-        [offhand, "オフハンド"],
+        [helmet, "Helmet"],
+        [chest, "Chestplate"],
+        [legs, "Leggings"],
+        [feet, "Boots"],
+        [mainhand, "Mainhand"],
+        [offhand, "Offhand"],
     ]) {
         if (!(verification instanceof ItemStack)) {
             continue;
@@ -181,7 +178,7 @@ async function handleStats(message: ChatSendAfterEvent, args: string[]) {
             materialType = verification.typeId.split(":")[1];
         }
         const materialColor = materialColors[materialType] || materialColors["none"];
-        reportBody.push(`§f§4[§6Paradox§4]§f ${armorType}: ${isEnchanted ? "§aエンチャ有§f" : "§4エンチャ無§f"} || ${materialColor}${materialType}`);
+        reportBody.push(`§f§4[§6Paradox§4]§f §7${armorType}§f: ${isEnchanted ? "§aEnchanted§f" : "§4Unenchanted§f"} || ${materialColor}${materialType}`);
     }
 
     sendMsgToPlayer(player, reportBody);

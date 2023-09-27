@@ -50,7 +50,7 @@ export function prefix(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -77,16 +77,16 @@ export function prefix(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (args[0][0] == "/") {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f'/' を使用することはできません！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Using prefix '/' is not allowed!`);
     }
 
     // Change Prefix command under conditions
     if (args[0].length <= 2 && args[0].length >= 1) {
         resetPrefix(player);
         config.customcommands.prefix = args[0];
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 接頭辞が次のように変更された '${args[0]}'!`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Prefix has been changed to '§7${args[0]}§f'!`);
         return player.addTag("Prefix:" + args[0]);
     } else {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 接頭辞の長さは2文字まで！`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Prefix length cannot be more than 2 characters!`);
     }
 }

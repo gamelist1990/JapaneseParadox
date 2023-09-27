@@ -58,7 +58,7 @@ async function handleMute(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -77,7 +77,7 @@ async function handleMute(message: ChatSendAfterEvent, args: string[]) {
 
     // Modify the argument handling
     let playerName = args.shift();
-    let reason = "理由なし";
+    let reason = "No reason specified";
 
     // Check if the command has a reason provided
     if (args.length > 1) {
@@ -102,7 +102,7 @@ async function handleMute(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
     // Get unique ID
@@ -110,22 +110,22 @@ async function handleMute(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure they dont mute themselves
     if (uniqueId2 === uniqueId) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 自分自身には実行できません`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot mute yourself.`);
     }
 
     // Make sure staff dont mute staff
     if (uniqueId2 === member.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者には実行できません.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot mute staff players.`);
     }
 
     // If not already muted then tag
     if (!member.hasTag("isMuted")) {
         member.addTag("isMuted");
     } else {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f このプレイヤーは既にミュート済みです.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f This player is already muted.`);
     }
     // If Education Edition is enabled then legitimately mute them
     member.runCommandAsync(`ability @s mute true`);
-    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§fあなたは管理者にミュートされました. 理由: ${reason}`);
-    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f${player.name}§f が ${member.name}をミュート状態にしました§f. 理由: ${reason}`);
+    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You have been muted. Reason: §7${reason}§f`);
+    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has muted §7${member.name}§f. Reason: §7${reason}§f`);
 }

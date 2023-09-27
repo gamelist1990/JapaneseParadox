@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, EntityItemComponent, EntityQueryOptions, Player, world,  } from "@minecraft/server";
+import { ChatSendAfterEvent, EntityItemComponent, EntityQueryOptions, Player, world } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsgToPlayer } from "../../util.js";
@@ -46,7 +46,7 @@ export function despawn(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -87,7 +87,7 @@ export function despawn(message: ChatSendAfterEvent, args: string[]) {
         if (counter > 0) {
             return sendMsgToPlayer(player, ` §o§6|§f §4[§f${requestedEntity}§4]§f §6Amount: §4x${counter}§f`);
         } else {
-            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 指定したモブが見つかりません!`);
+            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f No entity found to despawn!`);
         }
     }
     // All entities
@@ -116,16 +116,16 @@ export function despawn(message: ChatSendAfterEvent, args: string[]) {
             if (entityCount.hasOwnProperty(entity)) {
                 const count = entityCount[entity];
                 if (count > 0) {
-                    entityMessage += ` §6|§f §4[§f${entity}§4]§f §e${count} §6匹消去しました§f\n`;
+                    entityMessage += ` §o§6|§f §4[§f${entity}§4]§f §6Amount: §4x${count}§f\n`;
                     totalCounter += count;
                 }
             }
         }
         if (totalCounter > 0) {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Killしました:`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Despawned:`);
             return sendMsgToPlayer(player, entityMessage);
         } else {
-            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f モブを検知できませんでした!`);
+            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f No entities found to despawn!`);
         }
     }
 }

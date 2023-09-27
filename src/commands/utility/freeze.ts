@@ -57,7 +57,7 @@ async function handleFreeze(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -85,7 +85,7 @@ async function handleFreeze(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
     // Get unique ID
@@ -93,31 +93,34 @@ async function handleFreeze(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId2 === member.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者には実行できません.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot freeze staff members.`);
     }
 
     const boolean = member.hasTag("paradoxFreeze");
 
     if (boolean) {
         member.removeTag("paradoxFreeze");
-        member.runCommand(`effect @s clear`);
-        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f フリーズが解除されました`);
-        sendMsg(`@a[tag=paradoxOpped]`, `${member.name}§f のフリーズが解除されました.`);
+        const effectsToRemove = [MinecraftEffectTypes.Blindness, MinecraftEffectTypes.MiningFatigue, MinecraftEffectTypes.Weakness, MinecraftEffectTypes.Slowness];
+
+        for (const effectType of effectsToRemove) {
+            member.removeEffect(effectType);
+        }
+
+        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You are no longer frozen.`);
+        sendMsg(`@a[tag=paradoxOpped]`, `§7${member.name}§f is no longer frozen.`);
         return;
     }
 
     if (!boolean) {
-        // Blindness
-        member.addEffect(MinecraftEffectTypes.Blindness, 1000000, { amplifier: 255, showParticles: true });
-        // Mining Fatigue
-        member.addEffect(MinecraftEffectTypes.MiningFatigue, 1000000, { amplifier: 255, showParticles: true });
-        // Weakness
-        member.addEffect(MinecraftEffectTypes.Weakness, 1000000, { amplifier: 255, showParticles: true });
-        // Slowness
-        member.addEffect(MinecraftEffectTypes.Slowness, 1000000, { amplifier: 255, showParticles: true });
+        const effectsToAdd = [MinecraftEffectTypes.Blindness, MinecraftEffectTypes.MiningFatigue, MinecraftEffectTypes.Weakness, MinecraftEffectTypes.Slowness];
+
+        for (const effectType of effectsToAdd) {
+            member.addEffect(effectType, 1000000, { amplifier: 255, showParticles: true });
+        }
+
         member.addTag("paradoxFreeze");
-        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f フリーズ状態になりました.`);
-        sendMsg(`@a[tag=paradoxOpped]`, `${member.name}§fがフリーズしました`);
+        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You are now frozen.`);
+        sendMsg(`@a[tag=paradoxOpped]`, `§7${member.name}§f is now frozen.`);
         return;
     }
 }

@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, Player,  } from "@minecraft/server";
+import { ChatSendAfterEvent, Player } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsgToPlayer } from "../../util.js";
@@ -42,7 +42,7 @@ export function notify(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -59,12 +59,12 @@ export function notify(message: ChatSendAfterEvent, args: string[]) {
     // Disable
     if (tagBoolean) {
         player.removeTag("notify");
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 検知ログが見れなくなりました`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You have disabled cheat notifications.`);
     }
 
     // Enable
     if (!tagBoolean) {
         player.addTag("notify");
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 検知ログが見れるようになりました.`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You have enabled cheat notifications.`);
     }
 }

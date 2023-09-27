@@ -56,7 +56,7 @@ async function handlePunish(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -87,12 +87,12 @@ async function handlePunish(message: ChatSendAfterEvent, args: string[]) {
 
     // Are they online?
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
     // Make sure they don't punish themselves
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者には実行できません.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot punish yourself.`);
     }
 
     // There are 30 slots ranging from 0 to 29
@@ -115,7 +115,7 @@ async function handlePunish(message: ChatSendAfterEvent, args: string[]) {
         } catch {}
     }
     // Notify staff and player that punishment has taken place
-    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f あなたのインベントリが全て消去された`);
+    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You have been punished for your behavior!`);
     // Use try/catch in case nobody has tag 'notify' as this will report 'no target selector'
-    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§fが ${member.name}のインベントリを全て消去した§f`);
+    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has punished §7${member.name}§f`);
 }

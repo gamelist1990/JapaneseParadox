@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, ItemStack, Player,  } from "@minecraft/server";
+import { ChatSendAfterEvent, ItemStack, Player } from "@minecraft/server";
 import { MinecraftItemTypes } from "../../node_modules/@minecraft/vanilla-data/lib/index";
 import config from "../../data/config.js";
 import { getPrefix, sendMsgToPlayer } from "../../util.js";
@@ -47,7 +47,7 @@ export function listitems(message: ChatSendAfterEvent, args: string[]) {
     const encode = EncryptionManager.hashWithSalt(salt as string, key);
     // Make sure the user has permissions to run the command
     if (!encode || hash === undefined || encode !== hash) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix

@@ -15,15 +15,15 @@ function dhms(ms: number) {
     const minutesms = ms % (60 * 1000);
     const sec = Math.floor(minutesms / 1000);
     if (days !== 0) {
-        return days + " 一日 : " + hours + " 時間 : " + minutes + " 分 : " + sec + " 秒";
+        return days + " Days : " + hours + " Hours : " + minutes + " Minutes : " + sec + " Seconds";
     }
     if (hours !== 0) {
-        return hours + " 時間 : " + minutes + " 分 : " + sec + " 秒";
+        return hours + " Hours : " + minutes + " Minutes : " + sec + " Seconds";
     }
     if (minutes !== 0) {
-        return minutes + " 分 : " + sec + " 秒";
+        return minutes + " Minutes : " + sec + " Seconds";
     }
-    return sec + " 秒";
+    return sec + " Seconds";
 }
 
 function goHomeHelp(player: Player, prefix: string) {
@@ -93,7 +93,7 @@ async function handleGoHome(message: ChatSendAfterEvent, args: string[]) {
 
     // Don't allow spaces
     if (length > 1) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 空白を入れないでね`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f No spaces in names please!`);
     }
 
     // Hash the coordinates for security
@@ -122,7 +122,7 @@ async function handleGoHome(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!coordinatesArray) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  '${args[0]}' 存在しません`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Home '§7${args[0]}§f' does not exist!`);
     }
 
     const coordArrayLength = coordinatesArray.length;
@@ -143,7 +143,7 @@ async function handleGoHome(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!homex || !homey || !homez || !dimension) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  '${args[0]}' 存在しません!`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Home '§7${args[0]}§f' does not exist!`);
     } else {
         let cooldownCalc: number;
         let activeTimer: string;
@@ -166,7 +166,7 @@ async function handleGoHome(message: ChatSendAfterEvent, args: string[]) {
         if (cooldownCalc === msSettings || cooldownCalc <= 0 || uniqueId === player.name) {
             // This timer is a grace period
             setTimer(player.id);
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f TPしました!`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Welcome back!`);
             player.teleport({ x: homex, y: homey, z: homez }, { dimension: world.getDimension(dimension), rotation: { x: 0, y: 0 }, facingLocation: { x: 0, y: 0, z: 0 }, checkForBlocks: false, keepVelocity: false });
             // Delete old key and value
             cooldownTimer.delete(player);
@@ -174,7 +174,7 @@ async function handleGoHome(message: ChatSendAfterEvent, args: string[]) {
             cooldownTimer.set(player, new Date().getTime());
         } else {
             // Teleporting to fast
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f テレポート間隔がはやすぎます${activeTimer} 待ってください`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Too fast! Please wait for §7${activeTimer}§f before going home.`);
         }
     }
 }

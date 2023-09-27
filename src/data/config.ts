@@ -40,7 +40,6 @@ export default {
         spammerb: true,
         spammerc: true,
         antispam: true,
-        crashera: true,
         namespoofa: true,
         namespoofb: true,
         reacha: true,
@@ -101,9 +100,6 @@ export default {
             enabled: true,
         },
         antispam: {
-            enabled: true,
-        },
-        crasherA: {
             enabled: true,
         },
         namespoofA: {
@@ -197,7 +193,7 @@ export default {
         },
         setHome: {
             enabled: true,
-            max: 10,
+            max: 5,
         },
         goHome: {
             seconds: 10,
@@ -206,7 +202,7 @@ export default {
             days: 0,
         },
         clearLag: {
-            enabled: false,
+            enabled: true,
             seconds: 0,
             minutes: 0,
             hours: 1,
@@ -221,10 +217,10 @@ export default {
         },
         hotbar: {
             enabled: false,
-            message: "プラグインが有効です", // Put Message inside the quotes
+            message: "通知", // Put Message inside the quotes
         },
         ops: {
-            enabled: true,
+            enabled: false,
         },
         salvage: {
             enabled: false,
@@ -244,14 +240,14 @@ export default {
             enabled: true,
         },
         tprExpiration: {
-            seconds: 0,
-            minutes: 2,
+            seconds: 10,
+            minutes: 0,
             hours: 0,
             days: 0,
         },
         banAppeal: {
             enabled: true,
-            discordLink: "異議がある場合Discordで連絡してください",
+            discordLink: "BANに不満があるならDISCORDでお知らせください。",
         },
         autoBan: {
             enabled: false,
@@ -275,9 +271,9 @@ export default {
      * This is required for Realm users to gain Paradox-Op.
      *
      * Anyone else is welcome to use this if they like but
-     * レルムズで使用する場合必ずパスワードを設定してね
+     * are not obligated.
      */
     encryption: {
-        password: "",
+        password: "HACKERBAN",
     },
 };

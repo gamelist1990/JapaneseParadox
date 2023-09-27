@@ -56,7 +56,7 @@ async function handleECWipe(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -84,12 +84,12 @@ async function handleECWipe(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
     // There are 30 slots ranging from 0 to 29
     for (let slot = 0; slot < 30; slot++) {
         member.runCommand(`replaceitem entity @s slot.enderchest ${slot} air`);
     }
-    return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  ${member.name}'のエンダーチェストが消去された`);
+    return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Wiped §7${member.name}'s§f enderchest!`);
 }

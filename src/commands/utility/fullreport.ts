@@ -1,9 +1,10 @@
-import { ChatSendAfterEvent, EntityEquipmentInventoryComponent, EquipmentSlot, ItemEnchantsComponent, ItemStack, Player, world } from "@minecraft/server";
+import { ChatSendAfterEvent, EntityEquippableComponent, EquipmentSlot, ItemEnchantsComponent, ItemStack, Player, world } from "@minecraft/server";
 import { MinecraftEnchantmentTypes } from "../../node_modules/@minecraft/vanilla-data/lib/index";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getGamemode, getPrefix, sendMsgToPlayer } from "../../util.js";
 import { ScoreManager } from "../../classes/ScoreManager";
+
 function fullReportHelp(player: Player, prefix: string) {
     let commandStatus: string;
     if (!config.customcommands.fullreport) {
@@ -57,7 +58,7 @@ async function handleFullReport(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -70,7 +71,7 @@ async function handleFullReport(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!player.hasTag("notify")) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f チートログを有効にしてね！.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to enable cheat notifications.`);
     }
 
     const players = world.getPlayers();
@@ -117,13 +118,13 @@ async function handleFullReport(message: ChatSendAfterEvent, args: string[]) {
             }
         });
 
-        const equipment = member.getComponent("equipment_inventory") as EntityEquipmentInventoryComponent;
-        const helmet = equipment.getEquipment("head" as EquipmentSlot);
-        const chest = equipment.getEquipment("chest" as EquipmentSlot);
-        const legs = equipment.getEquipment("legs" as EquipmentSlot);
-        const feet = equipment.getEquipment("feet" as EquipmentSlot);
-        const mainhand = equipment.getEquipment("mainhand" as EquipmentSlot);
-        const offhand = equipment.getEquipment("offhand" as EquipmentSlot);
+        const equipment = member.getComponent("equippable") as EntityEquippableComponent;
+        const helmet = equipment.getEquipment(EquipmentSlot.Head);
+        const chest = equipment.getEquipment(EquipmentSlot.Chest);
+        const legs = equipment.getEquipment(EquipmentSlot.Legs);
+        const feet = equipment.getEquipment(EquipmentSlot.Feet);
+        const mainhand = equipment.getEquipment(EquipmentSlot.Mainhand);
+        const offhand = equipment.getEquipment(EquipmentSlot.Offhand);
 
         const materialColors: { [key: string]: string } = {
             golden: "§6", // gold

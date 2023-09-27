@@ -56,7 +56,7 @@ export function unban(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -82,9 +82,9 @@ export function unban(message: ChatSendAfterEvent, args: string[]) {
     if (argCheck && args[0].toLowerCase() === "delete") {
         const nameToDelete = args.slice(1).join(" ");
         if (queueUnban.delete(nameToDelete)) {
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${nameToDelete} がBANリストから削除されました！`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${nameToDelete}§f has been removed from the unban queue!`);
         } else {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ${nameToDelete} がBANリストに入っていない！`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f §7${nameToDelete}§f is not in the unban queue!`);
         }
         return;
     }
@@ -96,5 +96,5 @@ export function unban(message: ChatSendAfterEvent, args: string[]) {
     }
 
     queueUnban.add(username);
-    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 追放解除待ちのプレイヤー＝＞ ${username}`);
+    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Player queued to be unbanned: §7${username}§f`);
 }

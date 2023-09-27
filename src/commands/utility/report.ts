@@ -37,7 +37,7 @@ export function report(message: ChatSendAfterEvent, args: string[]) {
     }
 
     const player = message.sender;
-    const reason = args.slice(1).join(" ") || "理由なし";
+    const reason = args.slice(1).join(" ") || "No reason specified";
 
     // Check for custom prefix
     const prefix = getPrefix(player);
@@ -65,15 +65,15 @@ export function report(message: ChatSendAfterEvent, args: string[]) {
 
     if (!member) {
         sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f !report <player> <reason>§f`);
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
     // Make sure they dont report themselves
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f自分自身には実行できません.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot report yourself.`);
     }
 
-    sendMsgToPlayer(player, `§r§4[§6Paradox§4]§r ${member.name}§r が報告を受けましたしました＝＞内容： ${reason}`);
+    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Reported §7${member.name}§f with reason: §7${reason}§f`);
 
-    sendMsg("@a[tag=notify]", `§r§4[§6Paradox§4]§r ${player.name}§rが ${member.name}§rに報告を送信しました内＝＞内容: ${reason}`);
+    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f §7${player.name}§f has reported §7${member.name}§f with reason: §7${reason}§f`);
 }

@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, Player, Vector3, } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3 } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsgToPlayer } from "../../util.js";
@@ -43,7 +43,7 @@ export function modules(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -77,7 +77,6 @@ export function modules(message: ChatSendAfterEvent, args: string[]) {
     const creativeGMBoolean = dynamicPropertyRegistry.get("creativegm_b");
     const survivalGMBoolean = dynamicPropertyRegistry.get("survivalgm_b");
     const flyABoolean = dynamicPropertyRegistry.get("flya_b");
-    const crasherABoolean = dynamicPropertyRegistry.get("crashera_b");
     const bedrockValidateBoolean = dynamicPropertyRegistry.get("bedrockvalidate_b");
     const reachBBoolean = dynamicPropertyRegistry.get("reachb_b");
     const antiScaffoldABoolean = dynamicPropertyRegistry.get("antiscaffolda_b");
@@ -111,7 +110,7 @@ export function modules(message: ChatSendAfterEvent, args: string[]) {
     const worldBorderNetherNumber = dynamicPropertyRegistry.get("worldborder_nether_n");
     const worldBorderEndNumber = dynamicPropertyRegistry.get("worldborder_end_n");
 
-    const status = (b: string | number | boolean | Vector3 | Vector3) => (b ? "§a有効" : "§4無効");
+    const status = (b: string | number | boolean | Vector3) => (b ? "§aENABLED" : "§4DISABLED");
 
     sendMsgToPlayer(player, [
         `§f§4[§6Paradox§4]§f List Of Modules:`,
@@ -123,7 +122,6 @@ export function modules(message: ChatSendAfterEvent, args: string[]) {
         `§o§6|§f SpammerB: ${status(spammerBBoolean)}`,
         `§o§6|§f SpammerC: ${status(spammerCBoolean)}`,
         `§o§6|§f Anti-Spam: ${status(antiSpamBoolean)}`,
-        `§o§6|§f CrasherA: ${status(crasherABoolean)}`,
         `§o§6|§f NamespoofA: ${status(nameSpoofABoolean)}`,
         `§o§6|§f NamespoofB: ${status(nameSpoofBBoolean)}`,
         `§o§6|§f Bedrock: ${status(bedrockValidateBoolean)}`,
@@ -134,8 +132,8 @@ export function modules(message: ChatSendAfterEvent, args: string[]) {
         `§o§6|§f InvalidSprintA: ${status(InvalidSprintABoolean)}`,
         `§o§6|§f FlyA: ${status(flyABoolean)}`,
         `§o§6|§f AntiFallA: ${status(antiFallABoolean)}`,
-        `§o§6|§f IllegalItemsA: ${illegalItemsABoolean ? `§a有効§f [違法スタックの禁止: ${status(stackBanBoolean)}§f]` : "§4無効"}`,
-        `§6|§f IllegalItemsB: ${illegalItemsBBoolean ? `§a有効§f [違法スタックの禁止: ${status(stackBanBoolean)}§f]` : "§4無効"}`,
+        `§o§6|§f IllegalItemsA: ${illegalItemsABoolean ? `§aENABLED§f [Ban Illegal Stacks: ${status(stackBanBoolean)}§f]` : "§4DISABLED"}`,
+        `§o§6|§f IllegalItemsB: ${illegalItemsBBoolean ? `§aENABLED§f [Ban Illegal Stacks: ${status(stackBanBoolean)}§f]` : "§4DISABLED"}`,
         `§o§6|§f IllegalItemsC: ${status(illegalItemsCBoolean)}`,
         `§o§6|§f IllegalEnchantments: ${status(illegalEnchantmentBoolean)}`,
         `§o§6|§f IllegalLores: ${status(illegalLoresBoolean)}`,
@@ -155,7 +153,7 @@ export function modules(message: ChatSendAfterEvent, args: string[]) {
         `§o§6|§f Anti-KillAura: ${status(antiKillAuraBoolean)}`,
         `§o§6|§f Anti-Enchanted: ${status(encharmor)}`,
         `§o§6|§f Autoclicker: ${status(autoclickerBoolean)}`,
-        `§o§6|§f World Border: ${worldBorderBoolean ? `§a有効§f (現世: §6${worldBorderOverworldNumber}§f ネザー: §6${worldBorderNetherNumber}§f エンド: §6${worldBorderEndNumber}§f)` : "§4無効"}`,
+        `§o§6|§f World Border: ${worldBorderBoolean ? `§aENABLED§f (Overworld: §6${worldBorderOverworldNumber}§f Nether: §6${worldBorderNetherNumber}§f End: §6${worldBorderEndNumber}§f)` : "§4DISABLED"}`,
         `§o§6|§f ClearLag: ${status(clearLagBoolean)}`,
         `§o§6|§f ShowRules: ${status(showrulesBoolean)}`,
         `§o§6|§f AutoBan: ${status(autobanBoolean)}`,

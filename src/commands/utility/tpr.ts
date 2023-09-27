@@ -58,7 +58,7 @@ function teleportRequestHandler({ sender, message }: ChatSendAfterEvent) {
     }
 
     if (!target) {
-        sendMsgToPlayer(player, "§f§4[§6Paradox§4]§f 指定したプレイヤーが見つかりません");
+        sendMsgToPlayer(player, "§f§4[§6Paradox§4]§f Target player not found.");
         return;
     }
 
@@ -68,7 +68,7 @@ function teleportRequestHandler({ sender, message }: ChatSendAfterEvent) {
         if (Date.now() >= request.expiresAt) {
             teleportRequests.splice(requestIndex, 1);
         } else {
-            sendMsgToPlayer(player, "§f§4[§6Paradox§4]§f  そのプレイヤーはすでにテレポートのリクエストを保留にしています");
+            sendMsgToPlayer(player, "§f§4[§6Paradox§4]§f That player already has a teleport request pending.");
             return;
         }
     }
@@ -88,8 +88,8 @@ function teleportRequestHandler({ sender, message }: ChatSendAfterEvent) {
         expiresAt: Date.now() + durationInMs, // Expires in the time specified in 'durationInMs'
     });
 
-    sendMsgToPlayer(player, `§r§4[§6Paradox§4]§r TPリクエストを ${target.name}. に送りました`);
-    sendMsgToPlayer(target, `§r§4[§6Paradox§4]§r  ${player.name}.からあなた宛てにTPリクエストが来ています 許可するにはチャット欄でyes拒否するにはnotと送ってください`);
+    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Teleport request sent to §7${target.name}§f. Waiting for approval...`);
+    sendMsgToPlayer(target, `§f§4[§6Paradox§4]§f You have received a teleport request from §7${player.name}§f. Type '§7approved§f' or '§7denied§f' in chat to respond.`);
 }
 
 // This handles requests pending approval
@@ -100,8 +100,8 @@ function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
     // Extract the response from the decrypted string
     const refChar = lowercaseMessage.split("§r");
     const extractedPhrase = refChar[1];
-    const isApprovalRequest = extractedPhrase === "yes" || extractedPhrase === "approve";
-    const isDenialRequest = extractedPhrase === "not" || extractedPhrase === "deny";
+    const isApprovalRequest = extractedPhrase === "approved" || extractedPhrase === "approve";
+    const isDenialRequest = extractedPhrase === "denied" || extractedPhrase === "deny";
 
     if (!isApprovalRequest && !isDenialRequest) {
         return;
@@ -118,8 +118,8 @@ function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
 
     const request = teleportRequests[requestIndex];
     if (Date.now() >= request.expiresAt) {
-        sendMsgToPlayer(request.requester, "§f§4[§6Paradox§4]§f テレポート要求の有効期限が切れました。もう一度やり直してください。");
-        sendMsgToPlayer(request.target, "§f§4[§6Paradox§4]§f テレポート要求の有効期限が切れました。もう一度やり直してください。");
+        sendMsgToPlayer(request.requester, "§f§4[§6Paradox§4]§f Teleport request expired. Please try again.");
+        sendMsgToPlayer(request.target, "§f§4[§6Paradox§4]§f Teleport request expired. Please try again.");
         teleportRequests.splice(requestIndex, 1);
         return;
     }
@@ -127,9 +127,9 @@ function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
     if (isApprovalRequest) {
         setTimer(request.requester.id);
         request.requester.teleport(request.target.location, { dimension: request.target.dimension, rotation: { x: 0, y: 0 }, facingLocation: { x: 0, y: 0, z: 0 }, checkForBlocks: false, keepVelocity: false });
-        sendMsgToPlayer(request.requester, `§f§4[§6Paradox§4]§f${request.target.name}がTPを許可しました`);
+        sendMsgToPlayer(request.requester, `§f§4[§6Paradox§4]§f Teleport request to §7${request.target.name}§f is approved.`);
     } else {
-        sendMsgToPlayer(request.requester, `§f§4[§6Paradox§4]§f${request.target.name}がTPを拒否しました`);
+        sendMsgToPlayer(request.requester, `§f§4[§6Paradox§4]§f Teleport request to §7${request.target.name}§f is denied.`);
     }
 
     teleportRequests.splice(requestIndex, 1);
@@ -167,7 +167,7 @@ export function TeleportRequestHandler({ sender, message }: ChatSendAfterEvent, 
     }
 
     // This is for the GUI when sending approvals or denials
-    const validMessages = ["yes", "approve", "not", "deny"];
+    const validMessages = ["approved", "approve", "denied", "deny"];
 
     if (validMessages.some((msg) => msg === message)) {
         const event = {

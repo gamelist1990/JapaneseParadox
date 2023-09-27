@@ -25,11 +25,11 @@ function flyHelp(player: Player, prefix: string | number | boolean) {
 }
 
 function mayflydisable(player: Player, member: Player) {
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ 飛行モード ＝＞ ${player === member ? "themselves" : member.name}.`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled fly mode for ${player === member ? "themselves" : "§7" + member.name}.`);
 }
 
 function mayflyenable(player: Player, member: Player) {
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ 飛行モード＝＞ ${player === member ? "themselves" : member.name}.`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled fly mode for ${player === member ? "themselves" : "§7" + member.name}.`);
 }
 
 /**
@@ -64,7 +64,7 @@ async function handleFly(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -94,7 +94,7 @@ async function handleFly(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
     const membertag = member.getTags();
@@ -107,7 +107,7 @@ async function handleFly(message: ChatSendAfterEvent, args: string[]) {
                 mayflyenable(player, member);
             })
             .catch(() => {
-                return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f§4[Fly]§f Education Editionが無効です.`);
+                return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f§4[Fly]§f Education Edition is disabled in this world.`);
             });
         return;
     }
@@ -125,7 +125,7 @@ async function handleFly(message: ChatSendAfterEvent, args: string[]) {
                 member.removeTag("noflying");
             })
             .catch(() => {
-                return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f§4[Fly]§f Education Editionが無効です.`);
+                return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f§4[Fly]§f Education Edition is disabled in this world.`);
             });
         return;
     }

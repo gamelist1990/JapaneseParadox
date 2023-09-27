@@ -56,7 +56,7 @@ export function delhome(message: ChatSendAfterEvent, args: string[]) {
 
     // Don't allow spaces
     if (length > 1) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 空白を入れないでね`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f No spaces in names please!`);
     }
 
     // Hash the coordinates for security
@@ -76,13 +76,13 @@ export function delhome(message: ChatSendAfterEvent, args: string[]) {
         if (tags[i].startsWith(args[0].toString() + " X", 13)) {
             verify = true;
             player.removeTag(encryptedString);
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 消去しました '${args[0]}'!`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Successfully deleted home '§7${args[0]}§f'!`);
             break;
         }
     }
     if (verify === true) {
         return;
     } else {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  '${args[0]}' は存在しません`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Home '§7${args[0]}§f' does not exist!`);
     }
 }

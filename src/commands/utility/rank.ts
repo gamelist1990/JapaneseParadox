@@ -24,11 +24,11 @@ function rankHelp(player: Player, prefix: string, chatRanksBoolean: string | num
         `§4[§6Optional§4]§f: tag, tag--tag, reset, help`,
         `§4[§6Description§4]§f: Gives one or more ranks to a specified player or resets it.`,
         `§4[§6Examples§4]§f:`,
-        `    ${prefix}rank ${player.name} Admin`,
+        `    ${prefix}rank ${player.name} {Admin}`,
         `        §4- §6Give the "Admin" rank to the specified player§f`,
-        `    ${prefix}rank ${player.name} Contributor--Mod`,
+        `    ${prefix}rank ${player.name} [Contributor]--{Mod}`,
         `        §4- §6Give the "Contributor" and "Mod" ranks to the specified player§f`,
-        `    ${prefix}rank ${player.name} Staff--Mod--Helper`,
+        `    ${prefix}rank ${player.name} (Staff)--Mod--[Helper]`,
         `        §4- §6Give the "Staff", "Mod", and "Helper" rank to the specified player§f`,
         `    ${prefix}rank reset ${player.name}`,
         `        §4- §6Reset all ranks of the specified player§f`,
@@ -58,7 +58,7 @@ export function rank(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Get Dynamic Property Boolean
@@ -81,6 +81,11 @@ export function rank(message: ChatSendAfterEvent, args: string[]) {
     const playerName = args.slice(0, -1).join(" "); // Combine all arguments except the last one as the player name
     const rank = args[args.length - 1]; // Last argument is the rank
 
+    // Check if the rank argument starts or ends with a hyphen
+    if (rank.startsWith("-") || rank.endsWith("-")) {
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f The rank cannot start or end with a hyphen.`);
+    }
+
     // try to find the player requested
     let member: Player;
     const players = world.getPlayers();
@@ -92,7 +97,7 @@ export function rank(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
     // check if array contains the string 'reset'
@@ -114,8 +119,8 @@ export function rank(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (player === member) {
-        return sendMsg("@a[tag=paradoxOpped]", `${player.name} ランクを変えました`);
+        return sendMsg("@a[tag=paradoxOpped]", `§7${player.name}§f has changed their rank`);
     }
 
-    sendMsg("@a[tag=paradoxOpped]", `${player.name}が ${member.name}'のランクを変更しました`);
+    sendMsg("@a[tag=paradoxOpped]", `§7${player.name}§f has changed §7${member.name}'s§f rank!`);
 }

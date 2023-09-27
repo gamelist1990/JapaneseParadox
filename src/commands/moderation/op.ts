@@ -95,15 +95,15 @@ export function op(message: ChatSendAfterEvent, args: string[]) {
 
                 dynamicPropertyRegistry.set(targetPlayer.id, targetPlayer.name);
 
-                sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f  ${targetPlayer.name}を管理者にしました`);
-                sendMsgToPlayer(targetPlayer, `§f§4[§6Paradox§4]§f 管理者になりました!`);
-                sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${targetPlayer.name}§f は管理者権限が与えられました.`);
+                sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f You have granted Paradox-Op to §7${targetPlayer.name}§f.`);
+                sendMsgToPlayer(targetPlayer, `§f§4[§6Paradox§4]§f You are now op!`);
+                sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${targetPlayer.name}§f is now Paradox-Opped.`);
                 targetPlayer.addTag("paradoxOpped");
             } else {
-                sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f ${targetPlayer.name} 既に管理者権限を所有しています.`);
+                sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f §7${targetPlayer.name}§f is already Paradox-Opped.`);
             }
         } else {
-            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f プレイヤーが見つかりません ${targetPlayerName}.`);
+            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f Could not find player §7${targetPlayerName}§f.`);
         }
     } else if (args.length === 0 && !config.encryption.password) {
         // Operator wants to change their own password
@@ -119,7 +119,7 @@ export function op(message: ChatSendAfterEvent, args: string[]) {
         operator.setDynamicProperty("salt", targetSalt);
         operator.addTag("paradoxOpped");
 
-        sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f管理者になりました`);
+        sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f You are now Paradox-Opped!`);
 
         dynamicPropertyRegistry.set(operator.id, operator.name);
 
@@ -136,11 +136,11 @@ export function op(message: ChatSendAfterEvent, args: string[]) {
             operator.setDynamicProperty("salt", targetSalt);
             operator.addTag("paradoxOpped");
 
-            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f あなたは今、パスワードを使ってログインしています。`);
+            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f You are now Paradox-Opped using the password.`);
             dynamicPropertyRegistry.set(operator.id, operator.name);
         } else {
             // Incorrect password
-            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f パスワードが間違っています。このコマンドを使用するにはオペレータである必要があります。`);
+            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f Incorrect password. You need to be Operator to use this command.`);
         }
     } else {
         return opHelp(operator, prefix);

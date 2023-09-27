@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, Player, world, } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
@@ -43,7 +43,7 @@ export function deop(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -74,7 +74,7 @@ export function deop(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ユーザーが見つかりません`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
     // Check for hash/salt and validate password from member
@@ -89,13 +89,13 @@ export function deop(message: ChatSendAfterEvent, args: string[]) {
         memberEncode = EncryptionManager.hashWithSalt(memberSalt as string, memberKey);
     } catch (error) {}
 
-    if (memberHash !== undefined && memberHash === memberEncode) {
+    if (memberEncode && memberHash !== undefined && memberHash === memberEncode) {
         member.removeDynamicProperty("hash");
         member.removeDynamicProperty("salt");
         member.removeTag("paradoxOpped");
         dynamicPropertyRegistry.delete(member.id);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f${member.name}から管理者権限を取り消しました`);
-        return sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f管理者権限が取り消されました`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${member.name}§f is no longer Paradox-Opped.`);
+        return sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f Your OP status has been revoked!`);
     }
-    return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ${member.name}管理者権限を消去しました`);
+    return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f §7${member.name}§f never had permission to use Paradox.`);
 }

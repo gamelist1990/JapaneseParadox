@@ -58,7 +58,7 @@ async function handleUnmute(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -77,7 +77,7 @@ async function handleUnmute(message: ChatSendAfterEvent, args: string[]) {
 
     // Modify the argument handling
     let playerName = args.shift();
-    let reason = "理由なし";
+    let reason = "No reason specified";
 
     // Check if the command has a reason provided
     if (args.length > 1) {
@@ -102,17 +102,17 @@ async function handleUnmute(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
     // If not already muted then tag
     if (member.hasTag("isMuted")) {
         member.removeTag("isMuted");
     } else {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f このプレイヤーはミュートされていない`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f This player is not muted.`);
     }
     // If Education Edition is enabled then legitimately unmute
     member.runCommandAsync(`ability @s mute false`);
-    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f あなたはミュートが解除されました.`);
-    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§fが${member.name}のミュートを解除しました§f. 理由: ${reason}`);
+    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You have been unmuted.`);
+    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has unmuted §7${member.name}§f. Reason: §7${reason}§f`);
 }

@@ -94,7 +94,7 @@ export function listhome(message: ChatSendAfterEvent, args: string[]) {
                     continue;
                 } else {
                     if (counter === 1) {
-                        homeMessages.push(`§f§4[§6Paradox§4]§f 保存されている座標:`);
+                        homeMessages.push(`§f§4[§6Paradox§4]§f List Of Homes:`);
                     }
                     homeMessages.push(` §o§6|§f §4[§f${home}§4]§f §6=>§f ${homex} ${homey} ${homez} §6<=§f §4[§f${dimension}§4]§f`);
                 }
@@ -106,7 +106,7 @@ export function listhome(message: ChatSendAfterEvent, args: string[]) {
         // Send all the home location messages at once using sendMsgToPlayer
         sendMsgToPlayer(player, homeMessages);
     } else {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 現在保存されている座標はありません`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You have none saved locations.`);
     }
     return;
 }

@@ -2,6 +2,7 @@ import { ChatSendAfterEvent, Player } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
+import { MinecraftEffectTypes } from "../../node_modules/@minecraft/vanilla-data/lib/index.js";
 
 function vanishHelp(player: Player, prefix: string) {
     let commandStatus: string;
@@ -56,7 +57,7 @@ async function handleVanish(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -73,13 +74,18 @@ async function handleVanish(message: ChatSendAfterEvent, args: string[]) {
     if (vanishBoolean) {
         player.removeTag("vanish");
         player.triggerEvent("unvanish");
-        player.runCommandAsync(`effect @s clear`);
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 透明化が解除されました`);
-        sendMsg(`@a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f ${player.name}§fは透明化が解除されました`);
+        // Remove effects
+        const effectsToRemove = [MinecraftEffectTypes.Invisibility, MinecraftEffectTypes.NightVision];
+
+        for (const effectType of effectsToRemove) {
+            player.removeEffect(effectType);
+        }
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You are no longer vanished.`);
+        sendMsg(`@a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f §7${player.name}§f is no longer in vanish.`);
     } else {
         player.addTag("vanish");
         player.triggerEvent("vanish");
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 透明化が有効です`);
-        sendMsg(`@a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f ${player.name}§f は透明化が有効になりました`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You are now vanished!`);
+        sendMsg(`@a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f §7${player.name}§f is now vanished!`);
     }
 }

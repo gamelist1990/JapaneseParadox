@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, Player, world,  } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
@@ -60,7 +60,7 @@ async function handleKick(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -79,7 +79,7 @@ async function handleKick(message: ChatSendAfterEvent, args: string[]) {
 
     // Modify the argument handling
     let playerName = args.shift();
-    let reason = "理由なし";
+    let reason = "No reason specified";
 
     // Check if the command has a reason provided
     if (args.length > 1) {
@@ -104,16 +104,16 @@ async function handleKick(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
     // make sure they dont kick themselves
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者にしか実行できません`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot kick yourself.`);
     }
     player.runCommandAsync(`kick "${member.name}" §f\n\n${reason}`).catch((error) => {
         console.warn(`${new Date()} | ` + error);
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f キックできませんでした`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f I was unable to kick that player!`);
     });
-    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f${player.name}§f has kicked ${member.name}§f. Reason: ${reason}`);
+    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has kicked §7${member.name}§f. Reason: §7${reason}§f`);
 }

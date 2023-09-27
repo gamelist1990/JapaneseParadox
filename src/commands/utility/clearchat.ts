@@ -42,7 +42,7 @@ export function clearchat(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -56,5 +56,5 @@ export function clearchat(message: ChatSendAfterEvent, args: string[]) {
 
     for (let clear = 0; clear < 10; clear++) sendMsg("@a", "\n".repeat(60));
 
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f  ${player.name}がチャット欄をクリアしました`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f Chat has been cleared by §7${player.name}§f`);
 }

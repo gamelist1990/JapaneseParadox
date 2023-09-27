@@ -50,7 +50,7 @@ export function give(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     // Check for custom prefix
@@ -81,7 +81,7 @@ export function give(message: ChatSendAfterEvent, args: string[]) {
 
     // Are they online?
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
     /**
@@ -125,11 +125,11 @@ export function give(message: ChatSendAfterEvent, args: string[]) {
             const item = new ItemStack(MinecraftItemTypes[itemStringConvert], Number(args[2]), Number(args[3]));
             inv.addItem(item);
             */
-            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ${member.name} に ${args[1]} x${args[2]}を与えました`);
+            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f §7${member.name}§f was given §7${args[1]}§f x§7${args[2]}§f.`);
         } else {
-            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f スタック数が上限を超えています！ ${maxStack} が最大です.`);
+            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f This stack is too high! §7${maxStack}§f is the max. Try again.`);
         }
     } else {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f このアイテムは見つかりませんでした！もう一度お試しください`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f This item could not be found! Try again.`);
     }
 }

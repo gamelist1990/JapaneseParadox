@@ -62,7 +62,7 @@ export function sethome(message: ChatSendAfterEvent, args: string[]) {
     // Don't allow spaces
     if (args.length > 1 || args[0].trim().length === 0) {
         setHomeHelp(player, prefix);
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 空白を入れないでね`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f No spaces in names please!`);
     }
 
     // Hash the coordinates for security
@@ -80,7 +80,7 @@ export function sethome(message: ChatSendAfterEvent, args: string[]) {
         }
         if (tags[i].startsWith(args[0].toString() + " X", 13)) {
             verify = true;
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f'${args[0]}'同じ名前の座標があります`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Home with name '§7${args[0]}§f' already exists!`);
             break;
         }
         if (tags[i].startsWith("LocationHome:")) {
@@ -88,7 +88,7 @@ export function sethome(message: ChatSendAfterEvent, args: string[]) {
         }
         if (counter >= config.modules.setHome.max && config.modules.setHome.enabled) {
             verify = true;
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  ${config.modules.setHome.max} 保存数が上限に達しました`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You can only have §7${config.modules.setHome.max}§f saved locations at a time!`);
             break;
         }
     }
@@ -104,13 +104,13 @@ export function sethome(message: ChatSendAfterEvent, args: string[]) {
         currentDimension = "nether";
     }
     if (player.dimension.id === "minecraft:the_end") {
-        currentDimension = "the_end";
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Not allowed to set home in this dimension!`);
     }
 
     const decryptedLocationString = `LocationHome:${args[0]} X:${homex} Y:${homey} Z:${homez} Dimension:${currentDimension}`;
-    const security = EncryptionManager.encryptString(decryptedLocationString, String(salt));
+    const security = EncryptionManager.encryptString(decryptedLocationString, salt as string);
     // Store their new home coordinates
     player.addTag(security);
 
-    sendMsgToPlayer(player, `§r§4[§6Paradox§4]§r'${args[0]}'を座標§2X=${homex} §4Y=${homey} §eZ=${homez}§rに設定しました`);
+    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Home '§7${args[0]}§f' has been set at §7${homex} ${homey} ${homez}§f!`);
 }
