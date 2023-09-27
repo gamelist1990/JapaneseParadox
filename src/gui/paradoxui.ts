@@ -46,7 +46,6 @@ async function handleParadoxUI(player: Player) {
         maingui.button("TPリクエスト！", "textures/blocks/portal_placeholder");
         maingui.button("座標保存", "textures/items/compass_item");
         maingui.button("報告！", "textures/items/paper");
-        maingui.button("制作途中【一時的に報告に置き換わります】", "textures/ui/mute_off");
     } else {
         maingui.button("オペレーター", "textures/ui/op");
         maingui.button("権限剝奪", "textures/items/ender_pearl");
@@ -80,8 +79,6 @@ async function handleParadoxUI(player: Player) {
                     case 3:
                         reportHandler(player);
                         break;
-                    case 4:
-                        chatChannelMainMenu(player);
                     default:
                         // Handle other selections for isUnique case
                         break;
