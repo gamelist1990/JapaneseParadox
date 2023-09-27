@@ -75,7 +75,6 @@ export function help(message: ChatSendAfterEvent) {
         `§6${prefix}spammerb§f - ${config.customcommands.spammerb ? `泳いでいる時にメッセージが送信されたかどうかをチェックする。` : textDisabled}`,
         `§6${prefix}spammerc§f - ${config.customcommands.spammerc ? `アイテム使用中にメッセージが送信されたかどうかをチェックする。` : textDisabled}`,
         `§6${prefix}antispam§f - ${config.customcommands.antispam ? `2秒のクールダウンでチャットのスパムをチェックする。` : textDisabled}`,
-        `§6${prefix}crashera§f - ${config.customcommands.crashera ? `Horion crasherを対策する` : textDisabled}`,
         `§6${prefix}namespoofa§f - ${config.customcommands.namespoofa ? `プレーヤーの名前が文字数の制限を超えていないかチェックする。` : textDisabled}`,
         `§6${prefix}namespoofb§f - ${config.customcommands.namespoofb ? `プレイヤーの名前にASCII以外の文字が含まれていないかチェックする。` : textDisabled}`,
         `§6${prefix}reacha§f - ${config.customcommands.reacha ? `プレイヤーの手の届かないところにブロックがあるかどうかをチェックする。` : textDisabled}`,
