@@ -1,7 +1,7 @@
 import { ChatSendAfterEvent, Player } from "@minecraft/server";
 import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
-import { getPrefix,  sendMsg, sendMsgToPlayer } from "../../util.js";
+import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import { ScoreManager } from "../../classes/ScoreManager.js";
 
 function removeCBEHelp(player: Player, prefix: string, commandblocksscore: number) {
@@ -62,7 +62,7 @@ async function handleRemoveCommandBlocks(message: ChatSendAfterEvent, args: stri
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
     }
 
     const commandblocksscore = ScoreManager.getScore("commandblocks", player);
@@ -79,11 +79,11 @@ async function handleRemoveCommandBlocks(message: ChatSendAfterEvent, args: stri
     if (commandblocksscore <= 0) {
         // Allow
         player.runCommand(`scoreboard players set paradox:config commandblocks 1`);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6Anti Command Blocks§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました＝＞ §6Anti Command Blocks§f!`);
     } else if (commandblocksscore >= 1) {
         // Deny
         player.runCommand(`scoreboard players set paradox:config commandblocks 0`);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4Anti Command Blocks§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ §4Anti Command Blocks§f!`);
     }
     return player.runCommand(`scoreboard players operation @a commandblocks = paradox:config commandblocks`);
 }

@@ -1,6 +1,6 @@
 import { world, EntityQueryOptions, system } from "@minecraft/server";
 import config from "../../../data/config.js";
-import {  sendMsg } from "../../../util.js";
+import { sendMsg } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 import { EncryptionManager } from "../../../classes/EncryptionManager.js";
 
@@ -20,7 +20,7 @@ function verifypermission() {
             if (config.debug) {
                 console.error(`Error retrieving dynamic properties for player: ${player.name}`);
                 console.error(error);
-                console.log("Player:", player.name);
+                console.log("Player: ", player.name);
             }
             continue; // Skip to the next player
         }
@@ -30,7 +30,7 @@ function verifypermission() {
 
         // Generate the hash
         const encode = EncryptionManager.hashWithSalt(salt as string, key);
-        if (encode === hash) {
+        if (encode && encode === hash) {
             // Make sure their unique ID exists in case of a reload
             if (dynamicPropertyRegistry.has(player.id) === false) {
                 dynamicPropertyRegistry.set(player.id, player.name);
@@ -43,7 +43,7 @@ function verifypermission() {
             player.removeTag("paradoxOpped");
         }
 
-        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f ${player.name} had unauthorized permissions. Permissions removed!`);
+        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f §7${player.name}§f had unauthorized permissions. Permissions removed!`);
     }
 }
 

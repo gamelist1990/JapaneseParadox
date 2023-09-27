@@ -1,5 +1,5 @@
 import { world, EntityQueryOptions, GameMode, system } from "@minecraft/server";
-import {  sendMsg } from "../../../util.js";
+import { sendMsg } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 import { ScoreManager } from "../../../classes/ScoreManager.js";
 

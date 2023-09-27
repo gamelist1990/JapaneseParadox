@@ -20,7 +20,7 @@ function verification(object: PlayerSpawnAfterEvent) {
 
     // Generate the hash
     const encode = EncryptionManager.hashWithSalt(salt as string, key);
-    if (encode === hash) {
+    if (encode && encode === hash) {
         // Store as an element using player scoreboard id to uniquely identify them
         dynamicPropertyRegistry.set(player.id, player.name);
         return;

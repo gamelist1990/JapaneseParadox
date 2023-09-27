@@ -73,7 +73,7 @@ export function report(message: ChatSendAfterEvent, args: string[]) {
         return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f自分自身には実行できません.`);
     }
 
-     sendMsgToPlayer(player, `§r§4[§6Paradox§4]§r ${member.name}§r が報告を受けましたしました＝＞内容： ${reason}`);
+    sendMsgToPlayer(player, `§r§4[§6Paradox§4]§r ${member.name}§r が報告を受けましたしました＝＞内容： ${reason}`);
 
-     sendMsg("@a[tag=notify]", `§r§4[§6Paradox§4]§r ${player.name}§rが ${member.name}§rに報告を送信しました内＝＞内容: ${reason}`);
+    sendMsg("@a[tag=notify]", `§r§4[§6Paradox§4]§r ${player.name}§rが ${member.name}§rに報告を送信しました内＝＞内容: ${reason}`);
 }

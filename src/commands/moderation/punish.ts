@@ -119,4 +119,3 @@ async function handlePunish(message: ChatSendAfterEvent, args: string[]) {
     // Use try/catch in case nobody has tag 'notify' as this will report 'no target selector'
     return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§fが ${member.name}のインベントリを全て消去した§f`);
 }
-

@@ -9,6 +9,13 @@ const beforeChatFilter = () => {
     world.beforeEvents.chatSend.subscribe((msg) => {
         const { message, sender: player } = msg;
 
+        // Check if the player is muted
+        if (player.hasTag("isMuted")) {
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You are currently muted.`);
+            msg.cancel = true; // Cancel the chat message
+            return;
+        }
+
         // Retrieve the 'chatranks_b' dynamic property
         const chatRanksBoolean = dynamicPropertyRegistry.get("chatranks_b");
         // Get the channel name associated with the player
@@ -16,20 +23,13 @@ const beforeChatFilter = () => {
 
         // Check if chat ranks are enabled
         if (!msg.sendToTargets && chatRanksBoolean === true) {
-            // Check if the player is muted
-            if (player.hasTag("isMuted")) {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You are currently muted.`);
-                msg.cancel = true; // Cancel the chat message
-                return;
-            }
-
             // Get the player's tags and find their rank
             const tags = player.getTags();
-            const rankTag = tags.find((tag) => tag.startsWith("Rank:")) || "Rank:Member";
-            const rank = rankTag.replace("Rank:", "").replaceAll("--", "§4][§6");
+            const rankTag = tags.find((tag) => tag.startsWith("Rank:")) || "Rank:§4[§6Member§4]";
+            const rank = rankTag.replace("Rank:", "").replaceAll("--", "");
 
             // Format the chat message with the rank
-            const formattedMessage = `§4[§6${rank}§4] §7${player.name}: §r${message}`;
+            const formattedMessage = `${rank} §7${player.name}: §r${message}`;
             // Encrypt and update the message
             msg.message = EncryptionManager.encryptString(channelName ? `§4[§6${channelName}§4] §7${player.name}: §r${message}` : formattedMessage, player.id);
             msg.sendToTargets = true; // Send the message to targets

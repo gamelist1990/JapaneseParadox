@@ -1,14 +1,14 @@
-import { Player, world } from "@minecraft/server";
+import { Player, Vector3, world } from "@minecraft/server";
 import { ActionFormResponse, ModalFormResponse } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
-import {  sendMsg, sendMsgToPlayer } from "../../util";
+import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
 import config from "../../data/config.js";
 import { EncryptionManager } from "../../classes/EncryptionManager.js";
 import { UUIDManager } from "../../classes/UUIDManager.js";
 
 //Function provided by Visual1mpact
-export function uiOP(opResult: ModalFormResponse | ActionFormResponse, salt: string | number | boolean, hash: string | number | boolean, player: Player, onlineList?: string[]) {
+export function uiOP(opResult: ModalFormResponse | ActionFormResponse, salt: string | number | boolean, hash: string | number | boolean | Vector3, player: Player, onlineList?: string[]) {
     if (!opResult || opResult.canceled) {
         // Handle canceled form or undefined result
         return;

@@ -1,10 +1,10 @@
-import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3, world } from "@minecraft/server";
 import config from "../../data/config.js";
 import { AntiKnockbackA } from "../../penrose/TickEvent/knockback/antikb_a.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 
-function antikbHelp(player: Player, prefix: string, antikbBoolean: string | number | boolean) {
+function antikbHelp(player: Player, prefix: string, antikbBoolean: string | number | boolean | Vector3) {
     let commandStatus: string;
     if (!config.customcommands.antikb) {
         commandStatus = "§6[§4DISABLED§6]§f";
@@ -62,7 +62,7 @@ async function handleAntiKnockback(message: ChatSendAfterEvent, args: string[]) 
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
     }
 
     // Get Dynamic Property Boolean
@@ -81,12 +81,12 @@ async function handleAntiKnockback(message: ChatSendAfterEvent, args: string[]) 
         // Allow
         dynamicPropertyRegistry.set("antikb_b", true);
         world.setDynamicProperty("antikb_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6Anti Knockback§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました＝＞ §6Anti Knockback§f!`);
         AntiKnockbackA();
     } else if (antikbBoolean === true) {
         // Deny
         dynamicPropertyRegistry.set("antikb_b", false);
         world.setDynamicProperty("antikb_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4Anti Knockback§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ §4Anti Knockback§f!`);
     }
 }

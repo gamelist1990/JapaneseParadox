@@ -1,6 +1,6 @@
 import { Player, PlayerSpawnAfterEvent, world } from "@minecraft/server";
 import { onJoinPrimaryData, onJoinSecondaryData } from "../../../data/onjoindata.js";
-import { getPrefix,  setTimer } from "../../../util.js";
+import { getPrefix, setTimer } from "../../../util.js";
 import { kickablePlayers } from "../../../kickcheck.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 import { ScoreManager } from "../../../classes/ScoreManager.js";

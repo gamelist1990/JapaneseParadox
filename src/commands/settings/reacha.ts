@@ -1,10 +1,10 @@
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import config from "../../data/config.js";
-import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
-import { ReachA } from "../../penrose/BlockPlaceAfterEvent/reach/reach_a.js";
+import { ChatSendAfterEvent, Player, Vector3, world } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
+import { BeforeReachA } from "../../penrose/PlayerPlaceBlockBeforeEvent/reach/reach_a.js";
 
-function reachAHelp(player: Player, prefix: string, reachABoolean: string | number | boolean) {
+function reachAHelp(player: Player, prefix: string, reachABoolean: string | number | boolean | Vector3) {
     let commandStatus: string;
     if (!config.customcommands.reacha) {
         commandStatus = "§6[§4DISABLED§6]§f";
@@ -48,7 +48,7 @@ export function reachA(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
     }
 
     // Get Dynamic Property Boolean
@@ -67,12 +67,12 @@ export function reachA(message: ChatSendAfterEvent, args: string[]) {
         // Allow
         dynamicPropertyRegistry.set("reacha_b", true);
         world.setDynamicProperty("reacha_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6ReachA§f!`);
-        ReachA();
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました＝＞ §6ReachA§f!`);
+        BeforeReachA();
     } else if (reachABoolean === true) {
         // Deny
         dynamicPropertyRegistry.set("reacha_b", false);
         world.setDynamicProperty("reacha_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4ReachA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ §4ReachA§f!`);
     }
 }

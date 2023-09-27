@@ -8,7 +8,6 @@ import { beforeChatFilter } from "./penrose/ChatSendBeforeEvent/chat/chatfilter.
 import { beforeAntiSpam } from "./penrose/ChatSendBeforeEvent/chat/antispam.js";
 // Import Tick Events
 import { ServerBan } from "./penrose/TickEvent/ban/serverban.js";
-import { CrasherA } from "./penrose/TickEvent/crasher/crasher_a.js";
 import { NamespoofA } from "./penrose/TickEvent/namespoof/namespoof_a.js";
 import { NamespoofB } from "./penrose/TickEvent/namespoof/namespoof_b.js";
 import { BedrockValidate } from "./penrose/TickEvent/bedrock/bedrockvalidate.js";
@@ -35,21 +34,24 @@ import { AutoBan } from "./penrose/TickEvent/ban/autoban.js";
 import { freeze, freezeJoin, freezeLeave } from "./penrose/TickEvent/freeze/freeze.js";
 import { AFK } from "./penrose/TickEvent/afk/afk.js";
 import { AntiPhaseA } from "./penrose/TickEvent/phase/phase_a.js";
-// Import BlockBreakAfter Events
-import { XrayA } from "./penrose/BlockBreakAfterEvent/xray/xray_a.js";
-import { NukerA } from "./penrose/BlockBreakAfterEvent/nuker/nuker_a.js";
+// Import PlayerBlockBreakAfter Events
+import { XrayA } from "./penrose/PlayerBreakBlockAfterEvent/xray/xray_a.js";
+// Import PlayerBlockBreakBefore Events
+import { BeforeNukerA } from "./penrose/PlayerBreakBlockBeforeEvent/nuker/nuker_a.js";
 // Import PlayerSpawnAfter Events
 import { onJoin } from "./penrose/PlayerSpawnAfterEvent/onjoin/onjoin.js";
 import { GlobalBanList } from "./penrose/PlayerSpawnAfterEvent/ban/globalbanlist.js";
 import { hashCode } from "./penrose/PlayerSpawnAfterEvent/hash/hash.js";
 import { onJoinrules } from "./gui/PlayerSpawnAfterEvent/rules/rules.js";
-// Import BlockPlaceAfter Events
-import { ScaffoldA } from "./penrose/BlockPlaceAfterEvent/scaffold/scaffold_a.js";
-import { IllegalItemsB } from "./penrose/BlockPlaceAfterEvent/illegalitems/illegalitems_b.js";
-import { ReachA } from "./penrose/BlockPlaceAfterEvent/reach/reach_a.js";
+// Import PlayerBlockPlaceAfter Events
+import { ScaffoldA } from "./penrose/PlayerPlaceBlockAfterEvent/scaffold/scaffold_a.js";
+import { IllegalItemsB } from "./penrose/PlayerPlaceBlockAfterEvent/illegalitems/illegalitems_b.js";
+// Import PlayerBlockPlaceAfter Events
+import { BeforeReachA } from "./penrose/PlayerPlaceBlockBeforeEvent/reach/reach_a.js";
 // Import EntityHitEntityAfter Events
 import { ReachB } from "./penrose/EntityHitEntityAfterEvent/reach_b.js";
 import { KillAura } from "./penrose/EntityHitEntityAfterEvent/killaura.js";
+import { PVP } from "./penrose/EntityHitEntityAfterEvent/pvpManager.js";
 // Import WorldInitializeAfter Events
 import { Registry } from "./penrose/WorldInitializeAfterEvent/registry.js";
 // Import SystemBefore Events
@@ -98,7 +100,6 @@ Adventure();
 Creative();
 WorldBorder();
 ServerBan;
-CrasherA();
 NamespoofA();
 NamespoofB();
 BedrockValidate();
@@ -118,9 +119,11 @@ if (config.customcommands.freeze || config.modules.antiKillAura || config.module
     freezeJoin();
 }
 
-// BlockBreakAfter Events
+// PlayerBlockBreakAfter Events
 XrayA();
-NukerA();
+
+// PlayerBlockBreakBefore Events
+BeforeNukerA();
 
 // playerSpawnAfter Events
 onJoin();
@@ -128,14 +131,19 @@ GlobalBanList();
 hashCode();
 onJoinrules(); // GUI
 
-// BlockPlaceAfter Events
+// PlayerBlockPlaceAfter Events
 ScaffoldA();
 IllegalItemsB();
-ReachA();
+
+// PlayerBlockPlaceBefore Events
+BeforeReachA();
 
 // EntityHitEntityAfter Events
 ReachB();
 KillAura();
+if (config.customcommands.pvp === true) {
+    PVP();
+}
 
 // EntityDieAfter Events
 DeathCoordinates();

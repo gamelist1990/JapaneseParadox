@@ -83,6 +83,7 @@ export default {
         afk: true,
         antiphasea: true,
         channel: true,
+        pvp: true,
     },
     modules: {
         badpackets1: {
@@ -277,6 +278,6 @@ export default {
      * レルムズで使用する場合必ずパスワードを設定してね
      */
     encryption: {
-        password: "",
+        password: "HACKERBANLOL",
     },
 };

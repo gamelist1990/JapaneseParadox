@@ -17,8 +17,8 @@
         },
         "description": {
             "identifier": "minecraft:npc",
-            "is_spawnable": false,
-            "is_summonable": false,
+            "is_spawnable": true,
+            "is_summonable": true,
             "is_experimental": false
         },
         "components": {

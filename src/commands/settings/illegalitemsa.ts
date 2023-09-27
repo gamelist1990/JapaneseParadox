@@ -1,10 +1,10 @@
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import config from "../../data/config.js";
-import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3, world } from "@minecraft/server";
 import { IllegalItemsA } from "../../penrose/TickEvent/illegalitems/illegalitems_a.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 
-function illegalItemsAHelp(player: Player, prefix: string, illegalItemsABoolean: string | number | boolean) {
+function illegalItemsAHelp(player: Player, prefix: string, illegalItemsABoolean: string | number | boolean | Vector3) {
     let commandStatus: string;
     if (!config.customcommands.illegalitemsa) {
         commandStatus = "§6[§4DISABLED§6]§f";
@@ -48,7 +48,7 @@ export function illegalitemsA(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
     }
 
     // Get Dynamic Property Boolean
@@ -71,7 +71,7 @@ export function illegalitemsA(message: ChatSendAfterEvent, args: string[]) {
         for (const temp of nohasTag) {
             temp.addTag("illegalitemsA");
         }
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6IllegalItemsA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました＝＞ §6IllegalItemsA§f!`);
         IllegalItemsA();
     } else if (illegalItemsABoolean === true) {
         // Deny
@@ -81,6 +81,6 @@ export function illegalitemsA(message: ChatSendAfterEvent, args: string[]) {
         for (const temp of hasTag) {
             temp.removeTag("illegalitemsA");
         }
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4IllegalItemsA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ §4IllegalItemsA§f!`);
     }
 }

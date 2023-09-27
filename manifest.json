@@ -1,28 +1,28 @@
 {
     "format_version": 2,
     "header": {
-        "name": "Paradox日本語版!! 【Beta2】",
-        "description": "Paradoxv3.3.4 日本語版です！！編集者：こう君",
-        "uuid": "88eedb1b-eb23-477b-8599-78d97cbe374e",
-        "version": [3, 3, 4],
-        "min_engine_version": [1, 20, 10]
+        "name": "Paradox AntiCheat",
+        "description": "A utility to fight against malicious hackers on Bedrock Edition ~ v3.3.6",
+        "uuid": "54edfea5-ab51-47ca-b992-724e255b5560",
+        "version": [3, 3, 6],
+        "min_engine_version": [1, 20, 30]
     },
     "metadata": {
-        "authors": ["MrDiamond64, Visual1mpact, Koukunn_"],
+        "authors": ["MrDiamond64, Visual1mpact"],
         "license": "GPLv3",
         "url": "https://github.com/Visual1mpact/Paradox_AntiCheat"
     },
     "modules": [
         {
             "type": "data",
-            "uuid": "f312754d-6bed-493a-a391-4e99b4ccae01",
+            "uuid": "d8395127-6923-4fb7-93d2-977cecd463e0",
             "version": [1, 0, 0]
         },
         {
             "description": "Paradox AntiCheat Gametest Features",
             "language": "javascript",
             "type": "script",
-            "uuid": "4ec6a34d-fa29-4477-9c88-7a44ed0163d8",
+            "uuid": "1326c87b-37f3-4543-9f0f-0d03893134e1",
             "version": [0, 0, 1],
             "entry": "scripts/paradox.js"
         }
@@ -30,7 +30,7 @@
     "dependencies": [
         {
             "module_name": "@minecraft/server",
-            "version": "1.4.0-beta"
+            "version": "1.6.0-beta"
         },
         {
             "module_name": "@minecraft/server-ui",

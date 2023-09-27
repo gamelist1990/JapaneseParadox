@@ -1,25 +1,22 @@
-import { world, BlockBreakAfterEvent, system, EntityQueryOptions, PlayerLeaveAfterEvent, EntityInventoryComponent, ItemEnchantsComponent } from "@minecraft/server";
+import { world, PlayerBreakBlockAfterEvent, system, EntityQueryOptions, PlayerLeaveAfterEvent, EntityInventoryComponent, ItemEnchantsComponent } from "@minecraft/server";
 import { flag } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 import { MinecraftEffectTypes } from "../../../node_modules/@minecraft/vanilla-data/lib/index.js";
 
 const lastBreakTime = new Map<string, number>();
-const breakCounter = new Map<string, number>();
 
 function onPlayerLogout(event: PlayerLeaveAfterEvent): void {
     // Remove the player's data from the map when they log off
     const playerName = event.playerId;
     lastBreakTime.delete(playerName);
-    breakCounter.delete(playerName);
 }
 
-async function nukera(object: BlockBreakAfterEvent): Promise<void> {
+async function afternukera(object: PlayerBreakBlockAfterEvent, breakData: Map<string, { breakCount: number; lastBreakTimeBefore: number }>, playerBreakBlockCallback: (arg: PlayerBreakBlockAfterEvent) => void): Promise<void> {
     const antiNukerABoolean = dynamicPropertyRegistry.get("antinukera_b");
     if (antiNukerABoolean === false) {
         lastBreakTime.clear();
-        breakCounter.clear();
         world.afterEvents.playerLeave.unsubscribe(onPlayerLogout);
-        world.afterEvents.blockBreak.unsubscribe(nukera);
+        world.afterEvents.playerBreakBlock.unsubscribe(playerBreakBlockCallback);
         return;
     }
 
@@ -29,6 +26,14 @@ async function nukera(object: BlockBreakAfterEvent): Promise<void> {
     if (uniqueId === player.name) {
         return;
     }
+
+    const playerBreakData = breakData.get(player.id);
+
+    if (!playerBreakData) {
+        return;
+    }
+
+    const { breakCount, lastBreakTimeBefore: beforeLastBreakTime } = playerBreakData;
 
     // Ignore vegetation
     const vegetation = [
@@ -166,6 +171,7 @@ async function nukera(object: BlockBreakAfterEvent): Promise<void> {
         "minecraft:azalea",
         "minecraft:sweet_berry_bush",
         "minecraft:sweet_berries",
+        "minecraft:snow_layer",
     ];
 
     const efficiencyLevels: Record<number, number> = {
@@ -178,8 +184,8 @@ async function nukera(object: BlockBreakAfterEvent): Promise<void> {
     };
 
     const now = Date.now();
-    const lastBreak = lastBreakTime.get(player.id);
-    const counter = breakCounter.get(player.id) || 0;
+    const lastBreakInSeconds = lastBreakTime.get(player.id) ? (beforeLastBreakTime - lastBreakTime.get(player.id)) / 1000 : undefined; // Use beforeLastBreakTime if lastBreakTime is not available
+    const counter = breakCount || 0;
 
     const hand = player.selectedSlot;
     const inventory = player.getComponent("inventory") as EntityInventoryComponent;
@@ -189,9 +195,8 @@ async function nukera(object: BlockBreakAfterEvent): Promise<void> {
     const itemEfficiencyLevel = itemEnchantmentComponent?.enchantments?.getEnchantment("efficiency")?.level || 0;
 
     const requiredTimeDifference = efficiencyLevels[itemEfficiencyLevel];
-    const timeDifferenceInSeconds = (now - lastBreak) / 1000;
 
-    if (vegetation.indexOf(brokenBlockPermutation.type.id) === -1 && lastBreak && timeDifferenceInSeconds < requiredTimeDifference) {
+    if (vegetation.indexOf(brokenBlockPermutation.type.id) === -1 && lastBreakInSeconds && lastBreakInSeconds < requiredTimeDifference) {
         if (counter >= 3) {
             const blockLoc = dimension.getBlock({ x: x, y: y, z: z });
             const blockID = brokenBlockPermutation.clone();
@@ -199,15 +204,15 @@ async function nukera(object: BlockBreakAfterEvent): Promise<void> {
             flag(player, "Nuker", "A", "Break", null, null, null, null, false);
             blockLoc.setPermutation(blockID);
             lastBreakTime.delete(player.id);
-            breakCounter.delete(player.id);
 
             player.runCommandAsync(`kill @e[x=${x},y=${y},z=${z},r=10,c=1,type=item]`);
 
             // Apply effects or actions for three or more consecutive block breaks
-            player.addEffect(MinecraftEffectTypes.Blindness, 1000000, { amplifier: 255, showParticles: true });
-            player.addEffect(MinecraftEffectTypes.MiningFatigue, 1000000, { amplifier: 255, showParticles: true });
-            player.addEffect(MinecraftEffectTypes.Weakness, 1000000, { amplifier: 255, showParticles: true });
-            player.addEffect(MinecraftEffectTypes.Slowness, 1000000, { amplifier: 255, showParticles: true });
+            const effectsToAdd = [MinecraftEffectTypes.Blindness, MinecraftEffectTypes.MiningFatigue, MinecraftEffectTypes.Weakness, MinecraftEffectTypes.Slowness];
+
+            for (const effectType of effectsToAdd) {
+                player.addEffect(effectType, 1000000, { amplifier: 255, showParticles: true });
+            }
 
             const hasFreezeTag = player.hasTag("paradoxFreeze");
             const hasNukerFreeze = player.hasTag("freezeNukerA");
@@ -217,13 +222,19 @@ async function nukera(object: BlockBreakAfterEvent): Promise<void> {
             if (!hasNukerFreeze) {
                 player.addTag("freezeNukerA");
             }
+            // Reset breakCount after three or more consecutive block breaks
+            breakData.set(player.id, { breakCount: 0, lastBreakTimeBefore: now });
             return;
         } else {
-            breakCounter.set(player.id, counter + 1);
+            const increment = breakData.get(player.id).breakCount + 1;
+            // Increment breakCount
+            breakData.set(player.id, { breakCount: increment, lastBreakTimeBefore: now });
         }
     } else {
+        // Reset breakCount when there is no offsense
+        breakData.set(player.id, { breakCount: 0, lastBreakTimeBefore: now });
+        // Update lastBreakTime based on after event
         lastBreakTime.set(player.id, now);
-        breakCounter.set(player.id, 1);
     }
 }
 
@@ -248,13 +259,13 @@ function freeze(id: number) {
             player.removeTag("freezeNukerA");
             return;
         }
-        player.onScreenDisplay.setTitle("§f§4[§6server§4]§f違法なツールを検知したためフリーズされました", { subtitle: "§f検知内容＝＞ §4[§6AntiNukerA§4]§f", fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 60 });
+        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f Frozen!", { subtitle: "§fContact Staff §4[§6AntiNukerA§4]§f", fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 60 });
     }
 }
 
-const NukerA = () => {
-    world.afterEvents.blockBreak.subscribe((object) => {
-        nukera(object).catch((error) => {
+const AfterNukerA = (breakData: Map<string, { breakCount: number; lastBreakTimeBefore: number }>) => {
+    const playerBreakBlockCallback = (object: PlayerBreakBlockAfterEvent) => {
+        afternukera(object, breakData, playerBreakBlockCallback).catch((error) => {
             console.error("Paradox Unhandled Rejection: ", error);
             // Extract stack trace information
             if (error instanceof Error) {
@@ -265,11 +276,12 @@ const NukerA = () => {
                 }
             }
         });
-    });
+    };
+    world.afterEvents.playerBreakBlock.subscribe(playerBreakBlockCallback);
     world.afterEvents.playerLeave.subscribe(onPlayerLogout);
     const id = system.runInterval(() => {
         freeze(id);
     }, 20);
 };
 
-export { NukerA };
+export { AfterNukerA };

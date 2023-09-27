@@ -1,10 +1,10 @@
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import config from "../../data/config.js";
-import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3, world } from "@minecraft/server";
 import { BadPackets1 } from "../../penrose/ChatSendBeforeEvent/spammer/badpackets_1.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 
-function badpackets1Help(player: Player, prefix: string, badPackets1Boolean: string | number | boolean) {
+function badpackets1Help(player: Player, prefix: string, badPackets1Boolean: string | number | boolean | Vector3) {
     let commandStatus: string;
     if (!config.customcommands.badpackets1) {
         commandStatus = "§6[§4DISABLED§6]§f";
@@ -48,7 +48,7 @@ export function badpackets1(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
     }
 
     // Get Dynamic Property Boolean
@@ -67,12 +67,12 @@ export function badpackets1(message: ChatSendAfterEvent, args: string[]) {
         // Allow
         dynamicPropertyRegistry.set("badpackets1_b", true);
         world.setDynamicProperty("badpackets1_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6Badpackets1§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました＝＞ §6Badpackets1§f!`);
         BadPackets1();
     } else if (badPackets1Boolean === true) {
         // Deny
         dynamicPropertyRegistry.set("badpackets1_b", false);
         world.setDynamicProperty("badpackets1_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4Badpackets1§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ §4Badpackets1§f!`);
     }
 }

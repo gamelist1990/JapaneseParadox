@@ -1,10 +1,10 @@
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import config from "../../data/config.js";
-import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3, world } from "@minecraft/server";
 import { SpammerB } from "../../penrose/ChatSendBeforeEvent/spammer/spammer_b.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 
-function spammerBHelp(player: Player, prefix: string, spammerBBoolean: string | number | boolean) {
+function spammerBHelp(player: Player, prefix: string, spammerBBoolean: string | number | boolean | Vector3) {
     let commandStatus: string;
     if (!config.customcommands.spammerb) {
         commandStatus = "§6[§4DISABLED§6]§f";
@@ -48,7 +48,7 @@ export function spammerB(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
     }
 
     // Get Dynamic Property Boolean
@@ -67,12 +67,12 @@ export function spammerB(message: ChatSendAfterEvent, args: string[]) {
         // Allow
         dynamicPropertyRegistry.set("spammerb_b", true);
         world.setDynamicProperty("spammerb_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6SpammerB§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました＝＞ §6SpammerB§f!`);
         SpammerB();
     } else if (spammerBBoolean === true) {
         // Deny
         dynamicPropertyRegistry.set("spammerb_b", false);
         world.setDynamicProperty("spammerb_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4SpammerB§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ §4SpammerB§f!`);
     }
 }

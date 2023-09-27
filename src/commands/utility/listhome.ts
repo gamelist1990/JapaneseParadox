@@ -58,7 +58,7 @@ export function listhome(message: ChatSendAfterEvent, args: string[]) {
     for (let i = 0; i < tagsLength; i++) {
         if (tags[i].startsWith("1337")) {
             // Decode it so we can verify it
-            tags[i] =EncryptionManager.decryptString(tags[i], salt as string);
+            tags[i] = EncryptionManager.decryptString(tags[i], salt as string);
             // If invalid then skip it
             if (tags[i].startsWith("LocationHome:") === false) {
                 continue;

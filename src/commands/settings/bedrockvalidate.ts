@@ -1,10 +1,10 @@
-import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3, world } from "@minecraft/server";
 import config from "../../data/config.js";
 import { BedrockValidate } from "../../penrose/TickEvent/bedrock/bedrockvalidate.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 
-function bedrockValidateHelp(player: Player, prefix: string, bedrockValidateBoolean: string | number | boolean) {
+function bedrockValidateHelp(player: Player, prefix: string, bedrockValidateBoolean: string | number | boolean | Vector3) {
     let commandStatus: string;
     if (!config.customcommands.bedrockvalidate) {
         commandStatus = "§6[§4DISABLED§6]§f";
@@ -48,7 +48,7 @@ export function bedrockvalidate(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
     }
 
     // Get Dynamic Property Boolean
@@ -67,12 +67,12 @@ export function bedrockvalidate(message: ChatSendAfterEvent, args: string[]) {
         // Allow
         dynamicPropertyRegistry.set("bedrockvalidate_b", true);
         world.setDynamicProperty("bedrockvalidate_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6BedrockValidate§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました＝＞ §6BedrockValidate§f!`);
         BedrockValidate();
     } else if (bedrockValidateBoolean === true) {
         // Deny
         dynamicPropertyRegistry.set("bedrockvalidate_b", false);
         world.setDynamicProperty("bedrockvalidate_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4BedrockValidate§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ §4BedrockValidate§f!`);
     }
 }

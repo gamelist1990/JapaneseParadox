@@ -1,10 +1,10 @@
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import config from "../../data/config.js";
-import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3, world } from "@minecraft/server";
 import { NamespoofA } from "../../penrose/TickEvent/namespoof/namespoof_a.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 
-function namespoofAHelp(player: Player, prefix: string, nameSpoofBoolean: string | number | boolean) {
+function namespoofAHelp(player: Player, prefix: string, nameSpoofBoolean: string | number | boolean | Vector3) {
     let commandStatus: string;
     if (!config.customcommands.namespoofa) {
         commandStatus = "§6[§4DISABLED§6]§f";
@@ -48,7 +48,7 @@ export function namespoofA(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
     }
 
     // Get Dynamic Property Boolean
@@ -67,12 +67,12 @@ export function namespoofA(message: ChatSendAfterEvent, args: string[]) {
         // Allow
         dynamicPropertyRegistry.set("namespoofa_b", true);
         world.setDynamicProperty("namespoofa_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6NamespoofA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました＝＞ §6NamespoofA§f!`);
         NamespoofA();
     } else if (nameSpoofBoolean === true) {
         // Deny
         dynamicPropertyRegistry.set("namespoofa_b", false);
         world.setDynamicProperty("namespoofa_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4NamespoofA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ §4NamespoofA§f!`);
     }
 }

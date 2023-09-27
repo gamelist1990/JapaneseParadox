@@ -1,10 +1,10 @@
-import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3, world } from "@minecraft/server";
 import config from "../../data/config.js";
 import { WorldBorder } from "../../penrose/TickEvent/worldborder/worldborder.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 
-function worldBorderHelp(player: Player, prefix: string, worldBorderBoolean: string | number | boolean) {
+function worldBorderHelp(player: Player, prefix: string, worldBorderBoolean: string | number | boolean | Vector3) {
     let commandStatus: string;
     if (!config.customcommands.worldborder) {
         commandStatus = "§6[§4DISABLED§6]§f";
@@ -37,7 +37,7 @@ function worldBorderHelp(player: Player, prefix: string, worldBorderBoolean: str
 }
 
 function setWorldBorder(player: Player, overworldSize: number, netherSize: number, endSize: number) {
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f has set the §6World Border§f! Overworld: ${overworldSize} Nether: ${netherSize} End: ${endSize}`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has set the §6World Border§f! Overworld: §7${overworldSize}§f Nether: §7${netherSize}§f End: §7${endSize}§f`);
     dynamicPropertyRegistry.set("worldborder_b", true);
     dynamicPropertyRegistry.set("worldborder_n", Math.abs(overworldSize));
     dynamicPropertyRegistry.set("worldborder_nether_n", Math.abs(netherSize));
@@ -63,7 +63,7 @@ export function worldborders(message: ChatSendAfterEvent, args: string[]) {
     const uniqueId = dynamicPropertyRegistry.get(player?.id);
 
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
     }
 
     const prefix = getPrefix(player);
@@ -79,7 +79,7 @@ export function worldborders(message: ChatSendAfterEvent, args: string[]) {
     // Shutdown worldborder
     if (args[0] === "disable") {
         // Disable Worldborder
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ the §6World Border§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ the §6World Border§f!`);
         dynamicPropertyRegistry.set("worldborder_b", false);
         dynamicPropertyRegistry.set("worldborder_n", 0);
         dynamicPropertyRegistry.set("worldborder_nether_n", 0);

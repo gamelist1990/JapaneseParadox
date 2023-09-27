@@ -63,44 +63,7 @@ export function op(message: ChatSendAfterEvent, args: string[]) {
         return opHelp(operator, prefix);
     }
 
-    if (args.length === 0 && !config.encryption.password) {
-        // Operator wants to change their own password
-        const targetSalt = UUIDManager.generateRandomUUID();
-
-        // Use either the operator's ID or the encryption password as the key
-        const key = config.encryption.password ? config.encryption.password : operator.id;
-
-        // Generate the hash
-        const newHash = EncryptionManager.hashWithSalt(targetSalt, key);
-
-        operator.setDynamicProperty("hash", newHash);
-        operator.setDynamicProperty("salt", targetSalt);
-        operator.addTag("paradoxOpped");
-
-        sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f You are now Paradox-Opped!`);
-
-        dynamicPropertyRegistry.set(operator.id, operator.name);
-
-        return;
-    } else if (args.length === 1 && config.encryption.password) {
-        // Allow the user to gain Paradox-Op using the password
-        if (config.encryption.password === args[0]) {
-            const targetSalt = UUIDManager.generateRandomUUID();
-
-            // Generate the hash using the provided password
-            const newHash = EncryptionManager.hashWithSalt(targetSalt, args[0]);
-
-            operator.setDynamicProperty("hash", newHash);
-            operator.setDynamicProperty("salt", targetSalt);
-            operator.addTag("paradoxOpped");
-
-            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f You are now Paradox-Opped using the password.`);
-            dynamicPropertyRegistry.set(operator.id, operator.name);
-        } else {
-            // Incorrect password
-            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f Incorrect password. You need to be Operator to use this command.`);
-        }
-    } else if (args.length >= 1 && operatorHash === EncryptionManager.hashWithSalt(operatorSalt as string, config.encryption.password || operator.id)) {
+    if (args.length >= 1 && operatorHash === EncryptionManager.hashWithSalt(operatorSalt as string, config.encryption.password || operator.id)) {
         // Operator wants to grant "Paradox-Op" to another player
         const targetPlayerName = args.join(" "); // Combine all arguments into a single string
         // Try to find the player requested
@@ -132,15 +95,52 @@ export function op(message: ChatSendAfterEvent, args: string[]) {
 
                 dynamicPropertyRegistry.set(targetPlayer.id, targetPlayer.name);
 
-                sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f${targetPlayer.name}に管理者権限が付与されました`);
-                sendMsgToPlayer(targetPlayer, `§f§4[§6Paradox§4]§f 管理者になりました`);
-                sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${targetPlayer.name}§f 管理者になりました`);
+                sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f  ${targetPlayer.name}を管理者にしました`);
+                sendMsgToPlayer(targetPlayer, `§f§4[§6Paradox§4]§f 管理者になりました!`);
+                sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${targetPlayer.name}§f は管理者権限が与えられました.`);
                 targetPlayer.addTag("paradoxOpped");
             } else {
-                sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f ${targetPlayer.name} 既に管理者です`);
+                sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f ${targetPlayer.name} 既に管理者権限を所有しています.`);
             }
         } else {
-            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f プレイヤーがオフライン又は存在していません ${targetPlayerName}.`);
+            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f プレイヤーが見つかりません ${targetPlayerName}.`);
+        }
+    } else if (args.length === 0 && !config.encryption.password) {
+        // Operator wants to change their own password
+        const targetSalt = UUIDManager.generateRandomUUID();
+
+        // Use either the operator's ID or the encryption password as the key
+        const key = config.encryption.password ? config.encryption.password : operator.id;
+
+        // Generate the hash
+        const newHash = EncryptionManager.hashWithSalt(targetSalt, key);
+
+        operator.setDynamicProperty("hash", newHash);
+        operator.setDynamicProperty("salt", targetSalt);
+        operator.addTag("paradoxOpped");
+
+        sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f管理者になりました`);
+
+        dynamicPropertyRegistry.set(operator.id, operator.name);
+
+        return;
+    } else if (args.length === 1 && config.encryption.password) {
+        // Allow the user to gain Paradox-Op using the password
+        if (config.encryption.password === args[0]) {
+            const targetSalt = UUIDManager.generateRandomUUID();
+
+            // Generate the hash using the provided password
+            const newHash = EncryptionManager.hashWithSalt(targetSalt, args[0]);
+
+            operator.setDynamicProperty("hash", newHash);
+            operator.setDynamicProperty("salt", targetSalt);
+            operator.addTag("paradoxOpped");
+
+            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f あなたは今、パスワードを使ってログインしています。`);
+            dynamicPropertyRegistry.set(operator.id, operator.name);
+        } else {
+            // Incorrect password
+            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f パスワードが間違っています。このコマンドを使用するにはオペレータである必要があります。`);
         }
     } else {
         return opHelp(operator, prefix);

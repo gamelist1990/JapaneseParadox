@@ -1,4 +1,4 @@
-import { world, ItemStack, Enchantment, Player, Block, BlockPlaceAfterEvent, BlockInventoryComponent, ItemEnchantsComponent, EnchantmentList, PlayerLeaveAfterEvent } from "@minecraft/server";
+import { world, ItemStack, Enchantment, Player, Block, PlayerPlaceBlockAfterEvent, BlockInventoryComponent, ItemEnchantsComponent, EnchantmentList, PlayerLeaveAfterEvent } from "@minecraft/server";
 import { illegalitems } from "../../../data/itemban.js";
 import config from "../../../data/config.js";
 import { flag, sendMsgToPlayer, sendMsg } from "../../../util.js";
@@ -48,7 +48,7 @@ function onPlayerLogout(event: PlayerLeaveAfterEvent): void {
     unverifiedItemMap.delete(event.playerId);
 }
 
-async function illegalitemsb(object: BlockPlaceAfterEvent) {
+async function illegalitemsb(object: PlayerPlaceBlockAfterEvent) {
     // Get Dynamic Property
     const illegalItemsBBoolean = dynamicPropertyRegistry.get("illegalitemsb_b");
     const salvageBoolean = dynamicPropertyRegistry.get("salvage_b");
@@ -61,7 +61,7 @@ async function illegalitemsb(object: BlockPlaceAfterEvent) {
     if (illegalItemsBBoolean === false) {
         resetMaps(); // Clear the maps
         world.afterEvents.playerLeave.unsubscribe(onPlayerLogout);
-        world.afterEvents.blockPlace.unsubscribe(illegalitemsb);
+        world.afterEvents.playerPlaceBlock.unsubscribe(illegalitemsb);
         return;
     }
 
@@ -88,7 +88,7 @@ async function illegalitemsb(object: BlockPlaceAfterEvent) {
     // Get the block's inventory
     const blockInventory = block.getComponent("minecraft:inventory") as BlockInventoryComponent;
     const blockContainer = blockInventory?.container;
-    const blockIdentifiers = ["ender_chest", "shulker"];
+    const blockIdentifiers = ["ender_chest", "shulker", "hopper"];
     let isFlagged = false;
     let isAdjacent = false;
     // Check if container illegally contains nested items if not an ender chest or shulker box
@@ -158,7 +158,7 @@ async function illegalitemsb(object: BlockPlaceAfterEvent) {
                 // Anti Shulker Boxes
                 if (antiShulkerBoolean && itemStackId.includes("shulker")) {
                     blockContainer.setItem(i);
-                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${block.typeId.replace("minecraft:", "")} from ${player.name}.`);
+                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${block.typeId.replace("minecraft:", "")} from §7${player.name}§f.`);
                     sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Shulker Boxes are not allowed!`);
                     continue;
                 }
@@ -168,7 +168,7 @@ async function illegalitemsb(object: BlockPlaceAfterEvent) {
                 const maxStack = blockItemStack.maxAmount;
                 if (stackBanBoolean && currentStack > maxStack) {
                     blockContainer.setItem(i);
-                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} x ${currentStack} from ${player.name}.`);
+                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} x ${currentStack} from §7${player.name}§f.`);
                     sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Illegal Stacks are not allowed!`);
                     rip(player, blockItemStack, null, block);
                     isFlagged = true;
@@ -178,7 +178,7 @@ async function illegalitemsb(object: BlockPlaceAfterEvent) {
                 // If the item is in the "illegalitems" object, remove it from the block's inventory and run the "rip" function on it
                 if (itemStackId in illegalitems) {
                     blockContainer.setItem(i);
-                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} from ${player.name}.`);
+                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} from §7${player.name}§f.`);
                     sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Illegal Items are not allowed!`);
                     rip(player, blockItemStack, null, block);
                     isFlagged = true;
@@ -188,7 +188,7 @@ async function illegalitemsb(object: BlockPlaceAfterEvent) {
                 // Illegal Lores
                 if (illegalLoresBoolean && !config.modules.illegalLores.exclude.includes(String(blockItemStack.getLore()))) {
                     blockContainer.setItem(i);
-                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} with lore from ${player.name}.`);
+                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} with lore from §7${player.name}§f.`);
                     sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Item with illegal lores are not allowed!`);
                     rip(player, blockItemStack, null, block);
                     isFlagged = true;
@@ -261,7 +261,7 @@ async function illegalitemsb(object: BlockPlaceAfterEvent) {
                     };
                     const itemStackId = blockContainer.getItem(itemSlot);
                     blockContainer.setItem(itemSlot);
-                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.typeId.replace("minecraft:", "")} with Illegal Enchantments from ${player.name}.`);
+                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.typeId.replace("minecraft:", "")} with Illegal Enchantments from §7${player.name}§f.`);
                     sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Item with illegal Enchantments are not allowed!`);
                     enchantmentPresenceMap.clear();
                     enchantmentDataMap.clear();
@@ -357,7 +357,7 @@ function resetMaps() {
 
 const IllegalItemsB = () => {
     world.afterEvents.playerLeave.subscribe(onPlayerLogout);
-    world.afterEvents.blockPlace.subscribe((object) => {
+    world.afterEvents.playerPlaceBlock.subscribe((object) => {
         illegalitemsb(object).catch((error) => {
             console.error("Paradox Unhandled Rejection: ", error);
             // Extract stack trace information

@@ -1,6 +1,6 @@
 import { Player, world } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
-import { XrayA } from "../../penrose/BlockBreakAfterEvent/xray/xray_a.js";
+import { XrayA } from "../../penrose/PlayerBreakBlockAfterEvent/xray/xray_a.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
@@ -18,20 +18,20 @@ export function uiXRAY(xrayResult: ModalFormResponse, player: Player) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to configure Xray`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者で実行してください`);
     }
     if (XrayToggle === true) {
         // Allow
         dynamicPropertyRegistry.set("xraya_b", true);
         world.setDynamicProperty("xraya_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6XrayA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました＝＞ §6XrayA§f!`);
         XrayA();
     }
     if (XrayToggle === false) {
         // Deny
         dynamicPropertyRegistry.set("xraya_b", false);
         world.setDynamicProperty("xraya_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4XrayA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ §4XrayA§f!`);
     }
 
     //show the main ui to the player once complete.

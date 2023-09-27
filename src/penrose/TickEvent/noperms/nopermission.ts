@@ -35,13 +35,13 @@ function noperms() {
         // Generate the hash
         const encode = EncryptionManager.hashWithSalt(salt as string, key);
         entity.removeTag("paradoxOpped");
-        if (encode === hash) {
+        if (encode && encode === hash) {
             entity.removeDynamicProperty("hash");
             entity.removeDynamicProperty("salt");
             dynamicPropertyRegistry.delete(entity.id);
         }
 
-        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f ${entity.nameTag} had unauthorized permissions. Permissions removed!`);
+        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f §7${entity.nameTag}§f had unauthorized permissions. Permissions removed!`);
     }
 }
 

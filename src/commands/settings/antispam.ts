@@ -1,11 +1,11 @@
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import config from "../../data/config.js";
-import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
+import { ChatSendAfterEvent, Player, Vector3, world } from "@minecraft/server";
 import { beforeAntiSpam } from "../../penrose/ChatSendBeforeEvent/chat/antispam.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { afterAntiSpam } from "../../penrose/ChatSendAfterEvent/chat/antispam.js";
 
-function antispamHelp(player: Player, prefix: string, antiSpamBoolean: string | number | boolean) {
+function antispamHelp(player: Player, prefix: string, antiSpamBoolean: string | number | boolean | Vector3) {
     let commandStatus: string;
     if (!config.customcommands.antispam) {
         commandStatus = "§6[§4DISABLED§6]§f";
@@ -49,7 +49,7 @@ export function antispam(message: ChatSendAfterEvent, args: string[]) {
 
     // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません`);
     }
 
     // Get Dynamic Property Boolean
@@ -68,13 +68,13 @@ export function antispam(message: ChatSendAfterEvent, args: string[]) {
         // Allow
         dynamicPropertyRegistry.set("antispam_b", true);
         world.setDynamicProperty("antispam_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6Anti Spam§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 有効にしました＝＞ §6Anti Spam§f!`);
         beforeAntiSpam();
         afterAntiSpam();
     } else if (antiSpamBoolean === true) {
         // Deny
         dynamicPropertyRegistry.set("antispam_b", false);
         world.setDynamicProperty("antispam_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4Anti Spam§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効にしました＝＞ §4Anti Spam§f!`);
     }
 }

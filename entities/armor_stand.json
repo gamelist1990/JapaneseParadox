@@ -11,7 +11,7 @@
         "description": {
             "identifier": "minecraft:armor_stand",
             "is_spawnable": false,
-            "is_summonable": false,
+            "is_summonable": true,
             "is_experimental": false
         },
         "components": {

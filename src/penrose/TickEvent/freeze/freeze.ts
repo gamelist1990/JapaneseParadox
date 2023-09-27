@@ -1,5 +1,5 @@
 import { world, Player, system, EntityQueryOptions, Vector } from "@minecraft/server";
-import {  sendMsg, setTimer } from "../../../util";
+import { sendMsg, setTimer } from "../../../util";
 import { MinecraftEffectTypes } from "../../../node_modules/@minecraft/vanilla-data/lib/index";
 import { EncryptionManager } from "../../../classes/EncryptionManager";
 
@@ -119,17 +119,17 @@ const freezePlayers = () => {
             }
 
             const combinations: Record<string, string> = {
-                "111": "§f検知内容＝＞ §4[§6NA§4]§f§4[§6KA§4]§f§4[§6AS§4]§f", // Aura + Nuker + Scaffold
-                "110": "§f検知内容＝＞ §4[§6NA§4]§f§4[§6KA§4]§f", // Aura + Nuker
-                "101": "§f検知内容＝＞ §4[§6NA§4]§f§4[§6AS§4]§f", // Aura + Scaffold
-                "011": "§f検知内容＝＞ §4[§6KA§4]§f§4[§6AS§4]§f", // Nuker + Scaffold
-                "000": "§f検知内容＝＞ §4[§6Command§4]§f", // Other cases
+                "111": "§fContact Staff §4[§6NA§4]§f§4[§6KA§4]§f§4[§6AS§4]§f", // Aura + Nuker + Scaffold
+                "110": "§fContact Staff §4[§6NA§4]§f§4[§6KA§4]§f", // Aura + Nuker
+                "101": "§fContact Staff §4[§6NA§4]§f§4[§6AS§4]§f", // Aura + Scaffold
+                "011": "§fContact Staff §4[§6KA§4]§f§4[§6AS§4]§f", // Nuker + Scaffold
+                "000": "§fContact Staff §4[§6Command§4]§f", // Other cases
             };
 
             const combinationKey = (hasAuraTag ? "1" : "0") + (hasNukerTag ? "1" : "0") + (hasScaffoldTag ? "1" : "0");
             const title = { subtitle: combinations[combinationKey] || combinations["000"] };
 
-            player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]違法なツールを検知したためフリーズされました", {
+            player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f Frozen!", {
                 ...title,
                 fadeInDuration: 0,
                 fadeOutDuration: 0,
@@ -160,7 +160,7 @@ export const freezeLeave = (): void => {
             ?.hasTag("paradoxFreeze");
 
         if (hasFreezeTag) {
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${event.playerName}§f was frozen and left the server.`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${event.playerName}§f was frozen and left the server.`);
         }
     });
 };
@@ -175,7 +175,7 @@ export const freezeJoin = (): void => {
             ?.hasTag("paradoxFreeze");
 
         if (hasFreezeTag) {
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${event.playerName}§f was frozen and returned to the server.`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${event.playerName}§f was frozen and returned to the server.`);
         }
     });
 };

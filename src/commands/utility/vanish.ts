@@ -79,7 +79,7 @@ async function handleVanish(message: ChatSendAfterEvent, args: string[]) {
     } else {
         player.addTag("vanish");
         player.triggerEvent("vanish");
-       sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 透明化が有効です`);
-       sendMsg(`@a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f ${player.name}§f は透明化が有効になりました`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 透明化が有効です`);
+        sendMsg(`@a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f ${player.name}§f は透明化が有効になりました`);
     }
 }

@@ -107,7 +107,7 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
                 }
                 return paradoxui(player);
             }
-        return paradoxui(player);
+            return paradoxui(player);
         })
         .catch((error) => {
             console.error("Paradox Unhandled Rejection: ", error);
