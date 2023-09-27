@@ -1,25 +1,24 @@
 # Changelog
-## [v日本語版paradox v3.3.4] Paradox v3.3.4-Beta Js▶︎Ts
 
-## [v日本語版paradox v3.3.4] Paradox v3.3.4-Beta  Japanese version update!!
+## [v3.3.6](https://github.com/Pete9xi/Paradox_AntiCheat/tree/v3.3.6) (2023-09-20)
 
-## [v日本語版paradox v3.3.3] Paradox v3.3.4  Japanese version update!!
+[Full Changelog](https://github.com/Pete9xi/Paradox_AntiCheat/compare/v3.3.5...v3.3.6)
 
-## [v日本語版paradox v3.3.2] Paradox v3.3.3  Japanese version update!!
+## [v3.3.5](https://github.com/Pete9xi/Paradox_AntiCheat/tree/v3.3.5) (2023-09-14)
 
-## [v日本語版paradox v3.3.2] Paradox v3.3.3にアップデートしました！！
+[Full Changelog](https://github.com/Pete9xi/Paradox_AntiCheat/compare/v3.3.4...v3.3.5)
 
-## [Unreleased](https://github.com/Pete9xi/Paradox_AntiCheat/tree/HEAD)
+## [v3.3.4](https://github.com/Pete9xi/Paradox_AntiCheat/tree/v3.3.4) (2023-08-30)
 
-[Full Changelog](https://github.com/Pete9xi/Paradox_AntiCheat/compare/v3.3.3...HEAD)
-
-**Merged pull requests:**
-
-- Apply fixes from CodeFactor [\#29](https://github.com/Pete9xi/Paradox_AntiCheat/pull/29) ([Visual1mpact](https://github.com/Visual1mpact))
+[Full Changelog](https://github.com/Pete9xi/Paradox_AntiCheat/compare/v3.3.3...v3.3.4)
 
 ## [v3.3.3](https://github.com/Pete9xi/Paradox_AntiCheat/tree/v3.3.3) (2023-08-30)
 
 [Full Changelog](https://github.com/Pete9xi/Paradox_AntiCheat/compare/v3.3.2...v3.3.3)
+
+**Merged pull requests:**
+
+- Apply fixes from CodeFactor [\#29](https://github.com/Pete9xi/Paradox_AntiCheat/pull/29) ([Visual1mpact](https://github.com/Visual1mpact))
 
 ## [v3.3.2](https://github.com/Pete9xi/Paradox_AntiCheat/tree/v3.3.2) (2023-08-18)
 
