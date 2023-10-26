@@ -6,6 +6,4 @@ types
 .gitignore
 .mcattributes
 .prettierrc
-dist.bat
-sync.bat
 tsconfig.json

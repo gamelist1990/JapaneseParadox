@@ -1,5 +1,25 @@
 # Changelog
 
+## [v3.4.3](https://github.com/Pete9xi/Paradox_AntiCheat/tree/v3.4.3) (2023-10-22)
+
+[Full Changelog](https://github.com/Pete9xi/Paradox_AntiCheat/compare/v3.4.2...v3.4.3)
+
+## [v3.4.2](https://github.com/Pete9xi/Paradox_AntiCheat/tree/v3.4.2) (2023-10-22)
+
+[Full Changelog](https://github.com/Pete9xi/Paradox_AntiCheat/compare/v3.4.1...v3.4.2)
+
+## [v3.4.1](https://github.com/Pete9xi/Paradox_AntiCheat/tree/v3.4.1) (2023-10-22)
+
+[Full Changelog](https://github.com/Pete9xi/Paradox_AntiCheat/compare/v3.4.0...v3.4.1)
+
+**Fixed bugs:**
+
+- Docs - Mobile Navbar Behavior [\#30](https://github.com/Pete9xi/Paradox_AntiCheat/issues/30)
+
+## [v3.4.0](https://github.com/Pete9xi/Paradox_AntiCheat/tree/v3.4.0) (2023-09-30)
+
+[Full Changelog](https://github.com/Pete9xi/Paradox_AntiCheat/compare/v3.3.6...v3.4.0)
+
 ## [v3.3.6](https://github.com/Pete9xi/Paradox_AntiCheat/tree/v3.3.6) (2023-09-20)
 
 [Full Changelog](https://github.com/Pete9xi/Paradox_AntiCheat/compare/v3.3.5...v3.3.6)

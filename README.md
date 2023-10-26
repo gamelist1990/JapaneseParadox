@@ -16,7 +16,7 @@
     <p>Paradox: A statement or situation that contradicts itself, opposed to common sense and yet perhaps true.</p>
   </blockquote>
   <p>Paradox AntiCheat offers a comprehensive solution for detecting and preventing cheating in Minecraft Bedrock. It uses detection methods to ensure that cheaters are caught and punished. In addition, Paradox AntiCheat is highly customizable, allowing game developers to tailor the tool to their specific needs and requirements.</p>
-  <p>If you're looking for a reliable and effective anti-cheat solution for your Minecraft Bedrock experience, look no further than Paradox AntiCheat. For more information, check out the <a href="https://github.com/Pete9xi/Paradox_AntiCheat/wiki">wiki</a>.</p>
+  <p>If you're looking for a reliable and effective anti-cheat solution for your Minecraft Bedrock experience, look no further than Paradox AntiCheat. For more information, check out the <a href="https://pete9xi.github.io/Paradox_AntiCheat/#/">Documentation</a>.</p>
 </div>
 <hr>
 <div align="center">
