@@ -3,6 +3,7 @@ import { ActionFormData, ActionFormResponse, ModalFormData, ModalFormResponse } 
 import { sendMsgToPlayer } from "../../../util";
 import { chatChannelMainMenu } from "../../guiHandler/results/chatChannelsMenu";
 import { ChatChannelManager } from "../../../classes/ChatChannelManager";
+import { WorldExtended } from "../../../classes/WorldExtended/World";
 
 export function uiChatChannelCreate(ChatChannelCreateUIResult: ModalFormResponse, player: Player) {
     handleUIChatChannelCreate(ChatChannelCreateUIResult, player).catch((error) => {
@@ -86,7 +87,7 @@ export function uiChatChannelJoin(ChatChannelJoinUIResult: ModalFormResponse, pl
             } else if (newChannel === "already_in_channel") {
                 uiMessage = `§6 You are already in a chat channel. Please leave your current channel first.`;
             } else if (newChannel !== false) {
-                const joinedPlayer = ChatChannelManager.getPlayerById(player.id);
+                const joinedPlayer = (world as WorldExtended).getPlayerById(player.id);
                 const joinedPlayerName = joinedPlayer ? joinedPlayer.name : "Unknown Player";
 
                 const joinMessage = `§f§4[§6Paradox§4]§f §6${joinedPlayerName}§f joined the chat channel.`;
@@ -94,7 +95,7 @@ export function uiChatChannelJoin(ChatChannelJoinUIResult: ModalFormResponse, pl
                 uiMessage = `§f You have been added to §2${selectedChannelName}.`;
 
                 channel.members.forEach((memberId) => {
-                    const member = ChatChannelManager.getPlayerById(memberId);
+                    const member = (world as WorldExtended).getPlayerById(memberId);
                     if (member && member !== joinedPlayer) {
                         sendMsgToPlayer(member, joinMessage);
                     }
@@ -155,7 +156,7 @@ export function uiChatChannelInvite(ChatChannelJoinUIResult: ModalFormResponse, 
         if (!playerToInvite) {
             uiMessage = `§6 Something went wrong did you select a player to invite, please try again.`;
         }
-        const joinedPlayer = ChatChannelManager.getPlayerByName(playerToInvite);
+        const joinedPlayer = (world as WorldExtended).getPlayerByName(playerToInvite);
         if (playerToInvite) {
             const inviteResult = ChatChannelManager.inviteToChatChannel(playerToInvite, channelNameToInvite);
             if (inviteResult) {
@@ -166,7 +167,7 @@ export function uiChatChannelInvite(ChatChannelJoinUIResult: ModalFormResponse, 
                 const channel = ChatChannelManager.getChatChannelByName(channelNameToInvite);
 
                 channel.members.forEach((memberId) => {
-                    const member = ChatChannelManager.getPlayerById(memberId);
+                    const member = (world as WorldExtended).getPlayerById(memberId);
                     if (member && member !== joinedPlayer) {
                         sendMsgToPlayer(member, joinMessage);
                     }
@@ -221,12 +222,12 @@ export function uiChatChannelLeave(player: Player) {
         ChatChannelManager.clearPlayerFromChannelMap(player.id);
 
         // Inform all remaining members in the channel that the player left
-        const leavingPlayer = ChatChannelManager.getPlayerById(player.id);
+        const leavingPlayer = (world as WorldExtended).getPlayerById(player.id);
         const leavingPlayerName = leavingPlayer ? leavingPlayer.name : "Unknown Player";
         const leaveMessage = `§f§4[§6Paradox§4]§f §6${leavingPlayerName}§f left the chat channel.`;
 
         channelToLeave.members.forEach((memberId) => {
-            const member = ChatChannelManager.getPlayerById(memberId);
+            const member = (world as WorldExtended).getPlayerById(memberId);
             if (member) {
                 sendMsgToPlayer(member, leaveMessage);
             }
@@ -237,8 +238,8 @@ export function uiChatChannelLeave(player: Player) {
             const newOwnerId = Array.from(channelToLeave.members)[0]; // Get the first member as new owner
 
             if (newOwnerId) {
-                ChatChannelManager.handOverChannelOwnership(channelNameToLeave, ChatChannelManager.getPlayerById(player.id), ChatChannelManager.getPlayerById(newOwnerId).name);
-                const newOwnerObject = ChatChannelManager.getPlayerById(newOwnerId);
+                ChatChannelManager.handOverChannelOwnership(channelNameToLeave, (world as WorldExtended).getPlayerById(player.id), (world as WorldExtended).getPlayerById(newOwnerId).name);
+                const newOwnerObject = (world as WorldExtended).getPlayerById(newOwnerId);
                 sendMsgToPlayer(newOwnerObject, `§f§4[§6Paradox§4]§f Ownership of chat channel '§7${channelNameToLeave}§f' transferred to '§7${newOwnerObject.name}§f'.`);
             } else {
                 // If no other members, delete the channel

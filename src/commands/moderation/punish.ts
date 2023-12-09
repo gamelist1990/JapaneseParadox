@@ -1,26 +1,26 @@
 import { world, Player, ChatSendAfterEvent, EntityInventoryComponent } from "@minecraft/server";
-import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
-function punishHelp(player: Player, prefix: string) {
+function punishHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
-    if (!config.customcommands.punish) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: punish`,
+        `\n罰則§4[§6命令§4]§f: 罰則`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: punish [optional]`,
-        `§4[§6Optional§4]§f: username, help`,
-        `§4[§6Description§4]§f: Removes all items from the player's inventory and ender chest.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f: [オプション]を罰する。`,
+        `§4[§6オプション§4]§f: ユーザー名、ヘルプ`,
+        `§4[§6解説§4]§f．プレイヤーのインベントリとエンダーチェストから全てのアイテムを取り除く。`,
+        `§4[§6例§4]§f：`,
         `    ${prefix}punish ${player.name}`,
         `        §4- §6Remove all items from ${player.name}§f`,
         `    ${prefix}punish help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドを表示するヘルプ§f`,
     ]);
 }
 
@@ -32,7 +32,7 @@ function punishHelp(player: Player, prefix: string) {
 export function punish(message: ChatSendAfterEvent, args: string[]) {
     handlePunish(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -44,36 +44,38 @@ export function punish(message: ChatSendAfterEvent, args: string[]) {
 }
 
 async function handlePunish(message: ChatSendAfterEvent, args: string[]) {
-    // validate that required params are defined
+    // 必要なパラメータが定義されていることを確認する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/moderation/punish.js:10)");
     }
 
     const player = message.sender;
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
     }
 
-    // Check for custom prefix
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Was help requested
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.punish) {
-        return punishHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.punish) {
+        return punishHelp(player, prefix, configuration.customcommands.punish);
     }
 
-    // Are there arguements
+    // 反論はあるか
     if (!args.length) {
-        return punishHelp(player, prefix);
+        return punishHelp(player, prefix, configuration.customcommands.punish);
     }
 
-    // Try to find the player requested
+    // 要求された選手を見つけよう
     let member: Player;
     if (args.length) {
         const players = world.getPlayers();
@@ -85,23 +87,23 @@ async function handlePunish(message: ChatSendAfterEvent, args: string[]) {
         }
     }
 
-    // Are they online?
+    // オンラインですか？
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
     }
 
-    // Make sure they don't punish themselves
+    // 自分自身を罰することがないようにする
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot punish yourself.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f あなた自身を罰することはできない。`);
     }
 
-    // There are 30 slots ranging from 0 to 29
-    // Let's clear out that ender chest
+    // 0から29までの30個のスロットがある。
+    // エンダーの胸を一掃しよう
     for (let slot = 0; slot < 30; slot++) {
         member.runCommand(`replaceitem entity @s slot.enderchest ${slot} air`);
     }
 
-    // Get requested player's inventory so we can wipe it out
+    // リクエストされた選手のインベントリーを取得し、それを消去できるようにする。
     const inventoryContainer = member.getComponent("minecraft:inventory") as EntityInventoryComponent;
     const inventory = inventoryContainer.container;
 
@@ -114,8 +116,8 @@ async function handlePunish(message: ChatSendAfterEvent, args: string[]) {
             inventory.setItem(i, undefined);
         } catch {}
     }
-    // Notify staff and player that punishment has taken place
-    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You have been punished for your behavior!`);
-    // Use try/catch in case nobody has tag 'notify' as this will report 'no target selector'
-    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has punished §7${member.name}§f`);
+    // 罰が行われたことをスタッフと選手に通知する。
+    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f あなたがたは自分の行いのために罰を受けた！`);
+    // タグ「通知」を誰も持っていない場合は、try/catchを使用する。
+    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 処罰しました §7${member.name}§f`);
 }

@@ -6,7 +6,7 @@ import { paradoxui } from "../paradoxui.js";
 
 export function uiNOTIFY(notifyResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!notifyResult || notifyResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [value, Enabled] = notifyResult.formValues;
@@ -18,12 +18,12 @@ export function uiNOTIFY(notifyResult: ModalFormResponse, onlineList: string[], 
             break;
         }
     }
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 通知をオンにしてください`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f通知をBooleanにするには、Paradox-Oppedにする必要があります。`);
     }
     if (Enabled === true) {
         try {
@@ -35,7 +35,7 @@ export function uiNOTIFY(notifyResult: ModalFormResponse, onlineList: string[], 
             sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Something went wrong! Error: ${error}`);
             paradoxui(player);
         }
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ notifications.`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ notifications.`);
         paradoxui(player);
     }
     if (Enabled === false) {
@@ -48,7 +48,7 @@ export function uiNOTIFY(notifyResult: ModalFormResponse, onlineList: string[], 
             sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Something went wrong! Error: ${error}`);
             paradoxui(player);
         }
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ notifications.`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ notifications.`);
         paradoxui(player);
     }
     return paradoxui(player);

@@ -1,26 +1,26 @@
 import { ChatSendAfterEvent, Player } from "@minecraft/server";
-import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsgToPlayer } from "../../util.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
-function notifyHelp(player: Player, prefix: string) {
+function notifyHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
-    if (!config.customcommands.notify) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: notify`,
+        `\n§o§4[§6コマンド§4]§f: 通知`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: notify [optional]`,
-        `§4[§6Optional§4]§f: help`,
-        `§4[§6Description§4]§f: Toggles cheat notifications like a toggle.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f: 通知 [任意].`,
+        `§4[§6オプション§4]§f: ヘルプ`,
+        `§4[§6説明§4]§f：不正行為の通知をトグルのように切り替える。`,
+        `§4[§6例§4]§f：`,
         `    ${prefix}notify`,
-        `        §4- §6Toggle cheat notifications§f`,
+        `        §4- §6チート通知の切り替え§f`,
         `    ${prefix}notify help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドを表示するヘルプ§f`,
     ]);
 }
 
@@ -30,41 +30,43 @@ function notifyHelp(player: Player, prefix: string) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function notify(message: ChatSendAfterEvent, args: string[]) {
-    // validate that required params are defined
+    // 必要なパラメータが定義されていることを確認する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/moderation/notify.js:26)");
     }
 
     const player = message.sender;
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
     }
 
-    // Check for custom prefix
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Was help requested
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.notify) {
-        return notifyHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.notify) {
+        return notifyHelp(player, prefix, configuration.customcommands.notify);
     }
 
     const tagBoolean = player.hasTag("notify");
 
-    // Disable
+    // 無効
     if (tagBoolean) {
         player.removeTag("notify");
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You have disabled cheat notifications.`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはチート通知を無効にしています。`);
     }
 
-    // Enable
+    // Booleanにする
     if (!tagBoolean) {
         player.addTag("notify");
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You have enabled cheat notifications.`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fチート通知をBooleanにしました。`);
     }
 }

@@ -15,7 +15,7 @@ import { ModalFormResponse } from "@minecraft/server-ui";
 export function uiPUNISH(punishResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUIPunish(punishResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -28,7 +28,7 @@ export function uiPUNISH(punishResult: ModalFormResponse, onlineList: string[], 
 
 async function handleUIPunish(punishResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!punishResult || punishResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [value] = punishResult.formValues;
@@ -40,33 +40,33 @@ async function handleUIPunish(punishResult: ModalFormResponse, onlineList: strin
             break;
         }
     }
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
-    // Make sure the user has permissions to run the command
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to use punish.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f罰則を使うにはパラドックス・オップである必要がある。`);
     }
 
-    // Are they online?
+    // オンラインですか？
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
     }
 
-    // Make sure they don't punish themselves
+    // 自分自身を罰することがないようにする
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者には実行できません.`);
+        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f あなた自身を罰することはできない。`);
     }
-    //Make sure they don't punish staff!
+    //スタッフに罰を与えないようにする！
     if (member.hasTag("paradoxOpped")) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者には無効です.`);
+        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f スタッフを罰することはできない。`);
     }
-    // There are 30 slots ranging from 0 to 29
-    // Let's clear out that ender chest
+    // 0から29までの30個のスロットがある。
+    // エンダーの胸を一掃しよう
     for (let slot = 0; slot < 30; slot++) {
         member.runCommand(`replaceitem entity @s slot.enderchest ${slot} air`);
     }
 
-    // Get requested player's inventory so we can wipe it out
+    // リクエストされた選手のインベントリーを取得し、それを消去できるようにする。
     const inventoryContainer = member.getComponent("minecraft:inventory") as EntityInventoryComponent;
     const inventory = inventoryContainer.container;
 
@@ -79,9 +79,9 @@ async function handleUIPunish(punishResult: ModalFormResponse, onlineList: strin
             inventory.setItem(i, undefined);
         } catch {}
     }
-    // Notify staff and player that punishment has taken place
-    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f アイテム欄が消去されました`);
-    // Use try/catch in case nobody has tag 'notify' as this will report 'no target selector'
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§fが ${member.name}のアイテム欄を消しました§f`);
+    // 罰が行われたことをスタッフと選手に通知する。
+    sendMsgToPlayer(member, `§f§4[§6パラドックス§4]§f あなたがたは自分の行いのために罰を受けた！`);
+    // タグ「通知」を誰も持っていない場合は、try/catchを使用する。
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has punished §7${member.name}§f`);
     return paradoxui(player);
 }

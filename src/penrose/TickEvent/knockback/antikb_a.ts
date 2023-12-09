@@ -1,10 +1,11 @@
 import { EntityInventoryComponent, world, system } from "@minecraft/server";
 import { flag } from "../../../util.js";
-import config from "../../../data/config.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
 async function antiknockbacka(id: number) {
-    const antikbBoolean = dynamicPropertyRegistry.get("antikb_b");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const antikbBoolean = configuration.modules.antikbA.enabled;
 
     if (antikbBoolean === false) {
         system.clearRun(id);
@@ -13,7 +14,7 @@ async function antiknockbacka(id: number) {
 
     const players = world.getPlayers();
     for (const player of players) {
-        const uniqueId = dynamicPropertyRegistry.get(player?.id);
+        const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
         if (uniqueId === player.name) {
             continue;
@@ -37,7 +38,7 @@ async function antiknockbacka(id: number) {
         const velocity = player.getVelocity();
         const velocitySum = Math.abs(velocity.y) + Math.abs(velocity.x) + Math.abs(velocity.z);
 
-        if (velocitySum <= config.modules.antikbA.magnitude) {
+        if (velocitySum <= configuration.modules.antikbA.velocityIntensity) {
             const tags = player.getTags();
             if (tags.includes("attacked") && !tags.includes("dead") && !player.isGliding && !tags.includes("levitating") && !tags.includes("flying")) {
                 flag(player, "AntiKB", "A", "Movement", null, null, "Magnitude", velocitySum.toFixed(3), true);

@@ -1,38 +1,40 @@
-import { Player, world } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
 import { BeforeNukerA } from "../../penrose/PlayerBreakBlockBeforeEvent/nuker/nuker_a.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiANTINUKER(antinukerResult: ModalFormResponse, player: Player) {
     if (!antinukerResult || antinukerResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [AntiNukerToggle] = antinukerResult.formValues;
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Get Dynamic Property Boolean
-
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to configure Anti Nuker`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fアンチ・ヌーカーの設定にはパラドックス・オップが必要です。`);
     }
+
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
     if (AntiNukerToggle === true) {
-        // Allow
-        dynamicPropertyRegistry.set("antinukera_b", true);
-        world.setDynamicProperty("antinukera_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6AntiNukerA§f!`);
+        // 許可する
+        configuration.modules.antinukerA.enabled = true;
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6AntiNukerA§f!`);
         BeforeNukerA();
     }
     if (AntiNukerToggle === false) {
-        dynamicPropertyRegistry.set("antinukera_b", false);
-        world.setDynamicProperty("antinukera_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4AntiNukerA§f!`);
+        configuration.modules.antinukerA.enabled = false;
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4AntiNukerA§f!`);
     }
 
-    //show the main ui to the player once complete.
+    //完了したら、プレイヤーにメインUIを表示する。
     return paradoxui(player);
 }

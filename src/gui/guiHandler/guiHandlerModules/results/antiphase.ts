@@ -2,25 +2,27 @@ import { Player } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../../../penrose/WorldInitializeAfterEvent/registry";
 import { uiANTIPHASE } from "../../../modules/uiAntiPhase";
+import ConfigInterface from "../../../../interfaces/Config";
 
 export function antiPhaseAHandler(player: Player) {
     const modulesantiphaseui = new ModalFormData();
-    const antiPhaseBoolean = dynamicPropertyRegistry.get("antiphasea_b") as boolean;
-    modulesantiphaseui.title("§4メニュー：Anti Phase§4");
-    modulesantiphaseui.toggle("ユーザーが壁抜けしているかを検知します", antiPhaseBoolean);
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const antiPhaseBoolean = configuration.modules.antiphaseA.enabled;
+    modulesantiphaseui.title("§4 Anti Phaseメニュー§4");
+    modulesantiphaseui.toggle("アンチフェイズ - プレイヤーのフェイズブロックをチェックする：", antiPhaseBoolean);
     modulesantiphaseui
         .show(player)
         .then((antiphaseResult) => {
             uiANTIPHASE(antiphaseResult, player);
         })
         .catch((error) => {
-            console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
+            console.error("パラドックスの未処理拒否：", error);
+            // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("Error originated from:", sourceInfo[0]);
+                    console.error("エラーの原因", sourceInfo[0]);
                 }
             }
         });

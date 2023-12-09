@@ -1,3 +1,3 @@
 export default {
-    version: "3.3.7カスタム",
+    version: "3.4.5",
 };

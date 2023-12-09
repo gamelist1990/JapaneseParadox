@@ -1,33 +1,35 @@
-import { Player, Vector3, world } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { ActionFormResponse, ModalFormResponse } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
-import config from "../../data/config.js";
-import { EncryptionManager } from "../../classes/EncryptionManager.js";
-import { UUIDManager } from "../../classes/UUIDManager.js";
+import { WorldExtended } from "../../classes/WorldExtended/World.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
-//Function provided by Visual1mpact
-export function uiOP(opResult: ModalFormResponse | ActionFormResponse, salt: string | number | boolean, hash: string | number | boolean | Vector3, player: Player, onlineList?: string[]) {
+//Visual1インパクトが提供する機能
+export function uiOP(opResult: ModalFormResponse | ActionFormResponse, salt: string | number | boolean, hash: string | number | boolean, player: Player, onlineList?: string[]) {
     if (!opResult || opResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
-    if (!hash || !salt || (hash !== EncryptionManager.hashWithSalt(salt as string, config.encryption.password || player.id) && UUIDManager.isValidUUID(salt as string))) {
-        if (!config.encryption.password) {
+
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    if (!hash || !salt || (hash !== (world as WorldExtended).hashWithSalt(salt as string, configuration.encryption.password || player.id) && (world as WorldExtended).isValidUUID(salt as string))) {
+        if (!configuration.encryption.password) {
             if (!player.isOp()) {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません.`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うにはオペレータである必要がある。`);
                 return paradoxui(player);
             }
         }
     }
 
     if ("formValues" in opResult) {
-        // It's a ModalFormResponse
+        // これはModalFormResponseです。
 
         const [value] = opResult.formValues;
 
-        // Try to find the player requested
+        // 要求された選手を見つけよう
         let targetPlayer: Player;
 
         if (onlineList.length > 0) {
@@ -40,9 +42,9 @@ export function uiOP(opResult: ModalFormResponse | ActionFormResponse, salt: str
             }
         } else {
             targetPlayer = player;
-            if (config.encryption.password !== value) {
-                // Incorrect password
-                return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f パスワードが違います. 管理者しか実行できません.`);
+            if (configuration.encryption.password !== value) {
+                // パスワードの誤り
+                return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fパスワードが間違っています。このコマンドを使用するには Operator である必要があります。`);
             }
         }
 
@@ -50,46 +52,46 @@ export function uiOP(opResult: ModalFormResponse | ActionFormResponse, salt: str
             const targetHash = targetPlayer.getDynamicProperty("hash");
 
             if (targetHash === undefined) {
-                const targetSalt = UUIDManager.generateRandomUUID();
+                const targetSalt = (world as WorldExtended).generateRandomUUID();
                 targetPlayer.setDynamicProperty("salt", targetSalt);
 
-                // Use either the operator's ID or the encryption password as the key
-                const targetKey = config.encryption.password ? config.encryption.password : targetPlayer.id;
+                // オペレーターのIDまたは暗号化パスワードのいずれかをキーとして使用する。
+                const targetKey = configuration.encryption.password ? configuration.encryption.password : targetPlayer.id;
 
-                // Generate the hash
-                const newHash = EncryptionManager.hashWithSalt(targetSalt, targetKey);
+                // ハッシュを生成する
+                const newHash = (world as WorldExtended).hashWithSalt(targetSalt, targetKey);
 
                 targetPlayer.setDynamicProperty("hash", newHash);
 
-                dynamicPropertyRegistry.set(targetPlayer.id, targetPlayer.name);
+                dynamicPropertyRegistry.setProperty(targetPlayer, targetPlayer.id, targetPlayer.name);
 
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限を ${targetPlayer.name}に与えた`);
-                sendMsgToPlayer(targetPlayer, `§f§4[§6Paradox§4]§f 管理者になりました`);
-                sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${targetPlayer.name}§f 新しい管理者が来たよ！.`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You have granted Paradox-Op to §7${targetPlayer.name}§f.`);
+                sendMsgToPlayer(targetPlayer, `§f§4[§6パラドックス§4]§f あなたは今、操作している！`);
+                sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${targetPlayer.name}§f is now Paradox-Opped.`);
                 targetPlayer.addTag("paradoxOpped");
                 return paradoxui(player);
             } else {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ${targetPlayer.name} 既に管理者です`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f §7${targetPlayer.name}§f is already Paradox-Opped.`);
                 return paradoxui(player);
             }
         } else {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 見つかりませんでした ${targetPlayer.name}.`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Could not find player §7${targetPlayer.name}§f.`);
             return paradoxui(player);
         }
     } else if ("selection" in opResult) {
-        // It's an ActionFormResponse
+        // これはActionFormResponseである。
         if (opResult.selection === 0) {
-            // player wants to change their own password
-            const targetSalt = UUIDManager.generateRandomUUID();
-            const newHash = EncryptionManager.hashWithSalt(targetSalt, player.id);
+            // 選手が自分のパスワードを変更したい
+            const targetSalt = (world as WorldExtended).generateRandomUUID();
+            const newHash = (world as WorldExtended).hashWithSalt(targetSalt, player.id);
 
             player.setDynamicProperty("hash", newHash);
             player.setDynamicProperty("salt", targetSalt);
             player.addTag("paradoxOpped");
 
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者になりました`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたは今、パラドックスに縛られている！`);
 
-            dynamicPropertyRegistry.set(player.id, player.name);
+            dynamicPropertyRegistry.setProperty(player, player.id, player.name);
 
             return paradoxui(player);
         }

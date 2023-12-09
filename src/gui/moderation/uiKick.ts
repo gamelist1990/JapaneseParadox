@@ -14,7 +14,7 @@ import { paradoxui } from "../paradoxui.js";
 export function uiKICK(banResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUIKick(banResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -27,7 +27,7 @@ export function uiKICK(banResult: ModalFormResponse, onlineList: string[], playe
 
 async function handleUIKick(banResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!banResult || banResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [value, reason] = banResult.formValues;
@@ -41,20 +41,20 @@ async function handleUIKick(banResult: ModalFormResponse, onlineList: string[], 
     }
 
     if (!member) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
         return paradoxui(player);
     }
 
-    // make sure they dont kick themselves
+    // 自分たちで蹴らないようにする
     if (member === player) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者にしか実行できません`);
+        sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f 自分を蹴ることはできない。`);
         return paradoxui(player);
     }
 
     player.runCommandAsync(`kick "${member.name}" §f\n\n${reason}`).catch((error) => {
         console.warn(`${new Date()} | ` + error);
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f キックできませんでした`);
+        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手を蹴ることができなかった．`);
     });
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f が ${member.name}をキック§f. 理由: ${reason}`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f が §7${member.name}をキックしました§f. 理由: §7${reason}§f`);
     return paradoxui(player);
 }

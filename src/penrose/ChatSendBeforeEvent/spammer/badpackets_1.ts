@@ -1,11 +1,12 @@
 import { ChatSendAfterEvent, world } from "@minecraft/server";
 import { flag } from "../../../util.js";
-import config from "../../../data/config.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
 function badpackets1(msg: ChatSendAfterEvent) {
     // Get Dynamic Property
-    const badPackets1Boolean = dynamicPropertyRegistry.get("badpackets1_b");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const badPackets1Boolean = configuration.modules.badpackets1.enabled;
 
     // Unsubscribe if disabled in-game
     if (badPackets1Boolean === false) {
@@ -16,7 +17,7 @@ function badpackets1(msg: ChatSendAfterEvent) {
     const message = msg.message.toLowerCase();
 
     // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
     // Skip if they have permission
     if (uniqueId === player.name) {
@@ -24,7 +25,7 @@ function badpackets1(msg: ChatSendAfterEvent) {
     }
 
     // BadPackets/1 = chat message length check
-    if (message.length > config.modules.badpackets1.maxlength || message.length < config.modules.badpackets1.minLength) {
+    if (message.length > configuration.modules.badpackets1.maxlength || message.length < configuration.modules.badpackets1.minLength) {
         flag(player, "BadPackets", "1", "messageLength", null, null, "Characters", String(message.length), false);
     }
 }

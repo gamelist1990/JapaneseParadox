@@ -1,25 +1,25 @@
-import { ChatSendAfterEvent, Player, } from "@minecraft/server";
-import config from "../../data/config.js";
+import { ChatSendAfterEvent, Player } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsgToPlayer } from "../../util.js";
-function biomeHelp(player: Player, prefix: string) {
+import ConfigInterface from "../../interfaces/Config.js";
+function biomeHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus;
-    if (!config.customcommands.biome) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: biome`,
+        `§6コマンド§4]§f：バイオーム`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: biome [optional]`,
-        `§4[§6Optional§4]§f: help`,
-        `§4[§6Description§4]§f: Sends the current biome and direction the player is facing. §6Note you need to enable Molang. `,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f：バイオーム[オプション］`,
+        `§4[§6オプション§4]§f: ヘルプ`,
+        `§4[§6解説§4]§f：現在のバイオームとプレイヤーが向いている方向を送信する。§6MolangをBooleanにする必要があることに注意。`,
+        `§4[§6例§4]§f：`,
         `    ${prefix}biome`,
-        `        §4- §6Send the current biome and direction to the player§f`,
+        `        §4- §6現在のバイオームと方向をプレイヤーに送る§f`,
         `    ${prefix}biome help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドを表示するヘルプ§f`,
     ]);
 }
 /**
@@ -28,23 +28,26 @@ function biomeHelp(player: Player, prefix: string) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function biome(message: ChatSendAfterEvent, args: string[]) {
-    // validate that required params are defined
+    // 必要なパラメータが定義されていることを確認する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./utility/biome.js:26)");
     }
     const player = message.sender;
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
-    // Make sure the user has permissions to run the command
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者権限がないと実行できません！！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
     }
-    // Check for custom prefix
+
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
-    // Was help requested
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.biome) {
-        return biomeHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.biome) {
+        return biomeHelp(player, prefix, configuration.customcommands.biome);
     }
     const directionMap: Map<string, string> = new Map([
         ["North", "向いている方角: 北"],
@@ -52,20 +55,20 @@ export function biome(message: ChatSendAfterEvent, args: string[]) {
         ["East", "向いている方角: 東"],
         ["West", "向いている方角: 西"],
     ]);
-    const defaultDirection: string = "Facing: Unknown!";
+    const defaultDirection: string = "検知できません！！";
     let direction: string;
-    // Iterate over the map entries to find a matching tag
+    // 一致するタグを見つけるために、マップのエントリーを繰り返し処理する。
     for (const [tag, mappedDirection] of directionMap.entries()) {
         if (player.hasTag(tag)) {
             direction = mappedDirection;
             break;
         }
     }
-    // If no matching tag is found, assign the default direction
+    // 一致するタグが見つからない場合は、デフォルトの方向を割り当てる。
     if (!direction) {
         direction = defaultDirection;
     }
-    //Biome Map
+    //バイオームマップ
     const biomeMap: Map<string, string> = new Map([
         ["basalt_deltas", "バイオーム: ネザーの玄武岩の三角州"],
         ["bamboo_jungle", "バイオーム: まばらなジャングル "],
@@ -158,16 +161,16 @@ export function biome(message: ChatSendAfterEvent, args: string[]) {
         ["stony_peaks", "バイオーム: ストーニー・ピークス"],
     ]);
 
-    const defaultBiome: string = "Unknown Or §4Molang is not enabled!§f";
+    const defaultBiome: string = "Unknown Or §4Molang is not Boolean!§f";
     let currentBiome: string;
-    // Iterate over the map entries to find a matching tag
+    // 一致するタグを見つけるために、マップのエントリーを繰り返し処理する。
     for (const [tag, mappedBiome] of biomeMap.entries()) {
         if (player.hasTag(tag)) {
             currentBiome = mappedBiome;
             break;
         }
     }
-    // If no matching tag is found, assign the default biome
+    // 一致するタグが見つからない場合は、デフォルトのバイオームを割り当てる。
     if (!currentBiome) {
         currentBiome = defaultBiome;
     }

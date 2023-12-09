@@ -4,6 +4,7 @@ import { getPrefix, setTimer } from "../../../util.js";
 import { kickablePlayers } from "../../../kickcheck.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 import { ScoreManager } from "../../../classes/ScoreManager.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
 async function onJoinTime(object: PlayerSpawnAfterEvent) {
     /**
@@ -23,18 +24,19 @@ async function onJoinTime(object: PlayerSpawnAfterEvent) {
     }
 
     // Get Dynamic Property
-    const lockdownBoolean = dynamicPropertyRegistry.get("lockdown_b");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const lockdownBoolean = configuration.modules.lockdown.enabled;
 
     // Lock down the server if enabled
     if (lockdownBoolean) {
         // Get unique ID
-        const uniqueId = dynamicPropertyRegistry.get(player?.id);
+        const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
         if (uniqueId === player.name) {
             return;
         }
 
-        const reason = "Under Maintenance! Sorry for the inconvenience.";
+        const reason = "メンテナンス中!ご不便をおかけして申し訳ございません。";
 
         // Kick players from server
         player.runCommandAsync(`kick "${player.name}" §f\n\n${reason}`).catch(() => {

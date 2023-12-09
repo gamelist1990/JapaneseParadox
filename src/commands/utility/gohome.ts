@@ -1,8 +1,8 @@
 import { world, Player, ChatSendAfterEvent } from "@minecraft/server";
-import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsgToPlayer, setTimer } from "../../util.js";
-import { EncryptionManager } from "../../classes/EncryptionManager.js";
+import { WorldExtended } from "../../classes/WorldExtended/World.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
 const cooldownTimer = new WeakMap();
 
@@ -15,35 +15,35 @@ function dhms(ms: number) {
     const minutesms = ms % (60 * 1000);
     const sec = Math.floor(minutesms / 1000);
     if (days !== 0) {
-        return days + " Days : " + hours + " Hours : " + minutes + " Minutes : " + sec + " Seconds";
+        return days + " 日 : " + hours + " 時間 : " + minutes + " 分 : " + sec + " 秒";
     }
     if (hours !== 0) {
-        return hours + " Hours : " + minutes + " Minutes : " + sec + " Seconds";
+        return hours + " 時間 : " + minutes + " 分 : " + sec + " 秒";
     }
     if (minutes !== 0) {
-        return minutes + " Minutes : " + sec + " Seconds";
+        return minutes + " 分 : " + sec + " 秒";
     }
-    return sec + " Seconds";
+    return sec + " 秒";
 }
 
-function goHomeHelp(player: Player, prefix: string) {
+function goHomeHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
-    if (!config.customcommands.gohome) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: gohome`,
+        `\n§o§4[§6コマンド§4]§f: gohome`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: gohome [optional]`,
-        `§4[§6Optional§4]§f: name, help`,
-        `§4[§6Description§4]§f: Return home to a specified saved location.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f: gohome [オプション］`,
+        `§4[§6オプション§4]§f: 名前、ヘルプ`,
+        `§4[§6説明§4]§f：指定した保存場所に帰る。`,
+        `§4[§6例§4]§f：`,
         `    ${prefix}gohome barn`,
-        `        §4- §6Return to the "barn" home§f`,
+        `        §4-§6「納屋」ホームへの帰還§f`,
         `    ${prefix}gohome help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドを表示するヘルプ§f`,
     ]);
 }
 
@@ -55,7 +55,7 @@ function goHomeHelp(player: Player, prefix: string) {
 export function gohome(message: ChatSendAfterEvent, args: string[]) {
     handleGoHome(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -67,40 +67,42 @@ export function gohome(message: ChatSendAfterEvent, args: string[]) {
 }
 
 async function handleGoHome(message: ChatSendAfterEvent, args: string[]) {
-    // Validate that required params are defined
+    // 必要なパラメータが定義されていることを検証する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? ./commands/utility/gohome.js:52)");
     }
 
     const player = message.sender;
 
-    // Check for custom prefix
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Cache
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // キャッシュ
     const length = args.length;
 
-    // Are there arguements
+    // 反論はあるか
     if (!length) {
-        return goHomeHelp(player, prefix);
+        return goHomeHelp(player, prefix, configuration.customcommands.gohome);
     }
 
-    // Was help requested
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.gohome) {
-        return goHomeHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.gohome) {
+        return goHomeHelp(player, prefix, configuration.customcommands.gohome);
     }
 
-    // Don't allow spaces
+    // スペースを許可しない
     if (length > 1) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f No spaces in names please!`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f名前にスペースを入れないでください！`);
     }
 
-    // Hash the coordinates for security
+    // 安全のために座標をハッシュ化する
     const salt = world.getDynamicProperty("crypt");
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
     let homex: number;
     let homey: number;
@@ -111,23 +113,23 @@ async function handleGoHome(message: ChatSendAfterEvent, args: string[]) {
     const tagsLength = tags.length;
     for (let i = 0; i < tagsLength; i++) {
         if (tags[i].startsWith("1337")) {
-            // Decode it so we can verify it
-            tags[i] = EncryptionManager.decryptString(tags[i], salt as string);
+            // それを検証するためにデコードする
+            tags[i] = (world as WorldExtended).decryptString(tags[i], salt as string);
         }
         if (tags[i].startsWith(args[0].toString() + " X", 13)) {
-            // Split string into array
+            // 文字列を配列に分割する
             coordinatesArray = tags[i].split(" ");
             break;
         }
     }
 
     if (!coordinatesArray) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Home '§7${args[0]}§f' does not exist!`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f '§7${args[0]}§f' は見つかりません`);
     }
 
     const coordArrayLength = coordinatesArray.length;
     for (let i = 0; i < coordArrayLength; i++) {
-        // Get their location from the array
+        // 配列から位置を取得する
         if (coordinatesArray[i].includes("X:")) {
             homex = parseInt(coordinatesArray[i].replace("X:", ""));
         }
@@ -143,38 +145,47 @@ async function handleGoHome(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!homex || !homey || !homez || !dimension) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Home '§7${args[0]}§f' does not exist!`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  '§7${args[0]}§f' 存在しないよ！もう一回確認してみて`);
     } else {
         let cooldownCalc: number;
         let activeTimer: string;
-        // Get original time in milliseconds
+        // 元の時間をミリ秒単位で取得
         const cooldownVerify = cooldownTimer.get(player);
-        // Convert config settings to milliseconds so we can be sure the countdown is accurate
-        const msSettings = config.modules.goHome.days * 24 * 60 * 60 * 1000 + config.modules.goHome.hours * 60 * 60 * 1000 + config.modules.goHome.minutes * 60 * 1000 + config.modules.goHome.seconds * 1000;
+        // コンフィグ設定をミリ秒に変換し、カウントダウンが正確であることを確認できるようにする。
+        const msSettings = configuration.modules.goHome.days * 24 * 60 * 60 * 1000 + configuration.modules.goHome.hours * 60 * 60 * 1000 + configuration.modules.goHome.minutes * 60 * 1000 + configuration.modules.goHome.seconds * 1000;
         if (cooldownVerify !== undefined) {
-            // Determine difference between new and original times in milliseconds
+            // 新しいタイムと元のタイムの差をミリ秒単位で判断する
             const bigBrain = new Date().getTime() - cooldownVerify;
-            // Subtract realtime clock from countdown in configuration to get difference
+            // 設定のカウントダウンからリアルタイムクロックを引いて差を求める
             cooldownCalc = msSettings - bigBrain;
-            // Convert difference to clock format D : H : M : S
+            // 差分をクロック形式に変換 D：H：M：S
             activeTimer = dhms(cooldownCalc);
         } else {
-            // First time executed so we default to configuration in milliseconds
+            // 初めて実行されるため、デフォルトではミリ秒単位で設定されます。
             cooldownCalc = msSettings;
         }
-        // If timer doesn't exist or has expired then grant permission to teleport and set the countdown
+        // タイマーが存在しないか、期限が切れている場合は、テレポートの許可を与え、カウントダウンを設定する。
         if (cooldownCalc === msSettings || cooldownCalc <= 0 || uniqueId === player.name) {
-            // This timer is a grace period
+            // このタイマーは猶予期間である
             setTimer(player.id);
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Welcome back!`);
-            player.teleport({ x: homex, y: homey, z: homez }, { dimension: world.getDimension(dimension), rotation: { x: 0, y: 0 }, facingLocation: { x: 0, y: 0, z: 0 }, checkForBlocks: false, keepVelocity: false });
-            // Delete old key and value
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f tpしました！`);
+            player.teleport(
+                { x: homex, y: homey, z: homez },
+                {
+                    dimension: world.getDimension(dimension),
+                    rotation: { x: 0, y: 0 },
+                    facingLocation: { x: 0, y: 0, z: 0 },
+                    checkForBlocks: true,
+                    keepVelocity: false,
+                }
+            );
+            // 古いキーと値を削除する
             cooldownTimer.delete(player);
-            // Create new key and value with current time in milliseconds
+            // ミリ秒単位の現在時刻を持つ新しいキーと値を作成する。
             cooldownTimer.set(player, new Date().getTime());
         } else {
-            // Teleporting to fast
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Too fast! Please wait for §7${activeTimer}§f before going home.`);
+            // 高速テレポート
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 速すぎる！7${activeTimer}§fまで待ってからtpしてください。`);
         }
     }
 }

@@ -12,12 +12,12 @@ export function uiTPR(requester: string, player: Player, respons: string) {
         }
     }
 
-    // Are they online?
+    // オンラインですか？
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
     }
 
-    // Let's complete this tpr request
+    // このTPRリクエストを完成させよう
     if (respons === "yes") {
         const event = {
             sender: player,

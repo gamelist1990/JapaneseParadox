@@ -1,32 +1,35 @@
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
-import config from "../../data/config.js";
-import { ChatSendAfterEvent, Player, Vector3, world } from "@minecraft/server";
+import { ChatSendAfterEvent, Player } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { AntiPhaseA } from "../../penrose/TickEvent/phase/phase_a.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
-function antiphaseaHelp(player: Player, prefix: string, antiphaseABoolean: string | number | boolean | Vector3) {
-    let commandStatus: string;
-    if (!config.customcommands.antiphasea) {
-        commandStatus = "§6[§4DISABLED§6]§f";
-    } else {
-        commandStatus = "§6[§aENABLED§6]§f";
-    }
-    let moduleStatus: string;
-    if (antiphaseABoolean === false) {
-        moduleStatus = "§6[§4DISABLED§6]§f";
-    } else {
-        moduleStatus = "§6[§aENABLED§6]§f";
-    }
-    return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: antiphasea`,
+/**
+ * Provides help information for the AntiPhaseA command.
+ * @param {Player} player - The player requesting help.
+ * @param {string} prefix - The custom prefix for the player.
+ * @param {boolean} antiPhaseABoolean - The status of AntiPhaseA module.
+ * @param {boolean} setting - The status of the AntiPhaseA custom command setting.
+ */
+function antiphaseaHelp(player: Player, prefix: string, antiPhaseABoolean: boolean, setting: boolean): void {
+    const commandStatus: string = setting ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
+    const moduleStatus: string = antiPhaseABoolean ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
+
+    sendMsgToPlayer(player, [
+        `§6コマンド§4]§f：アンチファセア`,
         `§4[§6Status§4]§f: ${commandStatus}`,
         `§4[§6Module§4]§f: ${moduleStatus}`,
-        `§4[§6Usage§4]§f: antiphasea [optional]`,
-        `§4[§6Optional§4]§f: help`,
-        `§4[§6Description§4]§f: Toggles checks for players phasing through blocks.`,
-        `§4[§6Examples§4]§f:`,
-        `    ${prefix}antiphasea`,
-        `    ${prefix}antiphasea help`,
+        `§4[§6Usage§4]§f: ${prefix}antiphasea [options]`,
+        `§4[§6解説§4]§f：ブロックをフェイズスルーする能力についてプレイヤーを監視する。`,
+        `§4[§6オプション§4]§f：`,
+        `    -h, --help`,
+        `       §4[§7このヘルプメッセージを表示する§4]§f`,
+        `    -s, --status`,
+        `       §4[§7AntiPhaseAモジュールの現在の状態を表示する§4]§f`,
+        `    -e, --enable`,
+        `       §4[§7AntiPhaseAモジュールをBooleanにする§4]§f`,
+        `    -d, --disable`,
+        `       §4[§7AntiPhaseAモジュールを無効にする§4]§f`,
     ]);
 }
 
@@ -35,44 +38,90 @@ function antiphaseaHelp(player: Player, prefix: string, antiphaseABoolean: strin
  * @param {ChatSendAfterEvent} message - Message object
  * @param {string[]} args - Additional arguments provided (optional).
  */
-export function antiphaseA(message: ChatSendAfterEvent, args: string[]) {
-    // validate that required params are defined
+export function antiphaseA(message: ChatSendAfterEvent, args: string[]): void {
+    handleAntiPhaseA(message, args).catch((error) => {
+        console.error("Paradox Unhandled Rejection: ", error);
+        // スタックトレース情報の抽出
+        if (error instanceof Error) {
+            const stackLines = error.stack.split("\n");
+            if (stackLines.length > 1) {
+                const sourceInfo = stackLines;
+                console.error("Error originated from:", sourceInfo[0]);
+            }
+        }
+    });
+}
+
+async function handleAntiPhaseA(message: ChatSendAfterEvent, args: string[]): Promise<void> {
+    // 必要なパラメータが定義されていることを検証する
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/settings/antiphasea.js:34)");
+        return console.warn(`${new Date()} | Error: ${message} isn't defined. Did you forget to pass it? (./commands/settings/antiphasea.js:34)`);
     }
 
     const player = message.sender;
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return;
     }
 
-    // Get Dynamic Property Boolean
-    const antiphaseABoolean = dynamicPropertyRegistry.get("antiphasea_b");
+    // ダイナミック・プロパティ・ブール値の取得
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // Check for custom prefix
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Was help requested
-    const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.antiphasea) {
-        return antiphaseaHelp(player, prefix, antiphaseABoolean);
+    // 位置以外の引数をチェックする
+    const length = args.length;
+    let validFlagFound = false; // Flag to track if any valid flag is encountered
+    for (let i = 0; i < length; i++) {
+        const additionalArg: string = args[i].toLowerCase();
+
+        // 追加引数の処理
+        switch (additionalArg) {
+            case "-h":
+            case "--help":
+                validFlagFound = true;
+                return antiphaseaHelp(player, prefix, configuration.modules.antiphaseA.enabled, configuration.customcommands.phase);
+            case "-s":
+            case "--status":
+                // ハンドル状態フラグ
+                validFlagFound = true;
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f AntiPhaseA module is currently ${configuration.modules.antiphaseA.enabled ? "有効" : "無効"}`);
+                break;
+            case "-e":
+            case "--enable":
+                // ハンドルイネーブルフラグ
+                validFlagFound = true;
+                if (configuration.modules.antiphaseA.enabled) {
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fアンチフェーズモジュールは既にBooleanになっている。`);
+                } else {
+                    configuration.modules.antiphaseA.enabled = true;
+                    dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 以下の機能が有効です=> §6AntiPhaseA§f!`);
+                    AntiPhaseA();
+                }
+                break;
+            case "-d":
+            case "--disable":
+                // ハンドル無効フラグ
+                validFlagFound = true;
+                if (!configuration.modules.antiphaseA.enabled) {
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fアンチフェーズモジュールは既に無効になっている。`);
+                } else {
+                    configuration.modules.antiphaseA.enabled = false;
+                    dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f は無効 §4AntiPhaseA§f!`);
+                }
+                break;
+        }
     }
 
-    if (antiphaseABoolean === false) {
-        // Allow
-        dynamicPropertyRegistry.set("antiphasea_b", true);
-        world.setDynamicProperty("antiphasea_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6AntiPhaseA§f!`);
-        AntiPhaseA();
-    } else if (antiphaseABoolean === true) {
-        // Deny
-        dynamicPropertyRegistry.set("antiphasea_b", false);
-        world.setDynamicProperty("antiphasea_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4AntiPhaseA§f!`);
+    if (!validFlagFound) {
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Invalid command. Use ${prefix}antiphasea --help for more information.`);
     }
 }

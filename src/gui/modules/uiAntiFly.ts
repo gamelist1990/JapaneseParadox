@@ -1,38 +1,40 @@
-import { Player, world } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { paradoxui } from "../paradoxui.js";
 import { sendMsgToPlayer, sendMsg } from "../../util.js";
 import { FlyA } from "../../penrose/TickEvent/fly/fly_a.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiANTIFLY(antiflyResult: ModalFormResponse, player: Player) {
     if (!antiflyResult || antiflyResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [AntiFlyToggle] = antiflyResult.formValues;
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Get Dynamic Property Boolean
-
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to configure Anti Fly`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fアンチフライを設定するには、パラドックス・オッピングが必要です。`);
     }
+
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
     if (AntiFlyToggle === true) {
-        // Allow
-        dynamicPropertyRegistry.set("flya_b", true);
-        world.setDynamicProperty("flya_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6FlyA§f!`);
+        // 許可する
+        configuration.modules.flyA.enabled = true;
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6FlyA§f!`);
         FlyA();
     }
     if (AntiFlyToggle === false) {
-        // Deny
-        dynamicPropertyRegistry.set("flya_b", false);
-        world.setDynamicProperty("flya_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4FlyA§f!`);
+        // 拒否する
+        configuration.modules.flyA.enabled = false;
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4FlyA§f!`);
     }
-    //show the main ui to the player once complete.
+    //完了したら、プレイヤーにメインUIを表示する。
     return paradoxui(player);
 }

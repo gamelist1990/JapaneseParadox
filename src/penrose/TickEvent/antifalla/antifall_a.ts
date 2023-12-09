@@ -1,10 +1,12 @@
 import { world, EntityQueryOptions, GameMode, system, Block } from "@minecraft/server";
 import { flag } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
 function antifalla(id: number) {
     // Get Dynamic Property
-    const antifallABoolean = dynamicPropertyRegistry.get("antifalla_b");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const antifallABoolean = configuration.modules.antifallA.enabled;
 
     // Unsubscribe if disabled in-game
     if (!antifallABoolean) {
@@ -40,7 +42,7 @@ function antifalla(id: number) {
 
     for (const player of filteredPlayers) {
         // Get unique ID
-        const uniqueId = dynamicPropertyRegistry.get(player?.id);
+        const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
         // Skip if they have permission
         if (uniqueId === player.name) {

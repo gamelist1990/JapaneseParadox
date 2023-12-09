@@ -1,6 +1,5 @@
 import { Player, world } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
-//import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
@@ -16,7 +15,7 @@ import { paradoxui } from "../paradoxui.js";
 export function uiMUTE(muteResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUIMute(muteResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -29,7 +28,7 @@ export function uiMUTE(muteResult: ModalFormResponse, onlineList: string[], play
 
 async function handleUIMute(muteResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!muteResult || muteResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [value, reason] = muteResult.formValues;
@@ -41,33 +40,33 @@ async function handleUIMute(muteResult: ModalFormResponse, onlineList: string[],
             break;
         }
     }
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to mute players!.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fプレイヤーをミュートするには、Paradox-Opped が必要です。`);
     }
 
-    // Make sure they dont mute themselves
+    // 自分たちがミュートにならないようにする
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 自分自身には実行できません`);
+        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f 自分自身を無言にすることはできない。`);
     }
 
-    // Make sure staff dont mute staff
+    // スタッフがミュートしないようにする
     if (member.hasTag("paradoxOpped")) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者には実行できません.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fスタッフプレイヤーをミュートすることはできません。`);
     }
 
-    // If not already muted then tag
+    // まだミュートされていなければ、タグを付ける
     if (!member.hasTag("isMuted")) {
         member.addTag("isMuted");
     } else {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f このプレイヤーは既にミュート済みです.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのプレイヤーは既にミュートされている。`);
     }
-    // If Education Edition is enabled then legitimately mute them
+    // エデュケーション・エディションがBooleanであれば、合法的にミュートする。
     member.runCommandAsync(`ability @s mute true`);
-    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f あなたはミュートされています　理由: ${reason}`);
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f が ${member.name}をミュートしました§f. 理由: ${reason}`);
+    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You have been muted. Reason: §7${reason}§f`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has muted §7${member.name}§f. Reason: §7${reason}§f`);
     return paradoxui(player);
 }

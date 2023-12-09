@@ -1,28 +1,28 @@
 import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
-import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
-function unmuteHelp(player: Player, prefix: string) {
+function unmuteHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
-    if (!config.customcommands.unmute) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: unmute`,
+        `\n[コマンド§4]§f: ミュート解除`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: unmute [optional]`,
-        `§4[§6Optional§4]§f: username, reason, help`,
-        `§4[§6Description§4]§f: Unmutes the specified user and optionally gives a reason.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f: ミュート解除 [オプション］`,
+        `§4[§6オプション§4]§f: ユーザー名、理由、ヘルプ`,
+        `§4[§6Description§4]§f：指定されたユーザのミュートを解除し、オプションで理由を示す。`,
+        `§4[§6例§4]§f：`,
         `    ${prefix}unmute ${player.name}`,
-        `        §4- §6Unmute ${player.name} without specifying a reason§f`,
+        `        §4- §6理由を指定せずに${player.name}のミュートを解除§f`,
         `    ${prefix}unmute ${player.name} You may chat`,
-        `        §4- §6Unmute ${player.name} with the reason "You may chat"§f`,
+        `        §4- §6理由"You may chat"で${player.name}のミュートを解除§f`,
         `    ${prefix}unmute help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドのヘルプを表示§f`,
     ]);
 }
 
@@ -34,7 +34,7 @@ function unmuteHelp(player: Player, prefix: string) {
 export function unmute(message: ChatSendAfterEvent, args: string[]) {
     handleUnmute(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -46,52 +46,54 @@ export function unmute(message: ChatSendAfterEvent, args: string[]) {
 }
 
 async function handleUnmute(message: ChatSendAfterEvent, args: string[]) {
-    // validate that required params are defined
+    // 必要なパラメータが定義されていることを確認する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? ./commands/moderation/unmute.js:30)");
     }
 
     const player = message.sender;
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
     }
 
-    // Check for custom prefix
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Was help requested
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.unmute) {
-        return unmuteHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.unmute) {
+        return unmuteHelp(player, prefix, configuration.customcommands.unmute);
     }
 
-    // Are there arguements
+    // 反論はあるか
     if (!args.length) {
-        return unmuteHelp(player, prefix);
+        return unmuteHelp(player, prefix, configuration.customcommands.unmute);
     }
 
-    // Modify the argument handling
+    // 引数処理の変更
     let playerName = args.shift();
     let reason = "No reason specified";
 
-    // Check if the command has a reason provided
+    // コマンドに理由があるかチェックする
     if (args.length > 1) {
-        // Remove double quotes from the reason if present
+        // 理由がある場合はダブルクォートを外す
         reason = args
             .slice(1)
             .join(" ")
             .replace(/(^"|"$)/g, "");
     }
 
-    // Remove double quotes from the player name if present
+    // 選手名にダブルクォーテーションがある場合は、それを削除する。
     playerName = playerName.replace(/(^"|"$)/g, "");
 
-    // try to find the player requested
+    // リクエストされた選手を探す
     let member: Player;
     const players = world.getPlayers();
     for (const pl of players) {
@@ -102,17 +104,17 @@ async function handleUnmute(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
     }
 
-    // If not already muted then tag
+    // まだミュートされていなければ、タグを付ける
     if (member.hasTag("isMuted")) {
         member.removeTag("isMuted");
     } else {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f This player is not muted.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのプレイヤーはミュートされていない。`);
     }
-    // If Education Edition is enabled then legitimately unmute
+    // エデュケーション・エディションがBooleanになっている場合は、合法的にミュートを解除する。
     member.runCommandAsync(`ability @s mute false`);
-    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You have been unmuted.`);
-    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has unmuted §7${member.name}§f. Reason: §7${reason}§f`);
+    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§fあなたはミュートを解かれた。`);
+    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§fミュート §7${member.name}§f. 理由: §7${reason}§f`);
 }

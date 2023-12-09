@@ -1,10 +1,10 @@
 import { world, ItemStack, Player, EntityInventoryComponent, system, ItemEnchantsComponent, EnchantmentList, Enchantment, PlayerLeaveAfterEvent } from "@minecraft/server";
-import config from "../../../data/config.js";
 import { illegalitems } from "../../../data/itemban.js";
 import { kickablePlayers } from "../../../kickcheck.js";
 import { sendMsg, sendMsgToPlayer } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
-import { StringTransformation } from "../../../classes/StringTransformation.js";
+import { WorldExtended } from "../../../classes/WorldExtended/World.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
 // Create a map of player objects and their enchantment presence
 const enchantmentPresenceMap = new Map<string, Map<Enchantment, boolean>>();
@@ -23,11 +23,11 @@ function rip(player: Player, inventory_item: ItemStack, enchData?: { id: string;
     let reason: string;
     if (enchData) {
         const { id, level } = enchData;
-        reason = `Illegal Item A (${inventory_item.typeId.replace("minecraft:", "")}: ${id}=${level})`;
+        reason = `不正なアイテム A (${inventory_item.typeId.replace("minecraft:", "")}: ${id}=${level})`;
     } else {
-        reason = `Illegal Item A (${inventory_item.typeId.replace("minecraft:", "")}=${inventory_item.amount})`;
+        reason = `不正なアイテム A(${inventory_item.typeId.replace("minecraft:", "")}=${inventory_item.amount})`;
         if (lore) {
-            reason += " (Lore)";
+            reason += " (伝承)";
         }
     }
 
@@ -53,12 +53,13 @@ function onPlayerLogout(event: PlayerLeaveAfterEvent): void {
 
 function illegalitemsa(id: number) {
     // Get Dynamic Property
-    const illegalItemsABoolean = dynamicPropertyRegistry.get("illegalitemsa_b");
-    const illegalEnchantmentBoolean = dynamicPropertyRegistry.get("illegalenchantment_b");
-    const stackBanBoolean = dynamicPropertyRegistry.get("stackban_b");
-    const antiShulkerBoolean = dynamicPropertyRegistry.get("antishulker_b");
-    const illegalLoresBoolean = dynamicPropertyRegistry.get("illegallores_b");
-    const salvageBoolean = dynamicPropertyRegistry.get("salvage_b");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const illegalItemsABoolean = configuration.modules.illegalitemsA.enabled;
+    const illegalEnchantmentBoolean = configuration.modules.illegalEnchantment.enabled;
+    const stackBanBoolean = configuration.modules.stackBan.enabled;
+    const antiShulkerBoolean = configuration.modules.antishulker.enabled;
+    const illegalLoresBoolean = configuration.modules.illegalLores.enabled;
+    const salvageBoolean = configuration.modules.salvage.enabled;
 
     // Unsubscribe if disabled in-game
     if (illegalItemsABoolean === false) {
@@ -78,7 +79,7 @@ function illegalitemsa(id: number) {
     // Iterate through each player
     for (const player of allPlayers) {
         // Get the player's unique ID from the "dynamicPropertyRegistry" object
-        const uniqueId = dynamicPropertyRegistry.get(player?.id);
+        const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
         // If the player has permission (i.e., their unique ID matches their name), skip to the next player
         if (uniqueId === player.name) {
@@ -111,8 +112,8 @@ function illegalitemsa(id: number) {
                 // Anti Shulker Boxes
                 if (antiShulkerBoolean && itemStackId.includes("shulker")) {
                     playerContainer.setItem(i);
-                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} from §7${player.name}§f.`);
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Shulker Boxes are not allowed!`);
+                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f§7${player.name}§f から ${itemStackId.replace("minecraft:", "")} を削除しました。`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f シュルカーボックスは許可されていません!`);
                     continue;
                 }
 
@@ -121,8 +122,8 @@ function illegalitemsa(id: number) {
                 const maxStack = playerItemStack.maxAmount;
                 if (stackBanBoolean && currentStack > maxStack) {
                     playerContainer.setItem(i);
-                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} x ${currentStack} from §7${player.name}§f.`);
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Illegal Stacks are not allowed!`);
+                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f§7${player.name}§f から ${itemStackId.replace("minecraft:", "")} x ${currentStack} を削除しました.`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 違法なスタックは許可されていません!`);
                     rip(player, playerItemStack);
                     break;
                 }
@@ -130,17 +131,17 @@ function illegalitemsa(id: number) {
                 // If the item is in the "illegalitems" object, remove it from the player's inventory and run the "rip" function on it
                 if (illegalitems.has(itemStackId)) {
                     playerContainer.setItem(i);
-                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} from §7${player.name}§f.`);
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Illegal Items are not allowed!`);
+                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f §7${player.name}§f から ${itemStackId.replace("minecraft:", "")} を削除しました。.`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 違法なアイテムは許可されていません!`);
                     rip(player, playerItemStack);
                     break;
                 }
 
                 // Illegal Lores
-                if (illegalLoresBoolean && !config.modules.illegalLores.exclude.includes(String(playerItemStack.getLore()))) {
+                if (illegalLoresBoolean && !configuration.modules.illegalLores.exclude.includes(String(playerItemStack.getLore()))) {
                     playerContainer.setItem(i);
-                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} with lore from §7${player.name}§f.`);
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Item with illegal lores are not allowed!`);
+                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f§7${player.name}§f から ${itemStackId.replace("minecraft:", "")} を伝承で削除しました.`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 違法な伝承を含むアイテムは許可されていません!`);
                     rip(player, playerItemStack, null, true);
                     break;
                 }
@@ -181,42 +182,46 @@ function illegalitemsa(id: number) {
             // Iterate through the enchantment presence map to perform any necessary operations
             if (illegalEnchantmentBoolean) {
                 let isPresent = false;
-                for (const [enchantment, present] of enchantmentPresenceMap.get(player.id)) {
-                    if (present) {
-                        // Do something with the present enchantment and its data
-                        const itemStackData = itemStackDataMap.get(player.id).get(enchantment);
-                        const enchantmentData = enchantmentDataMap.get(player.id).get(enchantment);
-                        const getEnchantment = enchantmentData.getEnchantment(enchantment.type);
-                        const currentLevel = getEnchantment.level;
-                        const maxLevel = getEnchantment.type.maxLevel;
-                        // Create new ItemStack to validate enchantments
-                        const newItemStack = new ItemStack(itemStackData.typeId);
-                        // Get the new enchantment component from the new ItemStack
-                        const newEnchantmentComponent = newItemStack.getComponent("minecraft:enchantments") as ItemEnchantsComponent;
-                        // Get the new enchantment data from the new ItemStack component
-                        const newEnchantmentData = newEnchantmentComponent.enchantments;
-                        // Verify if enchantment type is allowed on the item
-                        const canAddEnchantBoolean = newEnchantmentData.canAddEnchantment(getEnchantment);
-                        // Flag for illegal enchantments
-                        if (currentLevel > maxLevel || currentLevel < 0 || !canAddEnchantBoolean) {
-                            const itemSlot = inventorySlotMap.get(player.id).get(enchantment);
-                            const enchData = {
-                                id: getEnchantment.type.id,
-                                level: currentLevel,
-                            };
-                            const itemStackId = playerContainer.getItem(itemSlot);
-                            playerContainer.setItem(itemSlot);
-                            sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.typeId.replace("minecraft:", "")} with Illegal Enchantments from §7${player.name}§f.`);
-                            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Item with illegal Enchantments are not allowed!`);
-                            enchantmentPresenceMap.clear();
-                            enchantmentDataMap.clear();
-                            inventorySlotMap.clear();
-                            unverifiedItemMap.clear(); // Clear this map since we won't get that far to prevent memory leaks
-                            itemStackDataMap.clear();
-                            rip(player, itemStackId, enchData);
-                            break;
+                const enchantmentPresence = enchantmentPresenceMap.get(player.id);
+
+                if (enchantmentPresence) {
+                    for (const [enchantment, present] of enchantmentPresence) {
+                        if (present) {
+                            // Do something with the present enchantment and its data
+                            const itemStackData = itemStackDataMap.get(player.id).get(enchantment);
+                            const enchantmentData = enchantmentDataMap.get(player.id).get(enchantment);
+                            const getEnchantment = enchantmentData.getEnchantment(enchantment.type);
+                            const currentLevel = getEnchantment.level;
+                            const maxLevel = getEnchantment.type.maxLevel;
+                            // Create new ItemStack to validate enchantments
+                            const newItemStack = new ItemStack(itemStackData.typeId);
+                            // Get the new enchantment component from the new ItemStack
+                            const newEnchantmentComponent = newItemStack.getComponent("minecraft:enchantments") as ItemEnchantsComponent;
+                            // Get the new enchantment data from the new ItemStack component
+                            const newEnchantmentData = newEnchantmentComponent.enchantments;
+                            // Verify if enchantment type is allowed on the item
+                            const canAddEnchantBoolean = newEnchantmentData.canAddEnchantment(getEnchantment);
+                            // Flag for illegal enchantments
+                            if (currentLevel > maxLevel || currentLevel < 0 || !canAddEnchantBoolean) {
+                                const itemSlot = inventorySlotMap.get(player.id).get(enchantment);
+                                const enchData = {
+                                    id: getEnchantment.type.id,
+                                    level: currentLevel,
+                                };
+                                const itemStackId = playerContainer.getItem(itemSlot);
+                                playerContainer.setItem(itemSlot);
+                                sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f §7${player.name}§f から ${itemStackId.typeId.replace("minecraft:", "")} 違法なエンチャントを削除しました。`);
+                                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 不正なエンチャントを持つアイテムは許可されません!`);
+                                enchantmentPresenceMap.clear();
+                                enchantmentDataMap.clear();
+                                inventorySlotMap.clear();
+                                unverifiedItemMap.clear(); // Clear this map since we won't get that far to prevent memory leaks
+                                itemStackDataMap.clear();
+                                rip(player, itemStackId, enchData);
+                                break;
+                            }
+                            isPresent = true;
                         }
-                        isPresent = true;
                     }
                 }
                 // Clear these populated maps if Salvage System is disabled to prevent memory leaks
@@ -231,55 +236,58 @@ function illegalitemsa(id: number) {
             // Salvage System
             if (salvageBoolean) {
                 let salvagedList = false;
-                // Iterate over the unverifiedItemMap
-                for (const [slot, itemStackData] of unverifiedItemMap.get(player.id)) {
-                    // Create a new name tag for the item
-                    const newNameTag = StringTransformation.titleCase(itemStackData.typeId.replace("minecraft:", ""));
-                    // Create a new ItemStack with the same type as the original item
-                    const applyCustomProperties = new ItemStack(itemStackData.typeId);
-                    // Get the original enchantment component from the item
-                    const originalEnchantmentComponent = itemStackData.getComponent("minecraft:enchantments") as ItemEnchantsComponent;
-                    // Get the original enchantment data from the component
-                    const originalEnchantmentData = originalEnchantmentComponent.enchantments;
-                    // Get the new enchantment component from the new ItemStack
-                    const newEnchantmentComponent = applyCustomProperties.getComponent("minecraft:enchantments") as ItemEnchantsComponent;
-                    // Get the new enchantment data from the new ItemStack component
-                    const newEnchantmentData = newEnchantmentComponent.enchantments;
+                const unverifiedItem = unverifiedItemMap.get(player.id);
+                if (unverifiedItem) {
+                    // Iterate over the unverifiedItemMap
+                    for (const [slot, itemStackData] of unverifiedItem) {
+                        // Create a new name tag for the item
+                        const newNameTag = (world as WorldExtended).titleCase(itemStackData.typeId.replace("minecraft:", ""));
+                        // Create a new ItemStack with the same type as the original item
+                        const applyCustomProperties = new ItemStack(itemStackData.typeId);
+                        // Get the original enchantment component from the item
+                        const originalEnchantmentComponent = itemStackData.getComponent("minecraft:enchantments") as ItemEnchantsComponent;
+                        // Get the original enchantment data from the component
+                        const originalEnchantmentData = originalEnchantmentComponent.enchantments;
+                        // Get the new enchantment component from the new ItemStack
+                        const newEnchantmentComponent = applyCustomProperties.getComponent("minecraft:enchantments") as ItemEnchantsComponent;
+                        // Get the new enchantment data from the new ItemStack component
+                        const newEnchantmentData = newEnchantmentComponent.enchantments;
 
-                    // Iterate over the original enchantment data
-                    const iterator = originalEnchantmentData[Symbol.iterator]();
-                    let iteratorResult = iterator.next();
-                    while (!iteratorResult.done) {
-                        // Get the enchantment from the iterator
-                        const enchantment: Enchantment = iteratorResult.value;
-                        // Check if the enchantment is legal
-                        if (!illegalEnchantmentBoolean) {
-                            // Get the enchantment from the original enchantment data
-                            const getEnchantment = originalEnchantmentData.getEnchantment(enchantment.type);
-                            // Check if the new ItemStack can have the enchantment added
-                            const canAddEnchantBoolean = newEnchantmentData.canAddEnchantment(getEnchantment);
-                            // If it can, add the enchantment to the new enchantment data
-                            if (canAddEnchantBoolean) {
+                        // Iterate over the original enchantment data
+                        const iterator = originalEnchantmentData[Symbol.iterator]();
+                        let iteratorResult = iterator.next();
+                        while (!iteratorResult.done) {
+                            // Get the enchantment from the iterator
+                            const enchantment: Enchantment = iteratorResult.value;
+                            // Check if the enchantment is legal
+                            if (!illegalEnchantmentBoolean) {
+                                // Get the enchantment from the original enchantment data
+                                const getEnchantment = originalEnchantmentData.getEnchantment(enchantment.type);
+                                // Check if the new ItemStack can have the enchantment added
+                                const canAddEnchantBoolean = newEnchantmentData.canAddEnchantment(getEnchantment);
+                                // If it can, add the enchantment to the new enchantment data
+                                if (canAddEnchantBoolean) {
+                                    newEnchantmentData.addEnchantment(enchantment);
+                                    // Sets enchantment list to enchantment of new instance
+                                    newEnchantmentComponent.enchantments = newEnchantmentData;
+                                }
+                            } else {
+                                // Add the enchantment to the new enchantment data
                                 newEnchantmentData.addEnchantment(enchantment);
                                 // Sets enchantment list to enchantment of new instance
                                 newEnchantmentComponent.enchantments = newEnchantmentData;
                             }
-                        } else {
-                            // Add the enchantment to the new enchantment data
-                            newEnchantmentData.addEnchantment(enchantment);
-                            // Sets enchantment list to enchantment of new instance
-                            newEnchantmentComponent.enchantments = newEnchantmentData;
+                            // Get the next item from the iterator
+                            iteratorResult = iterator.next();
+                            salvagedList = true;
                         }
-                        // Get the next item from the iterator
-                        iteratorResult = iterator.next();
-                        salvagedList = true;
-                    }
 
-                    // Set the name tag and lore of the new ItemStack
-                    applyCustomProperties.nameTag = newNameTag;
-                    applyCustomProperties.setLore(itemStackData.getLore());
-                    // Set the new ItemStack in the player's container in the specified slot
-                    playerContainer.setItem(slot, applyCustomProperties);
+                        // Set the name tag and lore of the new ItemStack
+                        applyCustomProperties.nameTag = newNameTag;
+                        applyCustomProperties.setLore(itemStackData.getLore());
+                        // Set the new ItemStack in the player's container in the specified slot
+                        playerContainer.setItem(slot, applyCustomProperties);
+                    }
                 }
                 // Clear these populated maps to prevent memory leaks
                 if (salvagedList) {

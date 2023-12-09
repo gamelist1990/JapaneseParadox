@@ -2,6 +2,11 @@ import { world, Player, EntityHitEntityAfterEvent, EntityQueryOptions, system } 
 import { dynamicPropertyRegistry } from "../WorldInitializeAfterEvent/registry";
 import { flag } from "../../util";
 import { MinecraftEffectTypes } from "../../node_modules/@minecraft/vanilla-data/lib/index";
+import ConfigInterface from "../../interfaces/Config";
+
+function getRegistry() {
+    return dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+}
 
 function isAttackingFromOutsideView(player1: Player, player2: Player) {
     if (!player1 || !player2) {
@@ -44,7 +49,8 @@ function isAttackingFromOutsideView(player1: Player, player2: Player) {
 
 function killaura(obj: EntityHitEntityAfterEvent) {
     // Get Dynamic Property
-    const antiKillAuraBoolean = dynamicPropertyRegistry.get("antikillaura_b");
+    const configuration = getRegistry();
+    const antiKillAuraBoolean = configuration.modules.antiKillAura.enabled;
 
     // Unsubscribe if disabled in-game
     if (antiKillAuraBoolean === false) {
@@ -61,7 +67,7 @@ function killaura(obj: EntityHitEntityAfterEvent) {
     }
 
     // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(damagingEntity?.id);
+    const uniqueId = dynamicPropertyRegistry.getProperty(damagingEntity, damagingEntity?.id);
 
     // Skip if they have permission
     if (uniqueId === damagingEntity.name) {
@@ -93,7 +99,8 @@ function killaura(obj: EntityHitEntityAfterEvent) {
 }
 
 function freeze(id: number) {
-    const antiKillAuraBoolean = dynamicPropertyRegistry.get("antikillaura_b");
+    const configuration = getRegistry();
+    const antiKillAuraBoolean = configuration.modules.antiKillAura.enabled;
     if (antiKillAuraBoolean === false) {
         system.clearRun(id);
         return;
@@ -113,7 +120,12 @@ function freeze(id: number) {
             player.removeTag("freezeAura");
             return;
         }
-        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f Frozen!", { subtitle: "§fContact Staff §4[§6AntiKillAura§4]§f", fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 60 });
+        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f 凍結！", {
+            subtitle: "§fスタッフに連絡 §4[§6AntiKillAura§4]§f",
+            fadeInDuration: 0,
+            fadeOutDuration: 0,
+            stayDuration: 60,
+        });
     }
 }
 

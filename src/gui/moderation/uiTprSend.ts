@@ -6,7 +6,7 @@ import { TeleportRequestHandler } from "../../commands/utility/tpr.js";
 
 export function uiTPRSEND(tprSendRequestResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!tprSendRequestResult || tprSendRequestResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [value] = tprSendRequestResult.formValues;
@@ -19,11 +19,11 @@ export function uiTPRSEND(tprSendRequestResult: ModalFormResponse, onlineList: s
         }
     }
 
-    // Are they online?
+    // オンラインですか？
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
     }
-    //send the request to be teleported based off the player and the member requested.
+    //プレーヤーとリクエストされたメンバーに基づいて、テレポートのリクエストを送信します。
     const prefix = getPrefix(player);
     const event = {
         sender: player,

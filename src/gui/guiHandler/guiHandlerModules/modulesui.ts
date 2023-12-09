@@ -23,6 +23,8 @@ import { xrayHandler } from "./results/xray";
 import { hotbarHandler } from "./results/hotbar";
 import { afkHandler } from "./results/afk";
 import { antiPhaseAHandler } from "./results/antiphase";
+import { spawnProtectionHandler } from "./results/spawnProtection";
+import { paradoxui } from "../../paradoxui";
 
 export function modulesui(player: Player) {
     //Modules ui
@@ -51,6 +53,8 @@ export function modulesui(player: Player) {
     modulesui.button("ホットバーメッセージ", "textures/items/paper");
     modulesui.button("放置民キック", "textures/ui/keyboard_and_mouse_glyph_color");
     modulesui.button("壁抜け検知", "textures/blocks/end_portal");
+    modulesui.button("座標を保護します", "textures/blocks/barrier");
+    modulesui.button("戻る");
     modulesui
         .show(player)
         .then((ModulesUIResult) => {
@@ -123,6 +127,12 @@ export function modulesui(player: Player) {
                     break;
                 case 22:
                     antiPhaseAHandler(player);
+                    break;
+                case 23:
+                    spawnProtectionHandler(player);
+                    break;
+                case 24:
+                    paradoxui(player);
                     break;
                 default:
                     break;

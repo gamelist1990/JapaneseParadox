@@ -4,6 +4,6 @@ import { paradoxui } from "../paradoxui";
 export function uiCLEARCHAT(player: Player) {
     for (let clear = 0; clear < 10; clear++) sendMsg("@a", "\n".repeat(60));
 
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}がクリアチャットを実行した`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f  §7${player.name}のチャットランクをリセットしました§f`);
     return paradoxui(player);
 }

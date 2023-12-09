@@ -1,48 +1,50 @@
-import { Player, world } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
 import { onJoinrules } from "../PlayerSpawnAfterEvent/rules/rules.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiRULES(banResult: ModalFormResponse, player: Player) {
     if (!banResult || banResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [EnabledRules, EnableKick] = banResult.formValues;
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to configure the rules.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fルールを設定するためには、Paradox-Oppedである必要がある。`);
     }
-    const showrulesBoolean = dynamicPropertyRegistry.get("showrules_b");
-    const KickOnDeclineBoolean = dynamicPropertyRegistry.get("kickondecline_b");
+
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    const showrulesBoolean = configuration.modules.showrules.enabled;
+    const KickOnDeclineBoolean = configuration.modules.showrules.kick;
     if (EnabledRules === true && showrulesBoolean === false) {
-        dynamicPropertyRegistry.set("showrules_b", true);
-        world.setDynamicProperty("showrules_b", true);
-        //remember to call the function!
+        configuration.modules.showrules.enabled = true;
+        //関数を呼び出すのを忘れないように！
         onJoinrules();
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6showrules§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6showrules§f!`);
     }
     if (EnabledRules === false && showrulesBoolean === true) {
-        dynamicPropertyRegistry.set("showrules_b", false);
-        world.setDynamicProperty("showrules_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4showrules§f!`);
+        configuration.modules.showrules.enabled = false;
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4showrules§f!`);
     }
     if (EnableKick === true && KickOnDeclineBoolean === false) {
-        dynamicPropertyRegistry.set("kickondecline_b", true);
-        world.setDynamicProperty("kickondecline_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §4KickOnDecline§f!`);
+        configuration.modules.showrules.kick = true;
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §4KickOnDecline§f!`);
     }
     if (EnableKick === false && KickOnDeclineBoolean === true) {
-        dynamicPropertyRegistry.set("kickondecline_b", false);
-        world.setDynamicProperty("kickondecline_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4KickOnDecline§f!`);
+        configuration.modules.showrules.kick = false;
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4KickOnDecline§f!`);
     }
 
-    //show the main ui to the player one complete.
+    dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+
+    //メインUIをプレイヤーに表示する。
     return paradoxui(player);
 }

@@ -2,25 +2,27 @@ import { Player } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../../../penrose/WorldInitializeAfterEvent/registry";
 import { uiANTINUKER } from "../../../modules/uiAntiNuker";
+import ConfigInterface from "../../../../interfaces/Config";
 
 export function antiNukerAHandler(player: Player) {
     const modulesantinukerui = new ModalFormData();
-    const antiNukerABoolean = dynamicPropertyRegistry.get("antinukera_b") as boolean;
-    modulesantinukerui.title("§4メニュー：Anti Nuker§4");
-    modulesantinukerui.toggle("一括破壊を検知します【ほかのアドオンは除く】", antiNukerABoolean);
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const antiNukerABoolean = configuration.modules.antinukerA.enabled;
+    modulesantinukerui.title("§4Anti Nukerメニュー§4");
+    modulesantinukerui.toggle("Anti Nuker - プレイヤーにブロックの核攻撃がないかチェックする：", antiNukerABoolean);
     modulesantinukerui
         .show(player)
         .then((antinukerResult) => {
             uiANTINUKER(antinukerResult, player);
         })
         .catch((error) => {
-            console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
+            console.error("パラドックスの未処理拒否：", error);
+            // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("Error originated from:", sourceInfo[0]);
+                    console.error("エラーの原因", sourceInfo[0]);
                 }
             }
         });

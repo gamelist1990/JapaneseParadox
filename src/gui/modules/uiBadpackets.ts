@@ -1,54 +1,53 @@
-import { Player, world } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { BadPackets1 } from "../../penrose/ChatSendBeforeEvent/spammer/badpackets_1.js";
 import { BadPackets2 } from "../../penrose/TickEvent/badpackets2/badpackets2.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiBADPACKETS(badpacketsResult: ModalFormResponse, player: Player) {
     if (!badpacketsResult || badpacketsResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [BadPackets1Toggle, BadPackets2Toggle] = badpacketsResult.formValues;
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Get Dynamic Property Boolean
-    const badPackets1Boolean = dynamicPropertyRegistry.get("badpackets1_b");
-    const badPackets2Boolean = dynamicPropertyRegistry.get("badpackets2_b");
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to configure Badpackets`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fバッドパケットを設定するには、パラドックス・オップである必要があります。`);
     }
-    if (BadPackets1Toggle === true && badPackets1Boolean === false) {
-        // Allow
-        dynamicPropertyRegistry.set("badpackets1_b", true);
-        world.setDynamicProperty("badpackets1_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6Badpackets1§f!`);
+
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    if (BadPackets1Toggle === true && configuration.modules.badpackets1.enabled === false) {
+        // 許可する
+        configuration.modules.badpackets1.enabled = true;
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6Badpackets1§f!`);
         BadPackets1();
     }
-    if (BadPackets1Toggle === false && badPackets1Boolean === true) {
-        // Deny
-        dynamicPropertyRegistry.set("badpackets1_b", false);
-        world.setDynamicProperty("badpackets1_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4Badpackets1§f!`);
+    if (BadPackets1Toggle === false && configuration.modules.badpackets1.enabled === true) {
+        // 拒否する
+        configuration.modules.badpackets1.enabled = false;
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4Badpackets1§f!`);
     }
-    if (BadPackets2Toggle === true && badPackets2Boolean === false) {
-        // Allow
-        dynamicPropertyRegistry.set("badpackets2_b", true);
-        world.setDynamicProperty("badpackets2_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6Badpackets2§f!`);
+    if (BadPackets2Toggle === true && configuration.modules.badpackets2.enabled === false) {
+        // 許可する
+        configuration.modules.badpackets2.enabled = true;
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6Badpackets2§f!`);
         BadPackets2();
     }
-    if (BadPackets2Toggle === false && badPackets2Boolean === true) {
-        // Deny
-        dynamicPropertyRegistry.set("badpackets2_b", false);
-        world.setDynamicProperty("badpackets2_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4Badpackets2§f!`);
+    if (BadPackets2Toggle === false && configuration.modules.badpackets2.enabled === true) {
+        // 拒否する
+        configuration.modules.badpackets2.enabled = false;
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4Badpackets2§f!`);
     }
 
-    //show the main ui to the player once complete.
+    dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+
+    //完了したら、プレイヤーにメインUIを表示する。
     return paradoxui(player);
 }

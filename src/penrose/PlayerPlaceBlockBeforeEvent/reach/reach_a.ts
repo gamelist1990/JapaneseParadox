@@ -1,16 +1,24 @@
-import { world, PlayerPlaceBlockAfterEvent, Vector3 } from "@minecraft/server";
+import { world, PlayerPlaceBlockBeforeEvent, Vector3, PlayerPlaceBlockAfterEvent, PlayerLeaveAfterEvent } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 import { AfterReachA } from "../../PlayerPlaceBlockAfterEvent/reach/reach_a.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
 const blockPlaceReachData = new Map<string, { blockLocation: Vector3; playerLocation: Vector3 }>();
 
-function beforereacha(object: PlayerPlaceBlockAfterEvent) {
+function onPlayerLogout(object: PlayerLeaveAfterEvent): void {
+    // Remove the player's data from the map when they log off
+    const playerName = object.playerId;
+    blockPlaceReachData.delete(playerName);
+}
+
+function beforereacha(object: PlayerPlaceBlockBeforeEvent) {
     // Get Dynamic Property
-    const reachABoolean = dynamicPropertyRegistry.get("reacha_b");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const reachABoolean = configuration.modules.reachA.enabled;
 
     // Unsubscribe if disabled in-game
     if (reachABoolean === false) {
-        world.afterEvents.playerPlaceBlock.unsubscribe(beforereacha);
+        blockPlaceReachData.clear();
         return;
     }
 
@@ -18,7 +26,7 @@ function beforereacha(object: PlayerPlaceBlockAfterEvent) {
     const { block, player } = object;
 
     // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
     // Skip if they have permission
     if (uniqueId === player.name) {
@@ -26,13 +34,30 @@ function beforereacha(object: PlayerPlaceBlockAfterEvent) {
     }
 
     blockPlaceReachData.set(player.id, { blockLocation: block.location, playerLocation: player.location });
-
-    // Call the After Event
-    AfterReachA(blockPlaceReachData);
 }
 
 const BeforeReachA = () => {
-    world.afterEvents.playerPlaceBlock.subscribe(beforereacha);
+    // Subscribe to the before event here
+    const beforePlayerPlaceCallBack = (object: PlayerPlaceBlockBeforeEvent) => {
+        beforereacha(object);
+    };
+
+    // Subscribe to the after event here
+    const afterPlayerLeaveCallback = (object: PlayerLeaveAfterEvent) => {
+        // Call the AfterReachA function with the stored data
+        onPlayerLogout(object);
+    };
+    const afterPlayerPlaceCallback = (object: PlayerPlaceBlockAfterEvent) => {
+        // Call the AfterReachA function with the stored data
+        AfterReachA(object, blockPlaceReachData, afterPlayerPlaceCallback, beforePlayerPlaceCallBack, afterPlayerLeaveCallback);
+    };
+
+    // Subscribe to the before event
+    world.beforeEvents.playerPlaceBlock.subscribe(beforePlayerPlaceCallBack);
+
+    // Subscribe to the after event
+    world.afterEvents.playerPlaceBlock.subscribe(afterPlayerPlaceCallback);
+    world.afterEvents.playerLeave.subscribe(afterPlayerLeaveCallback);
 };
 
 export { BeforeReachA };

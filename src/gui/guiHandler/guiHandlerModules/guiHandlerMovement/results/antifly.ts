@@ -2,26 +2,28 @@ import { Player } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../../../../penrose/WorldInitializeAfterEvent/registry";
 import { uiANTIFLY } from "../../../../modules/uiAntiFly";
+import ConfigInterface from "../../../../../interfaces/Config";
 
 export function antiFlyHandler(player: Player) {
-    //Anti Fly
+    //アンチ・フライ
     const modulesantiflyui = new ModalFormData();
-    const flyABoolean = dynamicPropertyRegistry.get("flya_b") as boolean;
-    modulesantiflyui.title("§4メニュー：Anti Fly§4");
-    modulesantiflyui.toggle("よく飛んでるhackerを検知します", flyABoolean);
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const flyABoolean = configuration.modules.flyA.enabled;
+    modulesantiflyui.title("§4Anti Flyメニュー§4");
+    modulesantiflyui.toggle("アンチフライ - サバイバル中の違法飛行をチェックする：", flyABoolean);
     modulesantiflyui
         .show(player)
         .then((antiflyResult) => {
             uiANTIFLY(antiflyResult, player);
         })
         .catch((error) => {
-            console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
+            console.error("パラドックスの未処理拒否：", error);
+            // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("Error originated from:", sourceInfo[0]);
+                    console.error("エラーの原因", sourceInfo[0]);
                 }
             }
         });

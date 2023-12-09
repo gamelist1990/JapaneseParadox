@@ -1,78 +1,134 @@
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
-import config from "../../data/config.js";
-import { ChatSendAfterEvent, Player, Vector3, world } from "@minecraft/server";
+import { ChatSendAfterEvent, Player } from "@minecraft/server";
 import { ReachB } from "../../penrose/EntityHitEntityAfterEvent/reach_b.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
-function reachBHelp(player: Player, prefix: string, reachBBoolean: string | number | boolean | Vector3) {
-    let commandStatus: string;
-    if (!config.customcommands.reachb) {
-        commandStatus = "§6[§4DISABLED§6]§f";
-    } else {
-        commandStatus = "§6[§aENABLED§6]§f";
-    }
-    let moduleStatus: string;
-    if (reachBBoolean === false) {
-        moduleStatus = "§6[§4DISABLED§6]§f";
-    } else {
-        moduleStatus = "§6[§aENABLED§6]§f";
-    }
-    return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: reachb`,
+/**
+ * Provides help information for the reachb command.
+ * @param {Player} player - The player requesting help.
+ * @param {string} prefix - The custom prefix for the player.
+ * @param {boolean} reachBBoolean - The status of the reachB module.
+ * @param {boolean} setting - The status of the reachb custom command setting.
+ */
+function reachBHelp(player: Player, prefix: string, reachBBoolean: boolean, setting: boolean): void {
+    // コマンドとモジュールのステータスを決定する
+    const commandStatus: string = setting ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
+    const moduleStatus: string = reachBBoolean ? "§6[§4無効§6]§f" : "§6[§a有効§6]§f";
+
+    // 選手にヘルプ情報を表示する
+    sendMsgToPlayer(player, [
+        `§6コマンド§4]§f：到達点`,
         `§4[§6Status§4]§f: ${commandStatus}`,
         `§4[§6Module§4]§f: ${moduleStatus}`,
-        `§4[§6Usage§4]§f: reachb [optional]`,
-        `§4[§6Optional§4]§f: help`,
-        `§4[§6Description§4]§f: Toggles checks for player's attacking beyond reach.`,
-        `§4[§6Examples§4]§f:`,
-        `    ${prefix}reachb`,
-        `    ${prefix}reachb help`,
+        `§4[§6Usage§4]§f: ${prefix}reachb [options]`,
+        `§4[§6解説§4]§f．プレイヤーの攻撃が届かないかどうかのチェックを切り替える。`,
+        `§4[§6オプション§4]§f：`,
+        `    -h, --help`,
+        `       §4[§7このヘルプメッセージを表示する§4]§f`,
+        `    -s, --status`,
+        `       §4[§7ReachBモジュールの現在の状態を表示する§4]§f`,
+        `    -e, --enable`,
+        `       §4[§7ReachBモジュールをBooleanにする§4]§f`,
+        `    -d, --disable`,
+        `       §4[§7ReachBモジュールを無効にする§4]§f`,
     ]);
 }
 
 /**
  * @name reachB
- * @param {ChatSendAfterEvent} message - Message object
+ * @param {ChatSendAfterEvent} message - Message object.
  * @param {string[]} args - Additional arguments provided (optional).
  */
-export function reachB(message: ChatSendAfterEvent, args: string[]) {
-    // validate that required params are defined
+export function reachB(message: ChatSendAfterEvent, args: string[]): void {
+    handleReachB(message, args).catch((error) => {
+        console.error("Paradox Unhandled Rejection: ", error);
+        // スタックトレース情報の抽出
+        if (error instanceof Error) {
+            const stackLines = error.stack.split("\n");
+            if (stackLines.length > 1) {
+                const sourceInfo = stackLines;
+                console.error("Error originated from:", sourceInfo[0]);
+            }
+        }
+    });
+}
+
+/**
+ * Handles the reachb command.
+ * @param {ChatSendAfterEvent} message - Message object.
+ * @param {string[]} args - Additional arguments provided (optional).
+ */
+async function handleReachB(message: ChatSendAfterEvent, args: string[]): Promise<void> {
+    // 必要なパラメータが定義されていることを検証する
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/settings/reachb.js:36)");
+        return console.warn(`${new Date()} | ` + `Error: ${message} isnt defined. Did you forget to pass it? (./commands/settings/reachb.js:36)`);
     }
 
-    const player = message.sender;
+    const player: Player = message.sender;
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
     }
 
-    // Get Dynamic Property Boolean
-    const reachBBoolean = dynamicPropertyRegistry.get("reachb_b");
+    const configuration: ConfigInterface = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // Check for custom prefix
-    const prefix = getPrefix(player);
+    // カスタム接頭辞のチェック
+    const prefix: string = getPrefix(player);
 
-    // Was help requested
-    const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.reachb) {
-        return reachBHelp(player, prefix, reachBBoolean);
+    // 位置以外の引数をチェックする
+    const length = args.length;
+    let validFlagFound = false; // Flag to track if any valid flag is encountered
+    for (let i = 0; i < length; i++) {
+        const additionalArg: string = args[i].toLowerCase();
+
+        // 追加引数の処理
+        switch (additionalArg) {
+            case "-h":
+            case "--help":
+                // ヘルプメッセージを表示する
+                validFlagFound = true;
+                reachBHelp(player, prefix, configuration.modules.reachB.enabled, configuration.customcommands.reachb);
+                break;
+            case "-s":
+            case "--status":
+                // ReachBモジュールの現在のステータスを表示
+                validFlagFound = true;
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ReachB module is currently ${configuration.modules.reachB.enabled ? "§aBoolean" : "§4無効"}§f.`);
+                break;
+            case "-e":
+            case "--enable":
+                // ReachBモジュールをBooleanにする
+                validFlagFound = true;
+                if (!configuration.modules.reachB.enabled) {
+                    configuration.modules.reachB.enabled = true;
+                    dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 以下の機能が有効です=> §6ReachB§f!`);
+                    ReachB();
+                } else {
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ReachB モジュールは既にBooleanです。`);
+                }
+                break;
+            case "-d":
+            case "--disable":
+                // ReachBモジュールを無効にする
+                validFlagFound = true;
+                if (configuration.modules.reachB.enabled) {
+                    configuration.modules.reachB.enabled = false;
+                    dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f は無効 §4ReachB§f!`);
+                } else {
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ReachB モジュールは既に無効になっています。`);
+                }
+                break;
+        }
     }
 
-    if (reachBBoolean === false) {
-        // Allow
-        dynamicPropertyRegistry.set("reachb_b", true);
-        world.setDynamicProperty("reachb_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6ReachB§f!`);
-        ReachB();
-    } else if (reachBBoolean === true) {
-        // Deny
-        dynamicPropertyRegistry.set("reachb_b", false);
-        world.setDynamicProperty("reachb_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4ReachB§f!`);
+    if (!validFlagFound) {
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Invalid command. Use ${prefix}reachb --help for command usage.`);
     }
 }

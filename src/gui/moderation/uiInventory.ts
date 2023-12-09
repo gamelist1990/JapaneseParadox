@@ -15,7 +15,7 @@ import { uiInvEditorMenu } from "./uiInventory/uiInvEditorMainMenu.js";
 export function uiINVENTORY(inventoryUIResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUIInventory(inventoryUIResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -28,7 +28,7 @@ export function uiINVENTORY(inventoryUIResult: ModalFormResponse, onlineList: st
 
 async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!inventoryUIResult || inventoryUIResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [value] = inventoryUIResult.formValues;
@@ -40,16 +40,16 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
             break;
         }
     }
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
-    // Make sure the user has permissions to run the command
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはパラドックス・オップされる必要がある。`);
     }
 
-    // Are they online?
+    // オンラインですか？
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
     }
     const inv = member.getComponent("inventory") as EntityInventoryComponent;
     const container = inv.container;
@@ -57,21 +57,21 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
 
     const maxSlots = 36; // Maximum number of slots in the player's inventory
 
-    // Loop through the inventory and add items to the itemArray
+    // インベントリーをループし、アイテムをitemArrayに追加する。
     for (let i = 0; i < maxSlots; i++) {
         const item = container.getItem(i);
         if (item?.typeId) {
             itemArray.push(i, item.typeId.replace("minecraft:", ""), item.amount, item.typeId.replace("minecraft:", ""));
         } else {
-            itemArray.push(i, "無し", 0, "ui/slots_bg");
+            itemArray.push(i, "empty", 0, "ui/slots_bg");
         }
     }
 
-    // Map of all items/blocks and their texture paths
+    // すべてのアイテム/ブロックとそのテクスチャパスのマップ
     const textures = new Map([
-        //default texture if the slot is empty or no texture is found in the map, this can happen as some blocks/items dont seem to have a
+        //スロットが空であるか、マップにテクスチャがない場合、デフォルトのテクスチャが表示されます。
         ["empty", "ui/slots_bg"],
-        //blocks
+        //ブロック
         ["acacia_button", "blocks/planks_acacia"],
         ["acacia_door", "blocks/door_acacia_upper"],
         ["acacia_fence", "blocks/planks_acacia"],
@@ -130,7 +130,7 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         ["birch_fence", "blocks/planks_birch"],
         ["birch_fence_gate", "blocks/planks_birch"],
         ["birch_hanging_sign", "blocks/birch_hanging_sign"],
-        ["birch_log", "log_birch"],
+        ["birch_log", "blocks/log_birch_top"],
         ["birch_pressure_plate", "blocks/planks_birch"],
         ["birch_stairs", "blocks/planks_birch"],
         ["birch_standing_sign", "items/sign_birch"],
@@ -654,7 +654,7 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         ["seagrass", "blocks/seagrass"],
         ["shroomlight", "blocks/shroomlight"],
         ["silver_glazed_terracotta", "blocks/glazed_terracotta_silver"],
-        //Skull texture is under and entity and would need a shader.
+        //頭蓋骨のテクスチャはエンティティの下にあり、シェーダーが必要だ。
         ["skull", ""],
         ["slime", "blocks/slime"],
         ["small_amethyst_bud", "blocks/small_amethyst_bud"],
@@ -823,7 +823,7 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         ["yellow_shulker_box", "blocks/shulker_top_yellow"],
         ["yellow_wool", "blocks/wool_coloured_yellow"],
 
-        //items these have had the blocks excluded
+        //これらの項目はブロックが除外されている
         ["acacia_boat", "items/boat_acacia"],
         ["acacia_chest_boat", "items/acacia_chest_boat"],
         ["acacia_sign", "items/sign_acacia"],
@@ -973,7 +973,7 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         ["flower_banner_pattern", "items/banner_pattern"],
         ["fox_spawn_egg", "items/egg_fox"],
         ["friend_pottery_sherd", "items/friend_pottery_sherd"],
-        //Unable to locate a texture.
+        //テクスチャが見つかりません。
         ["frog_spawn_egg", ""],
         ["ghast_spawn_egg", "items/egg_ghast"],
         ["ghast_tear", "items/ghast_tear"],
@@ -1248,7 +1248,7 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         ["zombie_villager_spawn_egg", "egg_zombievillager"],
     ]);
 
-    // Update the fourth value (texture) in the itemArray
+    // itemArrayの4番目の値（texture）を更新する。
     const itemArrayLength = itemArray.length;
     for (let i = 0; i < itemArrayLength; i += 4) {
         const type: string | number = itemArray[i + 3];
@@ -1256,10 +1256,10 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         itemArray[i + 3] = texture;
     }
 
-    // Output the updated itemArray(Debugging)
-    console.log(itemArray);
+    // 更新されたitemArrayを出力する(Debugging)
+    // console.log(itemArray)；
 
-    //once the loop is done then move to the next part
+    //ループが終わったら、次のパートに移る。
 
     const playerInventory = new ActionFormData();
     playerInventory.title("§4" + member.nameTag + "のインベントリ！！" + "§4");
@@ -1411,7 +1411,7 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         })
         .catch((error) => {
             console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
+            // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {

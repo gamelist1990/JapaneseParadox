@@ -1,24 +1,34 @@
 {
-    "[javascript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[typescript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[typescriptreact]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[json]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "git.ignoreLimitWarning": true,
-    "editor.formatOnSave": true,
-    "search.exclude": {
-        "**/.git": true,
-        "**/node_modules": true
-    },
-    "files.exclude": {
-        "**/.git": true,
-        "**/node_modules": true
-    }
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "git.ignoreLimitWarning": true,
+  "editor.formatOnSave": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  "search.exclude": {
+    "**/.git": true,
+    "**/node_modules": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true
+  },
+  "commentTranslate.source": "Bing"
 }

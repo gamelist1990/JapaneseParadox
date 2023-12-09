@@ -1,7 +1,7 @@
 import { PlayerSpawnAfterEvent, world } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry";
 import config from "../../../data/config";
-import { EncryptionManager } from "../../../classes/EncryptionManager";
+import { WorldExtended } from "../../../classes/WorldExtended/World";
 
 function verification(object: PlayerSpawnAfterEvent) {
     // Properties from class
@@ -19,14 +19,14 @@ function verification(object: PlayerSpawnAfterEvent) {
     const key = config.encryption.password ? config.encryption.password : player.id;
 
     // Generate the hash
-    const encode = EncryptionManager.hashWithSalt(salt as string, key);
+    const encode = (world as WorldExtended).hashWithSalt(salt as string, key);
     if (encode && encode === hash) {
         // Store as an element using player scoreboard id to uniquely identify them
-        dynamicPropertyRegistry.set(player.id, player.name);
+        dynamicPropertyRegistry.setProperty(player, player.id, player.name);
         return;
     } else {
-        player.removeDynamicProperty("hash");
-        player.removeDynamicProperty("salt");
+        player.setDynamicProperty("hash");
+        player.setDynamicProperty("salt");
         const hasTag = player.hasTag("paradoxOpped");
         if (hasTag) {
             player.removeTag("paradoxOpped");

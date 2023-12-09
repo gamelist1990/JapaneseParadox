@@ -1,6 +1,6 @@
-import { Player } from "@minecraft/server";
-import { PlayerManager } from "./PlayerManager";
+import { Player, world } from "@minecraft/server";
 import { sendMsgToPlayer } from "../util";
+import { WorldExtended } from "./WorldExtended/World";
 
 /**
  * Define the ChatChannel type.
@@ -40,7 +40,7 @@ export class ChatChannelManager {
      * @returns True if the channel is created successfully, false otherwise.
      */
     public static createChatChannel(channelName: string, password: string, owner: string): boolean {
-        const player = this.getPlayerById(owner);
+        const player = (world as WorldExtended).getPlayerById(owner);
         if (!this.chatChannels[channelName] && player) {
             const existingChannel = Object.values(this.chatChannels).find((channel) => channel.members.has(player.id));
             if (existingChannel) {
@@ -67,7 +67,7 @@ export class ChatChannelManager {
      */
     public static inviteToChatChannel(playerName: string, channelName: string): boolean {
         const chatChannel = this.chatChannels[channelName];
-        const playerObject = this.getPlayerByName(playerName);
+        const playerObject = (world as WorldExtended).getPlayerByName(playerName);
         if (chatChannel && playerObject && !chatChannel.members.has(playerObject.id)) {
             chatChannel.members.add(playerObject.id);
             this.playerChannelMap[playerObject.id] = channelName;
@@ -134,7 +134,7 @@ export class ChatChannelManager {
             // Convert the Set to an array and clear the channel efficiently
             const membersArray = Array.from(channel.members);
             membersArray.forEach((thisMember) => {
-                const thisPlayer: Player | null = this.getPlayerById(thisMember);
+                const thisPlayer: Player | null = (world as WorldExtended).getPlayerById(thisMember);
                 // Let members know that this channel no longer exists
                 sendMsgToPlayer(thisPlayer, `§f§4[§6Paradox§4]§f '§7${channelName}§f' has been disbanded.`);
                 this.playerChannelMap[thisMember] = null;
@@ -165,7 +165,7 @@ export class ChatChannelManager {
                 return "not_owner";
             }
 
-            const newOwner = this.getPlayerByName(newOwnerName);
+            const newOwner = (world as WorldExtended).getPlayerByName(newOwnerName);
             if (!newOwner) {
                 return "target_not_found";
             }
@@ -188,24 +188,6 @@ export class ChatChannelManager {
      */
     public static getPlayerChannel(playerName: string): string | null {
         return this.playerChannelMap[playerName] || null;
-    }
-
-    /**
-     * Get a player by their name.
-     * @param playerName The name of the player.
-     * @returns The player with the specified name, or null if not found.
-     */
-    public static getPlayerByName(playerName: string): Player | null {
-        return PlayerManager.getPlayerByName(playerName) || null;
-    }
-
-    /**
-     * Get a player by their ID.
-     * @param playerId The ID of the player.
-     * @returns The player with the specified ID, or null if not found.
-     */
-    public static getPlayerById(playerId: string): Player | null {
-        return PlayerManager.getPlayerById(playerId) || null;
     }
 
     /**

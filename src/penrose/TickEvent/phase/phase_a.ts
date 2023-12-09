@@ -1,6 +1,7 @@
 import { world, EntityQueryOptions, GameMode, system, Vector3, PlayerLeaveAfterEvent } from "@minecraft/server";
 import { flag } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
 // Store last safe location
 const lastSafeLocation = new Map<string, Vector3>();
@@ -16,7 +17,8 @@ function onPlayerLogout(event: PlayerLeaveAfterEvent): void {
 
 function antiphasea(id: number) {
     // Get Dynamic Property
-    const antiphaseABoolean = dynamicPropertyRegistry.get("antiphasea_b");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const antiphaseABoolean = configuration.modules.antiphaseA.enabled;
 
     // Unsubscribe if disabled in-game
     if (!antiphaseABoolean) {
@@ -35,7 +37,7 @@ function antiphasea(id: number) {
 
     for (const player of filteredPlayers) {
         // Get unique ID
-        const uniqueId = dynamicPropertyRegistry.get(player?.id);
+        const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
         // Skip if they have permission
         if (uniqueId === player.name) {
@@ -45,18 +47,16 @@ function antiphasea(id: number) {
         const { x, y, z } = player.location;
 
         // Calculate block locations
-        const lowerBody = { x, y, z };
+        const lowerBody = { x, y: y + 0.5, z };
 
-        let allSafe = false;
-
+        let blockType;
         try {
-            const blockType = player.dimension.getBlock(lowerBody);
-            allSafe = blockType && ((blockType.typeId === "minecraft:soul_sand" && y - lowerBody.y <= 0.125) || player.hasTag("riding") || passableSolids.has(blockType.typeId.replace("minecraft:", "")));
-        } catch {
-            allSafe = true; // Handle any errors in getting the block type
-        }
+            blockType = player.dimension.getBlock(lowerBody);
+        } catch {}
 
-        if (allSafe) {
+        const unsafeConditions = blockType && ((blockType.typeId === "minecraft:soul_sand" && y - lowerBody.y <= 0.125) || passableSolids.has(blockType.typeId.replace("minecraft:", "")) || blockType.isSolid);
+
+        if (!unsafeConditions) {
             // Update last safe location
             lastSafeLocation.set(player.id, player.location);
         } else {
@@ -68,7 +68,7 @@ function antiphasea(id: number) {
                     dimension: player.dimension,
                     rotation: { x: 0, y: 0 },
                     facingLocation: { x: 0, y: 0, z: 0 },
-                    checkForBlocks: false,
+                    checkForBlocks: true,
                     keepVelocity: false,
                 });
             }

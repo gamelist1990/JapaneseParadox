@@ -1,23 +1,22 @@
-const fs = require("fs");
-const path = require("path");
-const util = require("util");
-const { spawn } = require("child_process");
-const os = require("os");
-const fse = require("fs-extra");
-const glob = require("glob");
+import fs from "fs";
+import path from "path";
+import { spawn } from "child_process";
+import os from "os";
+import fse from "fs-extra";
+import { glob } from "./node_modules/glob/dist/esm/index.js";
+import { promisify } from "util";
+import { exec as execCallback } from "child_process";
 
-// Add this line to import exec
-const exec = util.promisify(require("child_process").exec);
+// Promisify the exec function
+const exec = promisify(execCallback);
 
 // Array to store all spawned child processes
 const spawnedProcesses = [];
 
 // Function to get the latest "bedrock-server-*" directory
-function getLatestBedrockServerDir() {
-    return glob.sync("bedrock-server-*")[0];
-}
+const getLatestBedrockServerDir = () => glob.sync("bedrock-server-*")[0];
 
-async function checkAndBuild() {
+const checkAndBuild = async () => {
     // Clean up the 'build/' directory
     const cleanBuildDir = "build";
     if (fs.existsSync(cleanBuildDir)) {
@@ -50,13 +49,13 @@ async function checkAndBuild() {
         });
     }
 
-    if (bedrockServerDir) {
-        // Remove the ".zip" extension from the directory name if it exists
-        bedrockServerDir = bedrockServerDir.replace(/\.zip$/, "");
-    } else {
+    if (!bedrockServerDir) {
         console.error("> Bedrock server directory not found...\n");
         return;
     }
+
+    // Remove the ".zip" extension from the directory name if it exists
+    bedrockServerDir = bedrockServerDir.replace(/\.zip$/, "");
 
     // Check if the 'worlds' folder exists, and if not, create it
     const worldsDir = path.join(bedrockServerDir, "worlds");
@@ -159,6 +158,6 @@ async function checkAndBuild() {
     } else {
         console.error("   - Unsupported OS: " + os.type());
     }
-}
+};
 
 checkAndBuild();

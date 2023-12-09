@@ -83,6 +83,7 @@ export default {
         antiphasea: true,
         channel: true,
         pvp: true,
+        spawnprotection: true,
     },
     modules: {
         badpackets1: {
@@ -109,6 +110,7 @@ export default {
         },
         namespoofB: {
             enabled: true,
+            // eslint-disable-next-line no-control-regex
             banregex: /[^\x00-\x7F]|[/:\\*?"<>]|^\.$|\.$/gu,
             // Deny any invalid character not within the scope of this regex
             // Only kick because playstation and switch consoles are able to rename themselves
@@ -157,12 +159,11 @@ export default {
             enabled: false,
         },
         antikbA: {
-            enabled: false,
-            magnitude: -0.078,
+            enabled: true,
+            velocityIntensity: -0.078,
         },
         antiscaffoldA: {
             enabled: true,
-            max: 13,
         },
         antinukerA: {
             enabled: true,
@@ -192,12 +193,11 @@ export default {
             enabled: false,
         },
         setHome: {
-            enabled: true,
-            max: 5,
+            max: 10,
         },
         goHome: {
-            seconds: 10,
-            minutes: 0,
+            seconds: 0,
+            minutes: 1,
             hours: 0,
             days: 0,
         },
@@ -217,7 +217,7 @@ export default {
         },
         hotbar: {
             enabled: false,
-            message: "通知", // Put Message inside the quotes
+            message: "ホットバー通知", // Put Message inside the quotes
         },
         ops: {
             enabled: false,
@@ -230,6 +230,7 @@ export default {
         },
         showrules: {
             enabled: true,
+            kick: false,
             rule1: "ルール1: チートはダメ！！",
             rule2: "ルール2: 人の許可なく建築を破壊しない",
             rule3: "ルール3: スパム行為などは禁止！！",
@@ -247,7 +248,8 @@ export default {
         },
         banAppeal: {
             enabled: true,
-            discordLink: "BANに不満があるならDISCORDでお知らせください。",
+            //ここは個人に応じて変えてください
+            discordLink: "何か質問があればdiscordまで(@koukun_)",
         },
         autoBan: {
             enabled: false,
@@ -258,10 +260,21 @@ export default {
             enabled: true,
         },
         afk: {
-            enabled: true,
+            enabled: false,
             minutes: 10,
         },
         antiphaseA: {
+            enabled: true,
+        },
+        lockdown: {
+            enabled: false,
+        },
+        spawnprotection: {
+            enabled: false,
+            radius: 0,
+            vector3: { x: 0, y: 0, z: 0 },
+        },
+        autoclicker: {
             enabled: true,
         },
     },

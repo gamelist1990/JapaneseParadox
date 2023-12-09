@@ -2,29 +2,31 @@ import { ModalFormData } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../../../penrose/WorldInitializeAfterEvent/registry";
 import { uiRULES } from "../../../moderation/uiRules";
 import { Player } from "@minecraft/server";
+import ConfigInterface from "../../../../interfaces/Config";
 
 export function rulesHandler(player: Player) {
-    //show rules ui
+    //ルール表示
     const rulesui = new ModalFormData();
-    rulesui.title("§4ルールに関する設定§4");
-    const showrulesBoolean = dynamicPropertyRegistry.get("showrules_b") as boolean;
-    const KickOnDeclineBoolean = dynamicPropertyRegistry.get("kickondecline_b") as boolean;
-    rulesui.toggle("ルールを有効又は無効:", showrulesBoolean);
-    rulesui.toggle("ルールに同意しないとキック:", KickOnDeclineBoolean);
+    rulesui.title("§4Configure Rulesメニュー§4");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const showrulesBoolean = configuration.modules.showrules.enabled;
+    const KickOnDeclineBoolean = configuration.modules.showrules.kick;
+    rulesui.toggle("ルールをBooleanにする：", showrulesBoolean);
+    rulesui.toggle("キック・オン・デクライン", KickOnDeclineBoolean);
     rulesui
         .show(player)
         .then((rulesResult) => {
-            // due to limitations we can't edit the rules in game.
+            // 制限のため、ゲーム内でルールを編集することはできません。
             uiRULES(rulesResult, player);
         })
         .catch((error) => {
-            console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
+            console.error("パラドックスの未処理拒否：", error);
+            // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("Error originated from:", sourceInfo[0]);
+                    console.error("エラーの原因", sourceInfo[0]);
                 }
             }
         });

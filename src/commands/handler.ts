@@ -1,8 +1,7 @@
 import { ChatSendAfterEvent, ChatSendBeforeEvent, Player } from "@minecraft/server";
-import config from "../data/config.js";
 import { sendMsgToPlayer } from "../util.js";
 
-// import all our commands
+// すべてのコマンドをインポートする
 import { kick } from "./moderation/kick.js";
 import { help } from "./moderation/help.js";
 import { notify } from "./moderation/notify.js";
@@ -17,13 +16,13 @@ import { allowgma } from "./settings/allowgma.js";
 import { allowgmc } from "./settings/allowgmc.js";
 import { allowgms } from "./settings/allowgms.js";
 import { bedrockvalidate } from "./settings/bedrockvalidate.js";
-import { overidecommandblocksenabled } from "./settings/overidecommandblocksenabled.js";
-import { removecommandblocks } from "./settings/removecommandblocks.js";
+import { overridecbe } from "./settings/overidecommandblocksenabled.js";
+import { removecb } from "./settings/removecommandblocks.js";
 import { worldborders } from "./settings/worldborder.js";
-import { autoclick } from "./settings/autoclicker.js";
+import { autoclicker } from "./settings/autoclicker.js";
 import { jesusA } from "./settings/jesusa.js";
 import { enchantedarmor } from "./settings/enchantedarmor.js";
-import { antiknockback } from "./settings/antikb.js";
+import { antikb } from "./settings/antikb.js";
 import { antishulker } from "./settings/antishulker.js";
 import { rank } from "./utility/rank.js";
 import { ecwipe } from "./utility/ecwipe.js";
@@ -55,7 +54,7 @@ import { xrayA } from "./settings/xraya.js";
 import { unban } from "./moderation/unban.js";
 import { prefix } from "./moderation/prefix.js";
 import { chatranks } from "./settings/chatranks.js";
-import { stackban } from "./settings/stackban.js";
+import { stackBan } from "./settings/stackban.js";
 import { lockdown } from "./moderation/lockdown.js";
 import { punish } from "./moderation/punish.js";
 import { sethome } from "./utility/sethome.js";
@@ -86,6 +85,9 @@ import { afk } from "./settings/afk.js";
 import { antiphaseA } from "./settings/antiphasea.js";
 import { chatChannel } from "./utility/channel.js";
 import { pvp } from "./utility/pvp.js";
+import { spawnprotection } from "./settings/spawnprotection.js";
+import { dynamicPropertyRegistry } from "../penrose/WorldInitializeAfterEvent/registry.js";
+import ConfigInterface from "../interfaces/Config.js";
 
 const commandDefinitions: Record<string, (data: Player | ChatSendAfterEvent, args: string[], fullArgs: string) => void> = Object.setPrototypeOf(
     {
@@ -107,19 +109,19 @@ const commandDefinitions: Record<string, (data: Player | ChatSendAfterEvent, arg
         allowgms: allowgms,
         bedrockvalidate: bedrockvalidate,
         modules: modules,
-        overridecbe: overidecommandblocksenabled,
-        removecb: removecommandblocks,
+        overridecbe: overridecbe,
+        removecb: removecb,
         worldborder: worldborders,
         help: help,
         credits: credits,
         op: op,
         deop: deop,
         clearchat: clearchat,
-        autoclicker: autoclick,
+        autoclicker: autoclicker,
         jesusa: jesusA,
         enchantedarmor: enchantedarmor,
         antikillaura: auracheck,
-        antikb: antiknockback,
+        antikb: antikb,
         report: report,
         badpackets1: badpackets1,
         spammera: spammerA,
@@ -142,7 +144,7 @@ const commandDefinitions: Record<string, (data: Player | ChatSendAfterEvent, arg
         prefix: prefix,
         chatranks: chatranks,
         antishulker: antishulker,
-        stackban: stackban,
+        stackban: stackBan,
         lockdown: lockdown,
         punish: punish,
         sethome: sethome,
@@ -172,6 +174,7 @@ const commandDefinitions: Record<string, (data: Player | ChatSendAfterEvent, arg
         antiphasea: antiphaseA,
         channel: chatChannel,
         pvp: pvp,
+        spawnprotection: spawnprotection,
         //custom
         map: biome,
         tp: TeleportRequestHandler,
@@ -183,6 +186,7 @@ const commandDefinitions: Record<string, (data: Player | ChatSendAfterEvent, arg
         list: fullreport,
         van: vanish,
         ch: chatChannel,
+        clear: clearlag,
     },
     null
 );
@@ -193,43 +197,49 @@ const commandDefinitions: Record<string, (data: Player | ChatSendAfterEvent, arg
  * @param {ChatSendBeforeEvent} message - Message data
  */
 
-export function commandHandler(player: Player, message: ChatSendBeforeEvent): Promise<void> | void {
-    if (config.debug) {
-        console.warn(`${new Date()} | ${player.name}がコマンドを実行`);    }
+export function commandHandler(player: Player, message: ChatSendBeforeEvent): void {
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // checks if the message starts with our prefix, if not exit
-    if (!message.message.startsWith(config.customcommands.prefix)) return void 0;
+    if (configuration.debug) {
+        console.warn(`${new Date()} | ${player.name}がコマンドを実行`);
+    }
 
-    const args = message.message.slice(config.customcommands.prefix.length).split(/ +/);
+    // メッセージがプレフィックスで始まっているかチェックし、始まっていない場合は終了する。
+    if (!message.message.startsWith(configuration.customcommands.prefix)) return void 0;
+
+    const args = message.message.slice(configuration.customcommands.prefix.length).split(/ +/);
 
     const commandName = args.shift().toLowerCase();
 
-    if (config.debug) console.warn(`${new Date()} | "${player.name}"が以下のコマンドを実行しました: ${config.customcommands.prefix}${commandName} ${args.join(" ")}`);
+    if (configuration.debug) console.warn(`${new Date()} | "${player.name}" が以下のコマンドを実行しました: ${configuration.customcommands.prefix}${commandName} ${args.join(" ")}`);
 
     if (!(commandName in commandDefinitions)) {
         message.cancel = true;
         message.sendToTargets = true;
         message.setTargets([]);
         message.message = "";
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  ${config.customcommands.prefix}${commandName} そのコマンドは存在しません！！`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  §7${configuration.customcommands.prefix}${commandName}§f そのコマンドは存在しません！！`);
+        return;
     }
 
-    // Do not broadcast any message to any targets
+    // いかなるターゲットにもメッセージを流さない
     message.sendToTargets = true;
 }
 
 export function handleCommandAfterSend(chatSendAfterEvent: ChatSendAfterEvent): void {
-    // Logic for handling the command after the message is sent
-    if (!chatSendAfterEvent.message.startsWith(config.customcommands.prefix)) return;
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // Do not broadcast any message to any targets
+    // メッセージ送信後のコマンド処理ロジック
+    if (!chatSendAfterEvent.message.startsWith(configuration.customcommands.prefix)) return;
+
+    // いかなるターゲットにもメッセージを流さない
     chatSendAfterEvent.sendToTargets = true;
 
-    const args = chatSendAfterEvent.message.slice(config.customcommands.prefix.length).split(/ +/);
+    const args = chatSendAfterEvent.message.slice(configuration.customcommands.prefix.length).split(/ +/);
 
     const commandName = args.shift().toLowerCase();
 
-    commandDefinitions[commandName](chatSendAfterEvent, args, chatSendAfterEvent.message.slice(config.customcommands.prefix.length + commandName.length + 1));
+    commandDefinitions[commandName](chatSendAfterEvent, args, chatSendAfterEvent.message.slice(configuration.customcommands.prefix.length + commandName.length + 1));
 
     chatSendAfterEvent.message = "";
 }

@@ -1,37 +1,42 @@
-import { Player, world } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
-//import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
 import { AutoBan } from "../../penrose/TickEvent/ban/autoban.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiAUTOBAN(autobanResult: ModalFormResponse, player: Player) {
     if (!autobanResult || autobanResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [autobanToggle] = autobanResult.formValues;
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
-    const autoBanBoolean = dynamicPropertyRegistry.get("autoban_b");
-    // Make sure the user has permissions to run the command
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
+
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはパラドックス・オップされる必要がある。`);
     }
+
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    const autoBanBoolean = configuration.modules.autoBan.enabled;
+
     if (autobanToggle === true && autoBanBoolean === false) {
-        // Allow
-        dynamicPropertyRegistry.set("autoban_b", true);
-        world.setDynamicProperty("autoban_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6autoban§f!`);
+        // 許可する
+        configuration.modules.autoBan.enabled = true;
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6autoban§f!`);
         AutoBan();
     }
     if (autobanToggle === false && autoBanBoolean === true) {
-        // Deny
-        dynamicPropertyRegistry.set("autoban_b", false);
-        world.setDynamicProperty("autoban_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4autoban§f!`);
+        // 拒否する
+        configuration.modules.autoBan.enabled = false;
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4autoban§f!`);
     }
 
     return paradoxui(player);

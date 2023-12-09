@@ -17,21 +17,21 @@ export function antiEnchantedArmorHandler(player: Player) {
     if (encharmorscore >= 1) {
         enchantedarmorBoolean = true;
     }
-    modulesenchantedarmorui.title("§4メニュー：Enchanted Armor§4");
-    modulesenchantedarmorui.toggle("すべてのプレイヤーにからエンチャ防具を削除:", enchantedarmorBoolean);
+    modulesenchantedarmorui.title("§4Enchanted Armorメニュー§4");
+    modulesenchantedarmorui.toggle("Enchanted Armor - 全プレイヤーのためのアンチエンチャントアーマー：", enchantedarmorBoolean);
     modulesenchantedarmorui
         .show(player)
         .then((enchantedarmorResult) => {
             uiENCHANTEDARMOR(enchantedarmorResult, player);
         })
         .catch((error) => {
-            console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
+            console.error("パラドックスの未処理拒否：", error);
+            // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("Error originated from:", sourceInfo[0]);
+                    console.error("エラーの原因", sourceInfo[0]);
                 }
             }
         });

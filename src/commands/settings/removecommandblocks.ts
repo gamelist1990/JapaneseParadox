@@ -1,44 +1,49 @@
 import { ChatSendAfterEvent, Player } from "@minecraft/server";
-import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import { ScoreManager } from "../../classes/ScoreManager.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
-function removeCBEHelp(player: Player, prefix: string, commandblocksscore: number) {
-    let commandStatus: string;
-    if (!config.customcommands.removecommandblocks) {
-        commandStatus = "§6[§4DISABLED§6]§f";
-    } else {
-        commandStatus = "§6[§aENABLED§6]§f";
-    }
-    let moduleStatus: string;
-    if (commandblocksscore <= 0) {
-        moduleStatus = "§6[§4DISABLED§6]§f";
-    } else {
-        moduleStatus = "§6[§aENABLED§6]§f";
-    }
-    return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: removecb`,
+/**
+ * Provides help information for the removecb command.
+ * @param {Player} player - The player requesting help.
+ * @param {string} prefix - The custom prefix for the player.
+ * @param {number} commandblocksscore - The current score for the 'コマンドブロック' objective.
+ * @param {boolean} setting - The status of the removecommandblocks custom command setting.
+ */
+function removeCBEHelp(player: Player, prefix: string, commandblocksscore: number, setting: boolean): void {
+    // コマンドとモジュールのステータスを決定する
+    const commandStatus: string = setting ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
+    const moduleStatus: string = commandblocksscore <= 0 ? "§6[§4無効§6]§f" : "§6[§a有効§6]§f";
+
+    // 選手にヘルプ情報を表示する
+    sendMsgToPlayer(player, [
+        `\nコマンド§4[§6 コマンド§4]§f: removecb`,
         `§4[§6Status§4]§f: ${commandStatus}`,
         `§4[§6Module§4]§f: ${moduleStatus}`,
-        `§4[§6Usage§4]§f: removecb [optional]`,
-        `§4[§6Optional§4]§f: help`,
-        `§4[§6Description§4]§f: Toggles Anti Command Blocks (Clears all when enabled).`,
-        `§4[§6Examples§4]§f:`,
-        `    ${prefix}removecb`,
-        `    ${prefix}removecb help`,
+        `§4[§6Usage§4]§f: ${prefix}removecb [options]`,
+        `§4[§6Description§4]§f：アンチコマンドブロックを切り替える（Booleanにするとすべてクリアされる）。`,
+        `§4[§6オプション§4]§f：`,
+        `    -h, --help`,
+        `       §4[§7このヘルプメッセージを表示する§4]§f`,
+        `    -s, --status`,
+        `       §4[§7アンチコマンドブロックモジュールの現在の状態を表示する§4]§f`,
+        `    -e, --enable`,
+        `       §4[§7アンチ・コマンド・ブロック・モジュールをBooleanにする§4]§f`,
+        `    -d, --disable`,
+        `       §4[§7コマンドブロック対策モジュール§4を無効にする]§f`,
     ]);
 }
 
 /**
- * @name removecommandblocks
- * @param {ChatSendAfterEvent} message - Message object
+ * @name removecb
+ * @param {ChatSendAfterEvent} message - Message object.
  * @param {string[]} args - Additional arguments provided (optional).
  */
-export function removecommandblocks(message: ChatSendAfterEvent, args: string[]) {
-    handleRemoveCommandBlocks(message, args).catch((error) => {
+export function removecb(message: ChatSendAfterEvent, args: string[]): void {
+    handleRemoveCB(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -49,41 +54,80 @@ export function removecommandblocks(message: ChatSendAfterEvent, args: string[])
     });
 }
 
-async function handleRemoveCommandBlocks(message: ChatSendAfterEvent, args: string[]) {
-    // validate that required params are defined
+/**
+ * Handles the removecb command.
+ * @param {ChatSendAfterEvent} message - Message object.
+ * @param {string[]} args - Additional arguments provided (optional).
+ */
+async function handleRemoveCB(message: ChatSendAfterEvent, args: string[]): Promise<void> {
+    // 必要なパラメータが定義されていることを検証する
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/settings/removeCommandBlocks.js:33)");
+        return console.warn(`${new Date()} | ` + `Error: ${message} isnt defined. Did you forget to pass it? (./commands/settings/removeCommandBlocks.js:33)`);
     }
 
-    const player = message.sender;
+    const player: Player = message.sender;
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
     }
 
-    const commandblocksscore = ScoreManager.getScore("commandblocks", player);
+    const commandblocksscore: number = ScoreManager.getScore("commandblocks", player);
 
-    // Check for custom prefix
-    const prefix = getPrefix(player);
+    const configuration: ConfigInterface = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // Was help requested
-    const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.removecommandblocks) {
-        return removeCBEHelp(player, prefix, commandblocksscore);
+    // カスタム接頭辞のチェック
+    const prefix: string = getPrefix(player);
+
+    // 位置以外の引数をチェックする
+    const length = args.length;
+    let validFlagFound = false; // Flag to track if any valid flag is encountered
+    for (let i = 0; i < length; i++) {
+        const additionalArg: string = args[i].toLowerCase();
+
+        // 追加引数の処理
+        switch (additionalArg) {
+            case "-h":
+            case "--help":
+                // ヘルプメッセージを表示する
+                validFlagFound = true;
+                removeCBEHelp(player, prefix, commandblocksscore, configuration.customcommands.removecommandblocks);
+                break;
+            case "-s":
+            case "--status":
+                // アンチコマンドブロックモジュールの現在のステータスを表示
+                validFlagFound = true;
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Anti Command Blocks module is currently ${commandblocksscore <= 0 ? "§4無効" : "§aBoolean"}§f.`);
+                break;
+            case "-e":
+            case "--enable":
+                // アンチ・コマンド・ブロック・モジュールをBooleanにする
+                validFlagFound = true;
+                if (commandblocksscore <= 0) {
+                    player.runCommand(`scoreboard players set paradox:config commandblocks 1`);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 以下の機能が有効です=> §6Anti Command Blocks§f!`);
+                } else {
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fコマンドブロック対策モジュールが既にBoolean`);
+                }
+                break;
+            case "-d":
+            case "--disable":
+                // アンチ・コマンド・ブロック・モジュールを無効にする
+                validFlagFound = true;
+                if (commandblocksscore <= 0) {
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fコマンドブロック対策モジュールは既に無効になっています。`);
+                } else {
+                    player.runCommand(`scoreboard players set paradox:config commandblocks 0`);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f は無効 §4Anti Command Blocks§f!`);
+                }
+                break;
+        }
     }
 
-    if (commandblocksscore <= 0) {
-        // Allow
-        player.runCommand(`scoreboard players set paradox:config commandblocks 1`);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6Anti Command Blocks§f!`);
-    } else if (commandblocksscore >= 1) {
-        // Deny
-        player.runCommand(`scoreboard players set paradox:config commandblocks 0`);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4Anti Command Blocks§f!`);
+    if (!validFlagFound) {
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Invalid command. Use ${prefix}removecb --help for command usage.`);
     }
-    return player.runCommand(`scoreboard players operation @a commandblocks = paradox:config commandblocks`);
 }

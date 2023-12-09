@@ -1,28 +1,28 @@
 import { world, Player, ChatSendAfterEvent } from "@minecraft/server";
-import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsgToPlayer, setTimer } from "../../util.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
-function tpaHelp(player: Player, prefix: string) {
+function tpaHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
-    if (!config.customcommands.tpa) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: tpa`,
+        `§6コマンド§4]§f: tpa`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: tpa [optional]`,
-        `§4[§6Optional§4]§f: username, help`,
-        `§4[§6Description§4]§f: Teleport to a player or vice versa.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f: tpa [オプション］`,
+        `§4[§6オプション§4]§f: ユーザー名、ヘルプ`,
+        `§4[§6解説§4]§f：プレイヤーにテレポートする。`,
+        `§f§4[§6例§4]§f：`,
         `    ${prefix}tpa ${player.name} Steve`,
-        `        §4- §6Request to teleport to ${player.name} from Steve§f`,
+        `        §4- §6Steveから${player.name}へのテレポートリクエスト§f`,
         `    ${prefix}tpa Steve ${player.name}`,
-        `        §4- §6Request to teleport Steve to ${player.name}§f`,
+        `        §4- §6${player.name}からSteveへのテレポートリクエスト§f`,
         `    ${prefix}tpa help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドを表示するヘルプ§f`,
     ]);
 }
 
@@ -32,39 +32,41 @@ function tpaHelp(player: Player, prefix: string) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function tpa(message: ChatSendAfterEvent, args: string[]) {
-    // validate that required params are defined
+    // 必要なパラメータが定義されていることを確認する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/moderation/tpa.js:31)");
     }
 
     const player = message.sender;
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
     }
 
-    // Check for custom prefix
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Was help requested
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.tpa) {
-        return tpaHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.tpa) {
+        return tpaHelp(player, prefix, configuration.customcommands.tpa);
     }
 
-    // Are there arguements
+    // 反論はあるか
     if (!args.length) {
-        return tpaHelp(player, prefix);
+        return tpaHelp(player, prefix, configuration.customcommands.tpa);
     }
 
     let artificalPlayer: Player;
     let member: Player;
 
-    // Try to find the player requested
+    // 要求された選手を見つけよう
     const players = world.getPlayers();
     for (const pl of players) {
         if (pl.name.toLowerCase().includes(args[0].toLowerCase().replace(/"|\\|@/g, ""))) {
@@ -77,21 +79,27 @@ export function tpa(message: ChatSendAfterEvent, args: string[]) {
             break;
         }
     }
-    // Are they online?
+    // オンラインですか？
     if (!member) {
         return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player! Try '§7${prefix}tpa help§f' for more info.`);
     }
 
-    // Check if teleporting to them or vice versa then set it up
+    // テレポートが相手側にあるか、またはその逆かをチェックし、設定する。
     if (args[0] && args[1]) {
-        // Let's teleport you to that player
+        // その選手のところにテレポートしよう
         setTimer(artificalPlayer.id);
-        artificalPlayer.teleport(member.location, { dimension: member.dimension, rotation: { x: 0, y: 0 }, facingLocation: { x: 0, y: 0, z: 0 }, checkForBlocks: false, keepVelocity: false });
-        // Let you know that you have been teleported
+        artificalPlayer.teleport(member.location, {
+            dimension: member.dimension,
+            rotation: { x: 0, y: 0 },
+            facingLocation: { x: 0, y: 0, z: 0 },
+            checkForBlocks: true,
+            keepVelocity: false,
+        });
+        // テレポートしたことを知らせる
         return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Teleported §7${artificalPlayer.name}§f to §7${member.name}§f`);
     } else {
-        // Need to specify who
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You forgot to mention 'from' and 'who' to teleport.`);
-        return tpaHelp(player, prefix);
+        // 誰を指定する必要がある
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fテレポートの「from」と「who」を忘れている。`);
+        return tpaHelp(player, prefix, configuration.customcommands.tpa);
     }
 }

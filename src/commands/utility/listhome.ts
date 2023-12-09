@@ -1,26 +1,27 @@
 import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
-import config from "../../data/config.js";
 import { getPrefix, sendMsgToPlayer } from "../../util.js";
-import { EncryptionManager } from "../../classes/EncryptionManager.js";
+import { WorldExtended } from "../../classes/WorldExtended/World.js";
+import ConfigInterface from "../../interfaces/Config.js";
+import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 
-function listHomeHelp(player: Player, prefix: string) {
+function listHomeHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
-    if (!config.customcommands.listhome) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: listhome`,
+        `\n§o§4[§6コマンド§4]§f: リストホーム`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: listhome [optional]`,
-        `§4[§6Optional§4]§f: help`,
-        `§4[§6Description§4]§f: Shows a list of saved home locations.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f：リストホーム[オプション］`,
+        `§4[§6オプション§4]§f: ヘルプ`,
+        `§4[§6説明§4]§f：保存されたホームロケーションのリストを表示する。`,
+        `§4[§6例§4]§f：`,
         `    ${prefix}listhome`,
-        `        §4- §6Show a list of saved home locations§f`,
+        `        §4- §6保存されたホームロケーションのリストを表示する§f`,
         `    ${prefix}listhome help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドを表示するヘルプ§f`,
     ]);
 }
 
@@ -30,26 +31,28 @@ function listHomeHelp(player: Player, prefix: string) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function listhome(message: ChatSendAfterEvent, args: string[]) {
-    // Validate that required params are defined
+    // 必要なパラメータが定義されていることを検証する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? ./commands/utility/listhome.js:26)");
     }
 
     const player = message.sender;
 
-    // Check for custom prefix
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Was help requested
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.listhome) {
-        return listHomeHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.listhome) {
+        return listHomeHelp(player, prefix, configuration.customcommands.listhome);
     }
 
-    // Hash the coordinates for security
+    // 安全のために座標をハッシュ化する
     const salt = world.getDynamicProperty("crypt");
 
-    // Create an array to store the home location messages
+    // ホームロケーションメッセージを格納する配列を作成する
     const homeMessages: string[] = [];
 
     const tags = player.getTags();
@@ -57,13 +60,13 @@ export function listhome(message: ChatSendAfterEvent, args: string[]) {
     let counter = 0;
     for (let i = 0; i < tagsLength; i++) {
         if (tags[i].startsWith("1337")) {
-            // Decode it so we can verify it
-            tags[i] = EncryptionManager.decryptString(tags[i], salt as string);
-            // If invalid then skip it
+            // それを検証するためにデコードする
+            tags[i] = (world as WorldExtended).decryptString(tags[i], salt as string);
+            // 無効な場合はスキップする
             if (tags[i].startsWith("LocationHome:") === false) {
                 continue;
             }
-            // Split string into array
+            // 文字列を配列に分割する
             const coordinatesArray = tags[i].split(" ");
             const coordArrayLength = coordinatesArray.length;
             let home: string;
@@ -73,7 +76,7 @@ export function listhome(message: ChatSendAfterEvent, args: string[]) {
             let dimension: string;
             counter = ++counter;
             for (let j = 0; j < coordArrayLength; j++) {
-                // Get their location from the array
+                // 配列から位置を取得する
                 if (coordinatesArray[j].includes("LocationHome:")) {
                     home = coordinatesArray[j].replace("LocationHome:", "");
                 }
@@ -89,12 +92,12 @@ export function listhome(message: ChatSendAfterEvent, args: string[]) {
                 if (coordinatesArray[j].includes("Dimension:")) {
                     dimension = coordinatesArray[j].replace("Dimension:", "");
                 }
-                // Inside the loop where you are processing each home location
+                // 各ホームロケーションを処理するループの内側
                 if (!homex || !homey || !homez || !dimension) {
                     continue;
                 } else {
                     if (counter === 1) {
-                        homeMessages.push(`§f§4[§6Paradox§4]§f List Of Homes:`);
+                        homeMessages.push(`§f§4[§6Paradox§4]§f ホームのリスト：`);
                     }
                     homeMessages.push(` §o§6|§f §4[§f${home}§4]§f §6=>§f ${homex} ${homey} ${homez} §6<=§f §4[§f${dimension}§4]§f`);
                 }
@@ -103,10 +106,10 @@ export function listhome(message: ChatSendAfterEvent, args: string[]) {
         continue;
     }
     if (homeMessages.length > 0) {
-        // Send all the home location messages at once using sendMsgToPlayer
+        // sendMsgToPlayerを使用して、すべてのホームロケーションメッセージを一度に送信する。
         sendMsgToPlayer(player, homeMessages);
     } else {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You have none saved locations.`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 保存されている場所がありません。`);
     }
     return;
 }

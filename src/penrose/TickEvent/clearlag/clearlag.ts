@@ -1,23 +1,22 @@
-import config from "../../../data/config.js";
 import { world, system } from "@minecraft/server";
 import { sendMsg } from "../../../util.js";
 import { clearItems } from "../../../data/clearlag.js";
 import { kickablePlayers } from "../../../kickcheck.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
 const cooldownTimer = new WeakMap();
 // Just a dummy object to use with set/get
 const object = { cooldown: "String" };
 
-const countdown = {
-    days: config.modules.clearLag.days,
-    hours: config.modules.clearLag.hours,
-    minutes: config.modules.clearLag.minutes,
-    seconds: config.modules.clearLag.seconds,
-};
-
-let warned = false; // variable to track whether the 60 second warning has been displayed
-let clearLagId: number = null;
+function createCountdown(configuration: ConfigInterface) {
+    return {
+        days: configuration.modules.clearLag.days,
+        hours: configuration.modules.clearLag.hours,
+        minutes: configuration.modules.clearLag.minutes,
+        seconds: configuration.modules.clearLag.seconds,
+    };
+}
 
 function clearEntityItems() {
     const filter = { type: "item" };
@@ -25,7 +24,7 @@ function clearEntityItems() {
     for (const entity of entitiesCache) {
         const itemName = entity.getComponent("item");
         if (itemName.typeId in clearItems) {
-            entity.kill();
+            entity.remove();
         }
     }
 }
@@ -40,13 +39,14 @@ function clearEntities() {
             continue;
         }
         kickablePlayers.add(entity);
-        entity.triggerEvent("paradox:kick");
+        entity.remove();
     }
 }
 
 function clearLag(id: number) {
     // Get Dynamic Property
-    const clearLagBoolean = dynamicPropertyRegistry.get("clearlag_b");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const clearLagBoolean = configuration.modules.clearLag.enabled;
 
     // Unsubscribe if disabled in-game
     if (clearLagBoolean === false) {
@@ -60,25 +60,28 @@ function clearLag(id: number) {
         cooldownTimer.set(object, cooldownVerify);
     }
 
-    const msSettings = countdown.days * 24 * 60 * 60 * 1000 + countdown.hours * 60 * 60 * 1000 + countdown.minutes * 60 * 1000 + countdown.seconds * 1000;
-    const timeLeft = msSettings - (Date.now() - cooldownVerify);
+    const countdown = createCountdown(configuration);
 
-    const timeLeftSeconds = Math.ceil(timeLeft / 1000);
+    const msSettings = countdown.days * 24 * 60 * 60 + countdown.hours * 60 * 60 + countdown.minutes * 60 + countdown.seconds * 1000;
+    const timePassed = Date.now() - cooldownVerify;
+    const timeLeft = msSettings - timePassed;
+
+    const timeLeftSeconds = Math.round(timeLeft / 1000); // Round to second
 
     if (timeLeftSeconds <= 0) {
         clearEntityItems();
         clearEntities();
         cooldownTimer.delete(object);
-        sendMsg("@a", `§f§4[§6Paradox§4]§f Server lag has been cleared!`);
-        warned = false; // reset the warned variable so that the 60 second warning will display again next time
+        sendMsg("@a", `§f§4[§6Paradox§4]§f サーバーラグが解消されました!`);
     } else if (timeLeftSeconds <= 60) {
         if (timeLeftSeconds === 60) {
-            sendMsg("@a", `§f§4[§6Paradox§4]§f Server lag will be cleared in 1 minute!`);
-        } else if (!warned && timeLeftSeconds <= 5) {
-            sendMsg("@a", `§f§4[§6Paradox§4]§f Server lag will be cleared in ${timeLeftSeconds} seconds!`);
-            warned = true;
+            sendMsg("@a", `§f§4[§6Paradox§4]§f サーバーのラグは1分で解消されます!`);
+        } else if (timeLeftSeconds === 5) {
+            sendMsg("@a", `§f§4[§6Paradox§4]§f サーバーのラグは${timeLeftSeconds}秒でクリアされます!`);
+        } else if (timeLeftSeconds <= 5 && timeLeftSeconds > 1) {
+            sendMsg("@a", `§f§4[§6Paradox§4]§f ${timeLeftSeconds} 秒...`);
         } else if (timeLeftSeconds === 1) {
-            sendMsg("@a", `§f§4[§6Paradox§4]§f Server lag will be cleared in ${timeLeftSeconds} second!`);
+            sendMsg("@a", `§f§4[§6Paradox§4]§f ${timeLeftSeconds} 秒...`);
         }
     }
 }
@@ -89,11 +92,7 @@ function clearLag(id: number) {
  * if needed to do so.
  */
 export function ClearLag() {
-    if (clearLagId !== null) {
-        system.clearRun(clearLagId);
-    }
-
-    clearLagId = system.runInterval(() => {
+    const clearLagId = system.runInterval(() => {
         clearLag(clearLagId);
     }, 20);
 }

@@ -1,49 +1,45 @@
-import { Player, world } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { WorldBorder } from "../../penrose/TickEvent/worldborder/worldborder.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiWORLDBORDER(worldborderResult: ModalFormResponse, player: Player) {
     if (!worldborderResult || worldborderResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [OverworldValueTextfield, NetherValueTextfield, EndValueTextfield, WorldBorderToggle] = worldborderResult.formValues;
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Get Dynamic Property Boolean
-
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to configure World Borders`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fワールド・ボーダーを設定するには、パラドックス・オッピングが必要です。`);
     }
+
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
     if (WorldBorderToggle === true) {
-        dynamicPropertyRegistry.set("worldborder_b", true);
-        dynamicPropertyRegistry.set("worldborder_n", Math.abs(Number(OverworldValueTextfield)));
-        dynamicPropertyRegistry.set("worldborder_nether_n", Math.abs(Number(NetherValueTextfield)));
-        dynamicPropertyRegistry.set("worldborder_end_n", Math.abs(Number(EndValueTextfield)));
-        world.setDynamicProperty("worldborder_b", true);
-        world.setDynamicProperty("worldborder_n", Math.abs(Number(OverworldValueTextfield)));
-        world.setDynamicProperty("worldborder_nether_n", Math.abs(Number(NetherValueTextfield)));
-        world.setDynamicProperty("worldborder_end_n", Math.abs(Number(EndValueTextfield)));
+        configuration.modules.worldBorder.enabled = true;
+        configuration.modules.worldBorder.overworld = Math.abs(Number(OverworldValueTextfield));
+        configuration.modules.worldBorder.nether = Math.abs(Number(NetherValueTextfield));
+        configuration.modules.worldBorder.end = Math.abs(Number(EndValueTextfield));
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
         WorldBorder();
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f has set the §6World Border§f! Overworld: ${OverworldValueTextfield} Nether: ${NetherValueTextfield} End: ${EndValueTextfield}`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has set the §6World Border§f! Overworld: §7${OverworldValueTextfield}§f Nether: §7${NetherValueTextfield}§f End: §7${EndValueTextfield}§f`);
     }
     if (WorldBorderToggle === false) {
-        dynamicPropertyRegistry.set("worldborder_b", false);
-        dynamicPropertyRegistry.set("worldborder_n", 0);
-        dynamicPropertyRegistry.set("worldborder_nether_n", 0);
-        dynamicPropertyRegistry.set("worldborder_end_n", 0);
-        world.setDynamicProperty("worldborder_b", false);
-        world.setDynamicProperty("worldborder_n", 0);
-        world.setDynamicProperty("worldborder_nether_n", 0);
-        world.setDynamicProperty("worldborder_end_n", 0);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ the §6World Border§f!`);
+        configuration.modules.worldBorder.enabled = false;
+        configuration.modules.worldBorder.overworld = 0;
+        configuration.modules.worldBorder.nether = 0;
+        configuration.modules.worldBorder.end = 0;
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ the §6World Border§f!`);
     }
 
-    //show the main ui to the player once complete.
+    //完了したら、プレイヤーにメインUIを表示する。
     return paradoxui(player);
 }

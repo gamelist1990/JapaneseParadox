@@ -1,7 +1,7 @@
 import { world, Player, system, EntityQueryOptions, Vector } from "@minecraft/server";
 import { sendMsg, setTimer } from "../../../util";
 import { MinecraftEffectTypes } from "../../../node_modules/@minecraft/vanilla-data/lib/index";
-import { EncryptionManager } from "../../../classes/EncryptionManager";
+import { WorldExtended } from "../../../classes/WorldExtended/World";
 
 function freezePlayer(player: Player) {
     // Record the player's original location
@@ -14,7 +14,7 @@ function freezePlayer(player: Player) {
         dimension: world.getDimension("overworld"),
         rotation: player.getRotation(),
         facingLocation: player.getViewDirection(),
-        checkForBlocks: false,
+        checkForBlocks: true,
         keepVelocity: false,
     });
 
@@ -22,7 +22,7 @@ function freezePlayer(player: Player) {
     player.runCommand(`fill ${originalLocation.x + 2} ${245 + 2} ${originalLocation.z + 2} ${originalLocation.x - 2} ${245 - 1} ${originalLocation.z - 2} barrier [] hollow`);
 
     // Encrypt the data
-    const encryptData = EncryptionManager.encryptString(`${originalLocation.x},${originalLocation.y},${originalLocation.z},${originalDimension.replace("minecraft:", "")}`, player.id);
+    const encryptData = (world as WorldExtended).encryptString(`${originalLocation.x},${originalLocation.y},${originalLocation.z},${originalDimension.replace("minecraft:", "")}`, player.id);
     // Store original location and dimension in a tag
     player.addTag(`paradoxFreezeData:${encryptData}`);
 }
@@ -37,7 +37,7 @@ function unfreezePlayer(player: Player) {
 
     if (freezeTag) {
         // Decrypt data
-        const decryptData = EncryptionManager.decryptString(freezeTag.replace("paradoxFreezeData:", ""), player.id);
+        const decryptData = (world as WorldExtended).decryptString(freezeTag.replace("paradoxFreezeData:", ""), player.id);
         const freezeTagDecrypt = `paradoxFreezeData:${decryptData}`;
         // Parse the tag to extract location and dimension information
         const tagParts = freezeTagDecrypt.split(":");
@@ -60,7 +60,7 @@ function unfreezePlayer(player: Player) {
                     dimension: world.getDimension(originalDimensionName),
                     rotation: player.getRotation(),
                     facingLocation: player.getViewDirection(),
-                    checkForBlocks: false,
+                    checkForBlocks: true,
                     keepVelocity: false,
                 });
             }
@@ -88,7 +88,7 @@ const freezePlayers = () => {
             let freezeDataTag = player.getTags().find((tag) => tag.startsWith("paradoxFreezeData:"));
             if (freezeDataTag) {
                 // Decrypt data
-                const decryptData = EncryptionManager.decryptString(freezeDataTag.replace("paradoxFreezeData:", ""), player.id);
+                const decryptData = (world as WorldExtended).decryptString(freezeDataTag.replace("paradoxFreezeData:", ""), player.id);
                 freezeDataTag = `paradoxFreezeData:${decryptData}`;
                 // Process data
                 const freezeData = freezeDataTag.split(":")[1];
@@ -101,7 +101,7 @@ const freezePlayers = () => {
                         dimension: world.getDimension(originalDimension as string),
                         rotation: player.getRotation(),
                         facingLocation: player.getViewDirection(),
-                        checkForBlocks: false,
+                        checkForBlocks: true,
                         keepVelocity: false,
                     });
                 }
@@ -119,17 +119,17 @@ const freezePlayers = () => {
             }
 
             const combinations: Record<string, string> = {
-                "111": "§fContact Staff §4[§6NA§4]§f§4[§6KA§4]§f§4[§6AS§4]§f", // Aura + Nuker + Scaffold
-                "110": "§fContact Staff §4[§6NA§4]§f§4[§6KA§4]§f", // Aura + Nuker
-                "101": "§fContact Staff §4[§6NA§4]§f§4[§6AS§4]§f", // Aura + Scaffold
-                "011": "§fContact Staff §4[§6KA§4]§f§4[§6AS§4]§f", // Nuker + Scaffold
-                "000": "§fContact Staff §4[§6Command§4]§f", // Other cases
+                "111": "§fスタッフに連絡 §4[§6NA§4]§f§4[§6KA§4]§f§4[§6AS§4]§f", // Aura + Nuker + Scaffold
+                "110": "§fスタッフに連絡 §4[§6NA§4]§f§4[§6KA§4]§f", // Aura + Nuker
+                "101": "§fスタッフに連絡 §4[§6NA§4]§f§4[§6AS§4]§f", // Aura + Scaffold
+                "011": "§fスタッフに連絡 §4[§6KA§4]§f§4[§6AS§4]§f", // Nuker + Scaffold
+                "000": "§fスタッフに連絡§4[§6Command§4]§f", // Other cases
             };
 
             const combinationKey = (hasAuraTag ? "1" : "0") + (hasNukerTag ? "1" : "0") + (hasScaffoldTag ? "1" : "0");
             const title = { subtitle: combinations[combinationKey] || combinations["000"] };
 
-            player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f Frozen!", {
+            player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f 凍結!", {
                 ...title,
                 fadeInDuration: 0,
                 fadeOutDuration: 0,
@@ -160,7 +160,7 @@ export const freezeLeave = (): void => {
             ?.hasTag("paradoxFreeze");
 
         if (hasFreezeTag) {
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${event.playerName}§f was frozen and left the server.`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f§7${event.playerName}§f がフリーズし、サーバーを離れました。`);
         }
     });
 };
@@ -175,7 +175,7 @@ export const freezeJoin = (): void => {
             ?.hasTag("paradoxFreeze");
 
         if (hasFreezeTag) {
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${event.playerName}§f was frozen and returned to the server.`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${event.playerName}§f がフリーズし、サーバーに返されました.`);
         }
     });
 };

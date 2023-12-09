@@ -14,7 +14,7 @@ import { paradoxui } from "../paradoxui.js";
 export function uiDESPAWNER(despawnerResult: ModalFormResponse, player: Player) {
     handleUIDespawner(despawnerResult, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -27,42 +27,43 @@ export function uiDESPAWNER(despawnerResult: ModalFormResponse, player: Player) 
 
 async function handleUIDespawner(despawnerResult: ModalFormResponse, player: Player) {
     if (!despawnerResult || despawnerResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [entityValue, DespawnAllToggle] = despawnerResult.formValues;
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはパラドックス・オップされる必要がある。`);
     }
-    // try to find the entity or despawn them all if requested
+
+    // エンティティを見つけるか、要求があればすべてをデスポーンしてみる。
     const filter: EntityQueryOptions = {
         excludeTypes: ["player"],
     };
     const filteredEntities = world.getDimension("overworld").getEntities(filter);
     if (DespawnAllToggle === false) {
-        // Specified entity
+        // 特定団体
         let counter = 0;
         let requestedEntity: string = "";
         for (const entity of filteredEntities) {
             const filteredEntity = entity.typeId.replace("minecraft:", "");
             requestedEntity = (entityValue as string).replace("minecraft:", "");
-            // If an entity was specified then handle it here
+            // エンティティが指定された場合は、ここでそれを処理する。
             if (filteredEntity === requestedEntity || filteredEntity === entityValue) {
                 counter = ++counter;
-                // Despawn this entity
-                entity.triggerEvent("paradox:kick");
+                // このエンティティをデスポーンする
+                entity.remove();
                 continue;
-                // If all entities were specified then handle this here
+                // すべてのエンティティが指定された場合、ここでこれを処理する。
             }
         }
         if (counter > 0) {
-            sendMsgToPlayer(player, ` §o§6|§f §4[§f${requestedEntity}§4]§f §6匹: §4x${counter}§f`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Despawned:\n\n §o§6|§f §4[§f${requestedEntity}§4]§f §6Amount: §4x${counter}§f`);
         } else {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 指定したモブが見つかりません!`);
+            sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f デスポーンする実体が見つからない！`);
         }
     }
     if (DespawnAllToggle === true) {
@@ -81,8 +82,8 @@ async function handleUIDespawner(despawnerResult: ModalFormResponse, player: Pla
             } else {
                 entityCount[filteredEntity]++;
             }
-            // Despawn this entity
-            entity.triggerEvent("paradox:kick");
+            // このエンティティをデスポーンする
+            entity.remove();
         }
         let totalCounter = 0;
         let entityMessage = "";
@@ -90,16 +91,16 @@ async function handleUIDespawner(despawnerResult: ModalFormResponse, player: Pla
             if (entityCount.hasOwnProperty(entity)) {
                 const count = entityCount[entity];
                 if (count > 0) {
-                    entityMessage += ` §o§6|§f §4[§f${entity}§4]§f §6匹: §4x${count}§f\n`;
+                    entityMessage += ` §o§6|§f §4[§f${entity}§4]§f §6Amount: §4x${count}§f\n`;
                     totalCounter += count;
                 }
             }
         }
         if (totalCounter > 0) {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f kill:`);
+            sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f デスポーンした：`);
             sendMsgToPlayer(player, entityMessage);
         } else {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f モブが見つかりません`);
+            sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f デスポーンする実体が見つからない！`);
         }
     }
     return paradoxui;

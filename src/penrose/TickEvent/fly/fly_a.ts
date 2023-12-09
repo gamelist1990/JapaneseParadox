@@ -1,24 +1,139 @@
-import { world, EntityQueryOptions, GameMode, system, Vector3, PlayerLeaveAfterEvent } from "@minecraft/server";
+import { world, EntityQueryOptions, GameMode, system, Vector3, PlayerLeaveAfterEvent, Player } from "@minecraft/server";
 import { flag } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
+import { MinecraftBlockTypes } from "../../../node_modules/@minecraft/vanilla-data/lib/index.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
-const playersOldCoordinates = new Map<string, Vector3>();
-const playersAirTimeStart = new Map<string, number>();
+interface PlayerData {
+    fallingData: boolean[]; // Array to record falling behavior
+    surroundedByAirData: boolean[]; // Array to record surrounded-by-air data
+}
+
+const playerDataMap = new Map<string, PlayerData>();
 
 function onPlayerLogout(event: PlayerLeaveAfterEvent): void {
     // Remove the player's data from the map when they log off
     const playerName = event.playerId;
-    playersOldCoordinates.delete(playerName);
-    playersAirTimeStart.delete(playerName);
+    playerDataMap.delete(playerName);
+}
+
+function getRandomOffset(): number {
+    // Generate a random offset in the range [-10, 10]
+    return Math.random() * 20 - 10;
+}
+
+function getRandomizedCoordinates(player: Player): Vector3 {
+    const { x, y, z } = player.location;
+
+    // Randomize coordinates within a radius of 10
+    const randomizedX = x + getRandomOffset();
+    const randomizedY = y + getRandomOffset();
+    const randomizedZ = z + getRandomOffset();
+
+    return { x: randomizedX, y: randomizedY, z: randomizedZ };
+}
+
+function recordFallingBehavior(playerId: string, isFalling: boolean) {
+    if (!playerDataMap.has(playerId)) {
+        playerDataMap.set(playerId, {
+            fallingData: [],
+            surroundedByAirData: [],
+        });
+    }
+
+    const playerData = playerDataMap.get(playerId);
+    playerData.fallingData.push(isFalling);
+}
+
+function recordSurroundedByAir(playerId: string, isSurroundedByAir: boolean) {
+    if (playerDataMap.has(playerId)) {
+        const playerData = playerDataMap.get(playerId);
+        playerData.surroundedByAirData.push(isSurroundedByAir);
+    }
+}
+
+function analyzePlayerData(player: Player) {
+    const playerData = playerDataMap.get(player.id);
+    if (!playerData) return;
+
+    let isPotentialFlying = false;
+
+    const fallingData = playerData.fallingData;
+    const surroundedByAirData = playerData.surroundedByAirData;
+
+    const minDataCount = 3;
+    if (fallingData.length < minDataCount || surroundedByAirData.length < minDataCount) {
+        return;
+    }
+
+    const fallingCount = fallingData.filter((isFalling) => isFalling).length;
+    const airCount = surroundedByAirData.filter((isSurroundedByAir) => isSurroundedByAir).length;
+
+    // Adjust threshold based on observation
+    const threshold = 2;
+
+    if (fallingCount - airCount >= threshold) {
+        // Majority indicates falling
+        // Set isPotentialFlying to false
+        isPotentialFlying = false;
+    } else if (airCount - fallingCount >= threshold) {
+        // Majority indicates surrounded by air (potential flying)
+        // Set isPotentialFlying to true
+        isPotentialFlying = true;
+    }
+
+    fallingData.shift();
+    surroundedByAirData.shift();
+
+    if (isPotentialFlying) {
+        // Take appropriate action
+        handlePotentialFlying(player);
+    }
+}
+
+function checkSurroundedByAir(player: Player): boolean {
+    const { x, y, z } = player.location;
+
+    for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+            for (let dz = -1; dz <= 1; dz++) {
+                const block = player.dimension.getBlock({ x: x + dx, y: y + dy, z: z + dz });
+
+                if (block.typeId !== MinecraftBlockTypes.Air) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+function handlePotentialFlying(player: Player): void {
+    try {
+        // Teleport the player to randomized coordinates within a radius of 10
+        const randomizedCoords = getRandomizedCoordinates(player);
+        player.teleport(randomizedCoords, {
+            dimension: player.dimension,
+            rotation: { x: 0, y: 0 },
+            facingLocation: { x: 0, y: 0, z: 0 },
+            checkForBlocks: true,
+            keepVelocity: false,
+        });
+
+        // Flag the player
+        flag(player, "Fly", "A", "Exploit", null, null, null, null, false);
+    } catch (error) {
+        // Handle teleportation error
+    }
 }
 
 function flya(id: number) {
     // Get Dynamic Property
-    const flyABoolean = dynamicPropertyRegistry.get("flya_b");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const flyABoolean = configuration.modules.flyA.enabled;
     // Unsubscribe if disabled in-game
     if (flyABoolean === false) {
-        playersOldCoordinates.clear();
-        playersAirTimeStart.clear();
         world.afterEvents.playerLeave.unsubscribe(onPlayerLogout);
         system.clearRun(id);
         return;
@@ -31,93 +146,30 @@ function flya(id: number) {
     // run as each player who are in survival
     for (const player of filteredPlayers) {
         // Get unique ID
-        const uniqueId = dynamicPropertyRegistry.get(player?.id);
+        const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
         // Skip if they have permission
         if (uniqueId === player.name) {
             continue;
         }
-        const jumpCheck = player.isJumping;
-        if (jumpCheck && !playersAirTimeStart.has(player.id)) {
-            playersAirTimeStart.set(player.id, Date.now());
-        }
-        const groundCheck = player.isOnGround;
-        if (groundCheck) {
-            playersAirTimeStart.set(player.id, Date.now());
-            continue;
-        }
-        const glideCheck = player.isGliding;
-        if (glideCheck) {
-            playersAirTimeStart.set(player.id, Date.now());
-            continue;
-        }
+
         const fallCheck = player.isFalling;
         if (fallCheck) {
-            // Player is falling, subtract a specified amount of time from the air time
-            const airTimeStart = playersAirTimeStart.get(player.id);
-            if (airTimeStart) {
-                const newAirTimeStart = Math.max(airTimeStart - 500, 0); // Subtract 500 milliseconds (adjust as needed) and ensure it's not negative
-                playersAirTimeStart.set(player.id, newAirTimeStart);
-            }
-            continue;
+            // Record falling data
+            recordFallingBehavior(player.id, true);
+
+            // Record if surrounded by air
+            const isSurroundedByAir = checkSurroundedByAir(player);
+            recordSurroundedByAir(player.id, isSurroundedByAir);
+        } else {
+            recordFallingBehavior(player.id, false);
+
+            // Record if surrounded by air
+            const isSurroundedByAir = checkSurroundedByAir(player);
+            recordSurroundedByAir(player.id, isSurroundedByAir);
         }
-        const waterCheck = player.isInWater || player.isSwimming;
-        if (waterCheck) {
-            // Player is falling, ignore them
-            playersAirTimeStart.set(player.id, Date.now());
-            continue;
-        }
-        if (!jumpCheck && playersAirTimeStart.has(player.id)) {
-            const airTime = Date.now() - playersAirTimeStart.get(player.id);
-            if (airTime >= 4000) {
-                const velocity = player.getVelocity();
-                const horizontalVelocity = { x: velocity.x, y: 0, z: velocity.z };
-                const xyVelocity = Math.hypot(horizontalVelocity.x, horizontalVelocity.y).toFixed(4);
-                const zyVelocity = Math.hypot(horizontalVelocity.z, horizontalVelocity.y).toFixed(4);
-                if (Number(xyVelocity) > 0 || Number(zyVelocity) > 0) {
-                    const oldPlayerCoords = playersOldCoordinates.get(player.id);
-                    const playerX = Math.trunc(player.location.x);
-                    const playerY = Math.trunc(player.location.y);
-                    const playerZ = Math.trunc(player.location.z);
-                    playersOldCoordinates.set(player.id, { x: playerX, y: playerY, z: playerZ });
-                    if (oldPlayerCoords) {
-                        let isSurroundedByAir = true;
-                        for (let x = -1; x <= 1; x++) {
-                            for (let y = -1; y <= 1; y++) {
-                                for (let z = -1; z <= 1; z++) {
-                                    const block = player.dimension.getBlock({ x: player.location.x + x, y: player.location.y + y, z: player.location.z + z });
-                                    if (block.typeId !== "minecraft:air") {
-                                        isSurroundedByAir = false;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        if (isSurroundedByAir) {
-                            try {
-                                // Use try/catch since variables for cords could return undefined if player is loading in
-                                // and they meet the conditions. An example is them flagging this, logging off, then logging
-                                // back on again.
-                                player.teleport(
-                                    { x: oldPlayerCoords.x, y: oldPlayerCoords.y, z: oldPlayerCoords.z },
-                                    {
-                                        dimension: player.dimension,
-                                        rotation: { x: 0, y: 0 },
-                                        facingLocation: { x: 0, y: 0, z: 0 },
-                                        checkForBlocks: false,
-                                        keepVelocity: false,
-                                    }
-                                );
-                            } catch (error) {}
-                            flag(player, "Fly", "A", "Exploit", null, null, null, null, false);
-                        }
-                    }
-                }
-                const playerAnimation = player.isOnGround || player.isInWater || player.isSwimming;
-                if (playerAnimation) {
-                    playersAirTimeStart.delete(player.id);
-                }
-            }
-        }
+
+        // Analyze the player's data
+        analyzePlayerData(player);
     }
 }
 

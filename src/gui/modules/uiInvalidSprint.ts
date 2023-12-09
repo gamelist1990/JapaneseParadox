@@ -1,39 +1,41 @@
-import { Player, world } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { InvalidSprintA } from "../../penrose/TickEvent/invalidsprint/invalidsprint_a.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiINVALIDSPRINT(invalidsprintResult: ModalFormResponse, player: Player) {
     if (!invalidsprintResult || invalidsprintResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [InvalidSprintToggle] = invalidsprintResult.formValues;
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Get Dynamic Property Boolean
-
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to configure Invalid Sprint`);
+        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f 無効なスプリントを設定するには、パラドックス・オップである必要があります。`);
     }
+
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
     if (InvalidSprintToggle === true) {
-        // Allow
-        dynamicPropertyRegistry.set("invalidsprinta_b", true);
-        world.setDynamicProperty("invalidsprinta_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6InvalidSprintA§f!`);
+        // 許可する
+        configuration.modules.invalidsprintA.enabled = true;
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6InvalidSprintA§f!`);
         InvalidSprintA();
     }
 
     if (InvalidSprintToggle === false) {
-        dynamicPropertyRegistry.set("invalidsprinta_b", false);
-        world.setDynamicProperty("invalidsprinta_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4InvalidSprintA§f!`);
+        configuration.modules.invalidsprintA.enabled = false;
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4InvalidSprintA§f!`);
     }
 
-    //show the main ui to the player once complete.
+    //完了したら、プレイヤーにメインUIを表示する。
     return paradoxui(player);
 }

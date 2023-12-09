@@ -1,7 +1,8 @@
 import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
-import config from "../../data/config";
 import { getPrefix, sendMsgToPlayer, setTimer } from "../../util";
-import { EncryptionManager } from "../../classes/EncryptionManager";
+import { WorldExtended } from "../../classes/WorldExtended/World";
+import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry";
+import ConfigInterface from "../../interfaces/Config";
 
 interface TeleportRequest {
     requester: Player;
@@ -11,43 +12,43 @@ interface TeleportRequest {
 
 const teleportRequests: TeleportRequest[] = [];
 
-// This allows us to read from the teleportRequests array without
-// creating a memory leak by accidentally modifying its contents.
+// これにより、teleportRequests 配列から
+// その内容を誤って変更することで、メモリリークを引き起こす。
 export function getTeleportRequests(): TeleportRequest[] {
     return teleportRequests;
 }
 
-function tprHelp(player: Player, prefix: string) {
+function tprHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
-    if (!config.customcommands.tpr) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: tpr`,
+        `§n§o§4[§6コマンド§4]§f: tpr`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: tpr [optional]`,
-        `§4[§6Optional§4]§f: name, help`,
-        `§4[§6Description§4]§f: Will send requests to tp to players.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f: tpr [オプション］`,
+        `§4[§6オプション§4]§f: 名前、ヘルプ`,
+        `§4[§6解説§4]§f：プレイヤーにTPのリクエストを送る。`,
+        `§4[§6例§4]§f：`,
         `    ${prefix}tpr ${player.name}`,
-        `        §4- §6Send a teleport request to the specified player§f`,
+        `        §4- §6指定したプレイヤーにテレポート要請を出す§f`,
         `    ${prefix}tpr help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドを表示するヘルプ§f`,
     ]);
 }
 
-// This handles the submission of requests
-function teleportRequestHandler({ sender, message }: ChatSendAfterEvent) {
+// これはリクエストの提出を処理する。
+function teleportRequestHandler({ sender, message }: ChatSendAfterEvent, configuration: ConfigInterface) {
     const player = sender;
     const args = message.split(" ");
     if (args.length < 2) return;
 
-    // Extract the target name from the message, including the "@" symbol
+    // メッセージからターゲット名を取り出す。
     const targetName = args[1].trim();
 
-    // Try to find the player requested, including the "@" symbol
+    // 要求されたプレーヤーを"@"記号を含めて探してみる。
     let target: Player | undefined;
     const players = world.getPlayers();
     for (const pl of players) {
@@ -79,27 +80,34 @@ function teleportRequestHandler({ sender, message }: ChatSendAfterEvent) {
      * 60 minutes per hour, or 3600000 milliseconds per hour
      * 24 hours per day, or 86400000 milliseconds per day
      */
-    const { tprExpiration } = config.modules;
+    const { tprExpiration } = configuration.modules;
     const durationInMs = tprExpiration.seconds * 1000 + tprExpiration.minutes * 60000 + tprExpiration.hours * 3600000 + tprExpiration.days * 86400000;
 
     teleportRequests.push({
         requester: player,
         target,
-        expiresAt: Date.now() + durationInMs, // Expires in the time specified in 'durationInMs'
+        expiresAt: Date.now() + durationInMs, // Expires in the time specified in '継続時間'
     });
 
     sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Teleport request sent to §7${target.name}§f. Waiting for approval...`);
     sendMsgToPlayer(target, `§f§4[§6Paradox§4]§f You have received a teleport request from §7${player.name}§f. Type '§7approved§f' or '§7denied§f' in chat to respond.`);
 }
 
-// This handles requests pending approval
+// 承認待ちのリクエストを処理します。
 function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
     const { sender, message } = object;
-
-    const lowercaseMessage = EncryptionManager.decryptString(message, sender.id).toLowerCase();
-    // Extract the response from the decrypted string
-    const refChar = lowercaseMessage.split("§r");
-    const extractedPhrase = refChar[1];
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    let lowercaseMessage: string;
+    let refChar: string[];
+    let extractedPhrase: string;
+    if (configuration.modules.chatranks.enabled) {
+        lowercaseMessage = (world as WorldExtended).decryptString(message, sender.id).toLowerCase();
+        // 復号化された文字列からレスポンスを取り出す
+        refChar = lowercaseMessage.split("§r");
+        extractedPhrase = refChar[1];
+    } else {
+        extractedPhrase = message;
+    }
     const isApprovalRequest = extractedPhrase === "approved" || extractedPhrase === "approve";
     const isDenialRequest = extractedPhrase === "denied" || extractedPhrase === "deny";
 
@@ -111,9 +119,9 @@ function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
 
     object.sendToTargets = true;
 
-    // Target is the player with the request and player is the same target responding to the request
+    // ターゲットはリクエストしたプレーヤー、プレーヤーはリクエストに応答した同じターゲットである。
     const requestIndex = teleportRequests.findIndex((r) => r.target === player);
-    // Target doesn't exist so return
+    // ターゲットは存在しない。
     if (requestIndex === -1) return;
 
     const request = teleportRequests[requestIndex];
@@ -126,7 +134,13 @@ function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
 
     if (isApprovalRequest) {
         setTimer(request.requester.id);
-        request.requester.teleport(request.target.location, { dimension: request.target.dimension, rotation: { x: 0, y: 0 }, facingLocation: { x: 0, y: 0, z: 0 }, checkForBlocks: false, keepVelocity: false });
+        request.requester.teleport(request.target.location, {
+            dimension: request.target.dimension,
+            rotation: { x: 0, y: 0 },
+            facingLocation: { x: 0, y: 0, z: 0 },
+            checkForBlocks: true,
+            keepVelocity: false,
+        });
         sendMsgToPlayer(request.requester, `§f§4[§6Paradox§4]§f Teleport request to §7${request.target.name}§f is approved.`);
     } else {
         sendMsgToPlayer(request.requester, `§f§4[§6Paradox§4]§f Teleport request to §7${request.target.name}§f is denied.`);
@@ -136,37 +150,39 @@ function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
 }
 
 export function TeleportRequestHandler({ sender, message }: ChatSendAfterEvent, args: string[]) {
-    // Validate that required params are defined
+    // 必要なパラメータが定義されていることを検証する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? ./commands/utility/tpr.js:71)");
     }
 
     const player = sender;
 
-    // Check for custom prefix
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Are there arguements
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // 反論はあるか
     if (!args.length) {
-        return tprHelp(player, prefix);
+        return tprHelp(player, prefix, configuration.customcommands.tpr);
     }
 
-    // Was help requested
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.tpr) {
-        return tprHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.tpr) {
+        return tprHelp(player, prefix, configuration.customcommands.tpr);
     }
 
-    // Handle submitted requests here
+    // 提出されたリクエストはここで扱う
     if (message.startsWith(`${prefix}tpr`)) {
         const event = {
             sender,
             message,
         } as ChatSendAfterEvent;
-        teleportRequestHandler(event);
+        teleportRequestHandler(event, configuration);
     }
 
-    // This is for the GUI when sending approvals or denials
+    // これは承認または拒否を送信する際のGUI用である。
     const validMessages = ["approved", "approve", "denied", "deny"];
 
     if (validMessages.some((msg) => msg === message)) {
@@ -178,10 +194,11 @@ export function TeleportRequestHandler({ sender, message }: ChatSendAfterEvent, 
     }
 }
 
-// Subscribe to teleportRequestApprovalHandler
+// teleportRequestApprovalHandler にサブスクライブする。
 const TpRequestListener = () => {
-    // If TPR is not disabled
-    const validate = config.customcommands.tpr;
+    // TPRが無効でない場合
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const validate = configuration.customcommands.tpr;
     if (validate) {
         world.afterEvents.chatSend.subscribe(teleportRequestApprovalHandler);
     }

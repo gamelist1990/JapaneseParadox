@@ -1,15 +1,17 @@
 import { Player, world } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 import { sendMsgToPlayer } from "../../../util";
-import config from "../../../data/config";
 import { uiSAVEDLOCATIONS } from "../../playerui/uiSavedLocations";
-import { EncryptionManager } from "../../../classes/EncryptionManager";
+import { WorldExtended } from "../../../classes/WorldExtended/World";
+import ConfigInterface from "../../../interfaces/Config";
+import { dynamicPropertyRegistry } from "../../../penrose/WorldInitializeAfterEvent/registry";
 
 export function locationHandler(player: Player) {
     //No Opped Menu to show Saved Locations
     const savedlocationsui = new ModalFormData();
     // Hash the coordinates for security
     const salt = world.getDynamicProperty("crypt");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const tags = player.getTags();
     const tagsLength = tags.length;
     let counter = 0;
@@ -18,7 +20,7 @@ export function locationHandler(player: Player) {
     for (let i = 0; i < tagsLength; i++) {
         if (tags[i].startsWith("1337")) {
             // Decode it so we can verify it
-            tags[i] = EncryptionManager.decryptString(tags[i], salt as string);
+            tags[i] = (world as WorldExtended).decryptString(tags[i], salt as string);
             // If invalid then skip it
             if (tags[i].startsWith("LocationHome:") === false) {
                 continue;
@@ -49,7 +51,7 @@ export function locationHandler(player: Player) {
     savedlocationsui.toggle("選択した座標にTP【使う時オン】", false);
     savedlocationsui.toggle("選択した座標を削除します【消すときだけオンにしてね】", false);
     savedlocationsui.textField("ここの下に名前を入れると今いる座標が保存されます【例:home】", "");
-    if (config.customcommands.sethome === true && config.customcommands.delhome === true && config.customcommands.listhome === true && config.customcommands.gohome === true) {
+    if (configuration.customcommands.sethome === true && configuration.customcommands.delhome === true && configuration.customcommands.listhome === true && configuration.customcommands.gohome === true) {
         savedlocationsui
             .show(player)
             .then((savedlocationsResult) => {

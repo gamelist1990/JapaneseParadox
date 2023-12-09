@@ -1,27 +1,27 @@
 import { ChatSendAfterEvent, Player } from "@minecraft/server";
-import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import { MinecraftEffectTypes } from "../../node_modules/@minecraft/vanilla-data/lib/index.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
-function vanishHelp(player: Player, prefix: string) {
+function vanishHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
-    if (!config.customcommands.vanish) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: vanish`,
+        `\n§o§4[§6 コマンド§4]§f: vanish`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: vanish [optional]`,
-        `§4[§6Optional§4]§f: help`,
-        `§4[§6Description§4]§f: Turns the player invisible to monitor online player's.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f: vanish [オプション].`,
+        `§4[§6オプション§4]§f: ヘルプ`,
+        `§4[§6解説§4]§f：オンラインプレイヤーを監視するためにプレイヤーを透明化する。`,
+        `§4[§6例§4]§f：`,
         `    ${prefix}vanish`,
-        `        §4- §6Turns the player invisible to other players§f`,
+        `        §4- §6他のプレイヤーから見えなくなる§f`,
         `    ${prefix}vanish help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドを表示するヘルプ§f`,
     ]);
 }
 
@@ -33,7 +33,7 @@ function vanishHelp(player: Player, prefix: string) {
 export function vanish(message: ChatSendAfterEvent, args: string[]) {
     handleVanish(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -45,28 +45,30 @@ export function vanish(message: ChatSendAfterEvent, args: string[]) {
 }
 
 async function handleVanish(message: ChatSendAfterEvent, args: string[]) {
-    // validate that required params are defined
+    // 必要なパラメータが定義されていることを確認する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./utility/vanish.js:26)");
     }
 
     const player = message.sender;
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
     }
 
-    // Check for custom prefix
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Was help requested
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.vanish) {
-        return vanishHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.vanish) {
+        return vanishHelp(player, prefix, configuration.customcommands.vanish);
     }
 
     const vanishBoolean = player.hasTag("vanish");
@@ -74,18 +76,18 @@ async function handleVanish(message: ChatSendAfterEvent, args: string[]) {
     if (vanishBoolean) {
         player.removeTag("vanish");
         player.triggerEvent("unvanish");
-        // Remove effects
+        // 効果を取り除く
         const effectsToRemove = [MinecraftEffectTypes.Invisibility, MinecraftEffectTypes.NightVision];
 
         for (const effectType of effectsToRemove) {
             player.removeEffect(effectType);
         }
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You are no longer vanished.`);
-        sendMsg(`@a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f §7${player.name}§f is no longer in vanish.`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fもはやあなたは消えていない。`);
+        sendMsg(`a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f §7${player.name}§f is no longer in vanish.`);
     } else {
         player.addTag("vanish");
         player.triggerEvent("vanish");
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You are now vanished!`);
-        sendMsg(`@a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f §7${player.name}§f is now vanished!`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたは今、消滅した！`);
+        sendMsg(`a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f §7${player.name}§f is now vanished!`);
     }
 }

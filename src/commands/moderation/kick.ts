@@ -1,30 +1,30 @@
 import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
-import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
-function kickHelp(player: Player, prefix: string) {
+function kickHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
-    if (!config.customcommands.kick) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: kick`,
+        `\nプレイヤーをキックする。`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: kick [optional]`,
-        `§4[§6Optional§4]§f: username, reason, help`,
-        `§4[§6Description§4]§f: Kick the specified user and optionally gives a reason.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f: キック [オプション].`,
+        `§4[§6オプション§4]§f: ユーザー名、理由、ヘルプ`,
+        `§4[§6Description§4]§f：指定されたユーザをキックし、オプションで理由を与える。`,
+        `§4[§6例§4]§f：`,
         `    ${prefix}kick ${player.name}`,
-        `        §4- §6Kick ${player.name} without specifying a reason§f`,
+        `        §4- §6理由を指定せずに${player.name}をキック§f`,
         `    ${prefix}kick ${player.name} Hacker!`,
-        `        §4- §6Kick ${player.name} with the reason "Hacker!"§f`,
+        `        §4- §6理由"Hacker!"で${player.name}をキック§f`,
         `    ${prefix}kick ${player.name} Stop trolling!`,
-        `        §4- §6Kick ${player.name} with the reason "Stop trolling!"§f`,
+        `        §4- §6理由"Stop trolling!"で${player.name}をキック§f`,
         `    ${prefix}kick help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドのヘルプを表示§f`,
     ]);
 }
 
@@ -36,7 +36,7 @@ function kickHelp(player: Player, prefix: string) {
 export function kick(message: ChatSendAfterEvent, args: string[]) {
     handleKick(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -48,52 +48,54 @@ export function kick(message: ChatSendAfterEvent, args: string[]) {
 }
 
 async function handleKick(message: ChatSendAfterEvent, args: string[]) {
-    // validate that required params are defined
+    // 必要なパラメータが定義されていることを確認する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/moderation/kick.js:33)");
     }
 
     const player = message.sender;
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
     }
 
-    // Check for custom prefix
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Was help requested
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.kick) {
-        return kickHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.kick) {
+        return kickHelp(player, prefix, configuration.customcommands.kick);
     }
 
-    // Are there arguements
+    // 反論はあるか
     if (!args.length) {
-        return kickHelp(player, prefix);
+        return kickHelp(player, prefix, configuration.customcommands.kick);
     }
 
-    // Modify the argument handling
+    // 引数処理の変更
     let playerName = args.shift();
     let reason = "No reason specified";
 
-    // Check if the command has a reason provided
+    // コマンドに理由があるかチェックする
     if (args.length > 1) {
-        // Remove double quotes from the reason if present
+        // 理由がある場合はダブルクォートを外す
         reason = args
             .slice(1)
             .join(" ")
             .replace(/(^"|"$)/g, "");
     }
 
-    // Remove double quotes from the player name if present
+    // 選手名にダブルクォーテーションがある場合は、それを削除する。
     playerName = playerName.replace(/(^"|"$)/g, "");
 
-    // try to find the player requested
+    // リクエストされた選手を探す
     let member: Player;
     const players = world.getPlayers();
     for (const pl of players) {
@@ -104,16 +106,16 @@ async function handleKick(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
     }
 
-    // make sure they dont kick themselves
+    // 自分たちで蹴らないようにする
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot kick yourself.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 自分を蹴ることはできない。`);
     }
     player.runCommandAsync(`kick "${member.name}" §f\n\n${reason}`).catch((error) => {
         console.warn(`${new Date()} | ` + error);
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f I was unable to kick that player!`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手を蹴ることができなかった．`);
     });
-    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has kicked §7${member.name}§f. Reason: §7${reason}§f`);
+    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f が§7${member.name}§f を蹴りました。理由 §7${reason}§f`);
 }

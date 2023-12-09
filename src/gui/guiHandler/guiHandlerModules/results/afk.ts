@@ -1,28 +1,29 @@
 import { Player } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
-import config from "../../../../data/config";
 import { dynamicPropertyRegistry } from "../../../../penrose/WorldInitializeAfterEvent/registry";
 import { uiAFK } from "../../../modules/uiAFK";
+import ConfigInterface from "../../../../interfaces/Config";
 
 export function afkHandler(player: Player) {
     const modulesafkui = new ModalFormData();
-    const currentAFKConifg = config.modules.afk.minutes;
-    const afkBoolean = dynamicPropertyRegistry.get("afk_b") as boolean;
-    modulesafkui.title("§4メニュー：AFK§4");
-    modulesafkui.toggle("放置しているユーザーをキック" + currentAFKConifg + " 一分:", afkBoolean);
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const currentAFKConifg = configuration.modules.afk.minutes;
+    const afkBoolean = configuration.modules.afk.enabled;
+    modulesafkui.title("§4AFKメニュー§4");
+    modulesafkui.toggle("AFKをBooleanにする - AFKしているプレーヤーをキックする。" + currentAFKConifg + "分：", afkBoolean);
     modulesafkui
         .show(player)
         .then((afkResult) => {
             uiAFK(afkResult, player);
         })
         .catch((error) => {
-            console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
+            console.error("パラドックスの未処理拒否：", error);
+            // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("Error originated from:", sourceInfo[0]);
+                    console.error("エラーの原因", sourceInfo[0]);
                 }
             }
         });

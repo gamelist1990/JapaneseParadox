@@ -1,7 +1,7 @@
 import { world, system, EntityQueryOptions, GameMode, PlayerLeaveAfterEvent, EntityHurtAfterEvent, PlayerSpawnAfterEvent } from "@minecraft/server";
-import config from "../../../data/config.js";
 import { flag, isTimerExpired } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
 // Create a Map to store each player's last known position, timestamp, and highest speed
 const playerData = new Map<string, { lastPosition: number[]; lastTimestamp: number; highestBps: number; lastHitTimestamp: number }>();
@@ -68,7 +68,8 @@ function calculateMovementBPS(currentPosition: number[], lastPosition: number[],
 
 function speeda(id: number) {
     // Get Dynamic Property
-    const speedABoolean = dynamicPropertyRegistry.get("speeda_b");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const speedABoolean = configuration.modules.speedA.enabled;
 
     // Unsubscribe if disabled in-game
     if (speedABoolean === false) {
@@ -87,7 +88,7 @@ function speeda(id: number) {
     const filteredPlayers = world.getPlayers(filter);
     for (const player of filteredPlayers) {
         // Get unique ID
-        const uniqueId = dynamicPropertyRegistry.get(player?.id);
+        const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
         // Skip if they have permission
         if (uniqueId === player.name) {
@@ -137,7 +138,7 @@ function speeda(id: number) {
 
         const verifyTpGrace = isTimerExpired(player.id);
         // We compare with a 20% buffer to minimize false flags
-        if (!isNaN(playerInfo.highestBps) && playerInfo.highestBps > config.modules.speedA.speed && verifyTpGrace === true) {
+        if (!isNaN(playerInfo.highestBps) && playerInfo.highestBps > configuration.modules.speedA.speed && verifyTpGrace === true) {
             flag(player, "Speed", "A", "Movement", null, null, "IllegalSpeed", playerInfo.highestBps.toFixed(2), true);
             playerInfo.highestBps = 0;
         }

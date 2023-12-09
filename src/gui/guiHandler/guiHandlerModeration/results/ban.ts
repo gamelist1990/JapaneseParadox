@@ -3,28 +3,28 @@ import { ModalFormData } from "@minecraft/server-ui";
 import { uiBAN } from "../../../moderation/uiBan";
 
 export function banHandler(player: Player) {
-    //show ban ui here
+    //ここにバンを表示する
     const banui = new ModalFormData();
     let onlineList: string[] = [];
 
-    banui.title("§4メニュー：ユーザーをBANします§4");
+    banui.title("§4Ban A Playerメニュー§4");
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    banui.dropdown(`\n§fBANするユーザーを選択§f\n\n以下のプレイヤーがオンラインです\n`, onlineList);
-    banui.textField(`BAN理由:`, `理由入力.`);
+    banui.dropdown(`\n§f指定したユーザーをBan:§f\n\n以下のプレイヤーがオンラインです\n`, onlineList);
+    banui.textField(`理由`, `理由を入力してください。`);
     banui
         .show(player)
         .then((banResult) => {
-            //ban function goes here
+            //禁止機能はここにある
             uiBAN(banResult, onlineList, player);
         })
         .catch((error) => {
-            console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
+            console.error("パラドックスの未処理拒否：", error);
+            // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("Error originated from:", sourceInfo[0]);
+                    console.error("エラーの原因", sourceInfo[0]);
                 }
             }
         });

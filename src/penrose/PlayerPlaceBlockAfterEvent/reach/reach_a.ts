@@ -1,16 +1,26 @@
-import { world, PlayerPlaceBlockAfterEvent, Vector3 } from "@minecraft/server";
-import config from "../../../data/config.js";
+import { world, PlayerPlaceBlockAfterEvent, Vector3, PlayerPlaceBlockBeforeEvent, PlayerLeaveAfterEvent } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 import { flag } from "../../../util.js";
 import { MinecraftBlockTypes } from "../../../node_modules/@minecraft/vanilla-data/lib/index.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
-function afterreacha(object: PlayerPlaceBlockAfterEvent, blockPlaceReachData: Map<string, { blockLocation: Vector3; playerLocation: Vector3 }>, playerPlaceBlockCallback: (arg: PlayerPlaceBlockAfterEvent) => void) {
+function afterreacha(
+    object: PlayerPlaceBlockAfterEvent,
+    blockPlaceReachData: Map<string, { blockLocation: Vector3; playerLocation: Vector3 }>,
+    afterPlayerPlaceCallback: (arg: PlayerPlaceBlockAfterEvent) => void,
+    beforePlayerPlaceCallback: (arg: PlayerPlaceBlockBeforeEvent) => void,
+    afterPlayerLeaveCallback: (arg: PlayerLeaveAfterEvent) => void
+) {
     // Get Dynamic Property
-    const reachABoolean = dynamicPropertyRegistry.get("reacha_b");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const reachABoolean = configuration.modules.reachA.enabled;
 
     // Unsubscribe if disabled in-game
     if (reachABoolean === false) {
-        world.afterEvents.playerPlaceBlock.unsubscribe(playerPlaceBlockCallback);
+        blockPlaceReachData.clear();
+        world.afterEvents.playerLeave.unsubscribe(afterPlayerLeaveCallback);
+        world.beforeEvents.playerPlaceBlock.unsubscribe(beforePlayerPlaceCallback);
+        world.afterEvents.playerPlaceBlock.unsubscribe(afterPlayerPlaceCallback);
         return;
     }
 
@@ -18,7 +28,7 @@ function afterreacha(object: PlayerPlaceBlockAfterEvent, blockPlaceReachData: Ma
     const { block, player, dimension } = object;
 
     // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
     // Skip if they have permission
     if (uniqueId === player.name) {
@@ -40,20 +50,20 @@ function afterreacha(object: PlayerPlaceBlockAfterEvent, blockPlaceReachData: Ma
     const distanceSquared = dx * dx + dy * dy + dz * dz;
     const roundedDistanceSquared = Math.floor(distanceSquared); // Round down the distanceSquared
 
-    if (roundedDistanceSquared > config.modules.reachA.reach * config.modules.reachA.reach) {
+    if (roundedDistanceSquared > configuration.modules.reachA.reach * configuration.modules.reachA.reach) {
         dimension.getBlock({ x: x, y: y, z: z }).setType(MinecraftBlockTypes.Air);
         flag(player, "Reach", "A", "Placement", null, null, "reach", Math.sqrt(distanceSquared).toFixed(3), false);
     }
-
-    world.afterEvents.playerPlaceBlock.unsubscribe(playerPlaceBlockCallback);
 }
 
-const AfterReachA = (blockPlaceReachData: Map<string, { blockLocation: Vector3; playerLocation: Vector3 }>) => {
-    const playerPlaceBlockCallback = (object: PlayerPlaceBlockAfterEvent) => {
-        afterreacha(object, blockPlaceReachData, playerPlaceBlockCallback);
-    };
-
-    world.afterEvents.playerPlaceBlock.subscribe(playerPlaceBlockCallback);
+const AfterReachA = (
+    object: PlayerPlaceBlockAfterEvent,
+    blockPlaceReachData: Map<string, { blockLocation: Vector3; playerLocation: Vector3 }>,
+    afterPlayerPlaceCallback: (arg: PlayerPlaceBlockAfterEvent) => void,
+    beforePlayerPlaceCallback: (arg: PlayerPlaceBlockBeforeEvent) => void,
+    afterPlayerLeaveCallback: (arg: PlayerLeaveAfterEvent) => void
+) => {
+    afterreacha(object, blockPlaceReachData, afterPlayerPlaceCallback, beforePlayerPlaceCallback, afterPlayerLeaveCallback);
 };
 
 export { AfterReachA };

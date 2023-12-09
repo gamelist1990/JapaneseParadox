@@ -1,13 +1,12 @@
 import { Player, world } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
-//import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
 
 export function uiBAN(banResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!banResult || banResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [value, textField] = banResult.formValues;
@@ -19,21 +18,21 @@ export function uiBAN(banResult: ModalFormResponse, onlineList: string[], player
             break;
         }
     }
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f自分自身には実行できません`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fプレイヤーをBANするにはパラドックス・オッ プする必要がある。`);
     }
 
-    //make sure the player doesnt ban themselfs
+    //プレーヤーが自分自身を追放しないようにする。
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者には実行できません`);
+        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f 自分自身を禁止することはできない。`);
     }
-    // Make sure the reason is not blank.
+    // 理由が空白でないことを確認してください。
     if (!textField) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 理由なしでBANできません`);
+        sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f 禁止の理由を含めなければならない!`);
         return paradoxui(player);
     }
 
@@ -42,9 +41,9 @@ export function uiBAN(banResult: ModalFormResponse, onlineList: string[], player
         member.addTag("By:" + player.name);
         member.addTag("isBanned");
     } catch (error) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ユーザーをBANできませんでした! エラー内容: ${error}`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f BANできませんでした Error: ${error}`);
         return paradoxui(player);
     }
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f が ${member.name}をBANしました§f. 理由: ${textField}`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f が §7${member.name}をBANしました§f. 理由: §7${textField}§f`);
     return paradoxui(player);
 }

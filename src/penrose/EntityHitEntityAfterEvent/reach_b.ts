@@ -1,7 +1,7 @@
 import { world, Player, EntityHitEntityAfterEvent, system, PlayerLeaveAfterEvent } from "@minecraft/server";
-import config from "../../data/config.js";
 import { flag } from "../../util.js";
 import { dynamicPropertyRegistry } from "../WorldInitializeAfterEvent/registry.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
 // Store the previous locations and velocities of hitEntity and damagingEntity
 const previousData: Map<
@@ -33,7 +33,8 @@ function onPlayerLogout(event: PlayerLeaveAfterEvent | string): void {
 
 function reachb(object: EntityHitEntityAfterEvent) {
     // Get Dynamic Property
-    const reachBBoolean = dynamicPropertyRegistry.get("reachb_b");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const reachBBoolean = configuration.modules.reachB.enabled;
 
     // Unsubscribe if disabled in-game and stop the interval
     if (reachBBoolean === false) {
@@ -53,7 +54,7 @@ function reachb(object: EntityHitEntityAfterEvent) {
     }
 
     // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(damagingEntity?.id);
+    const uniqueId = dynamicPropertyRegistry.getProperty(damagingEntity, damagingEntity?.id);
 
     // Skip if they have permission
     if (uniqueId === damagingEntity.name) {
@@ -64,7 +65,7 @@ function reachb(object: EntityHitEntityAfterEvent) {
     const previousHitEntityData = previousData.get(hitEntity.id);
     const previousDamagingEntityData = previousData.get(damagingEntity.id);
 
-    if (previousHitEntityData && previousDamagingEntityData && isWithinReach(previousHitEntityData, previousDamagingEntityData, hitEntity.location, damagingEntity.location)) {
+    if (previousHitEntityData && previousDamagingEntityData && isWithinReach(previousHitEntityData, previousDamagingEntityData, hitEntity.location, damagingEntity.location, configuration)) {
         // Update the recorded data for hitEntity and damagingEntity
         recordPlayerData(hitEntity);
         recordPlayerData(damagingEntity);
@@ -79,7 +80,7 @@ function reachb(object: EntityHitEntityAfterEvent) {
 
     // Round down the reachDistance to the nearest integer
     const roundedReachDistance = Math.floor(reachDistance);
-    if (roundedReachDistance > config.modules.reachB.reach) {
+    if (roundedReachDistance > configuration.modules.reachB.reach) {
         // Flagging is done, now we can remove the player entity from previousData
         onPlayerLogout(damagingEntity.id);
         onPlayerLogout(hitEntity.id);
@@ -91,10 +92,17 @@ function reachb(object: EntityHitEntityAfterEvent) {
 }
 
 function isWithinReach(
-    previousHitEntityData: { location: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number } },
-    previousDamagingEntityData: { location: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number } },
+    previousHitEntityData: {
+        location: { x: number; y: number; z: number };
+        velocity: { x: number; y: number; z: number };
+    },
+    previousDamagingEntityData: {
+        location: { x: number; y: number; z: number };
+        velocity: { x: number; y: number; z: number };
+    },
     currentHitEntityLocation: { x: number; y: number; z: number },
-    currentDamagingEntityLocation: { x: number; y: number; z: number }
+    currentDamagingEntityLocation: { x: number; y: number; z: number },
+    configuration: ConfigInterface
 ): boolean {
     if (!previousHitEntityData || !previousDamagingEntityData) {
         return false;
@@ -105,7 +113,7 @@ function isWithinReach(
     const damagingEntityDistanceSquared = calculateDistanceSquared(previousDamagingEntityData.location, currentDamagingEntityLocation);
 
     // Compare the distances with the allowed distance squared
-    const allowedDistanceSquared = config.modules.reachB.reach;
+    const allowedDistanceSquared = configuration.modules.reachB.reach;
     return hitEntityDistanceSquared <= allowedDistanceSquared && damagingEntityDistanceSquared <= allowedDistanceSquared;
 }
 
@@ -117,8 +125,14 @@ function calculateDistanceSquared(position1: { x: number; y: number; z: number }
 }
 
 function calculateReachDistanceWithVelocity(
-    previousDamagingEntityData: { location: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number } },
-    previousHitEntityData: { location: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number } },
+    previousDamagingEntityData: {
+        location: { x: number; y: number; z: number };
+        velocity: { x: number; y: number; z: number };
+    },
+    previousHitEntityData: {
+        location: { x: number; y: number; z: number };
+        velocity: { x: number; y: number; z: number };
+    },
     currentDamagingEntityLocation: { x: number; y: number; z: number },
     currentHitEntityLocation: { x: number; y: number; z: number }
 ): number {

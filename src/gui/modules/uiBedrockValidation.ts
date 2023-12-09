@@ -1,39 +1,41 @@
-import { Player, world } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { BedrockValidate } from "../../penrose/TickEvent/bedrock/bedrockvalidate.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiBEDROCKVALIDATION(bedrockvalidationResult: ModalFormResponse, player: Player) {
     if (!bedrockvalidationResult || bedrockvalidationResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [BedrockValidationToggle] = bedrockvalidationResult.formValues;
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Get Dynamic Property Boolean
-
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to configure Bedrock Validation`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f岩盤検証の設定には Paradox-Opped が必要です。`);
     }
+
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
     if (BedrockValidationToggle === true) {
-        // Allow
-        dynamicPropertyRegistry.set("bedrockvalidate_b", true);
-        world.setDynamicProperty("bedrockvalidate_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6BedrockValidate§f!`);
+        // 許可する
+        configuration.modules.bedrockValidate.enabled = true;
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6BedrockValidate§f!`);
         BedrockValidate();
     }
     if (BedrockValidationToggle === false) {
-        // Deny
-        dynamicPropertyRegistry.set("bedrockvalidate_b", false);
-        world.setDynamicProperty("bedrockvalidate_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4BedrockValidate§f!`);
+        // 拒否する
+        configuration.modules.bedrockValidate.enabled = false;
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4BedrockValidate§f!`);
     }
 
-    //show the main ui to the player once complete.
+    //完了したら、プレイヤーにメインUIを表示する。
     return paradoxui(player);
 }

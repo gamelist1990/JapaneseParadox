@@ -15,7 +15,7 @@ import { ScoreManager } from "../../classes/ScoreManager.js";
 export function uiCOMMANDBLOCKS(commandblocksResult: ModalFormResponse, player: Player) {
     handleUICommandBlocks(commandblocksResult, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -28,15 +28,15 @@ export function uiCOMMANDBLOCKS(commandblocksResult: ModalFormResponse, player: 
 
 async function handleUICommandBlocks(commandblocksResult: ModalFormResponse, player: Player) {
     if (!commandblocksResult || commandblocksResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [CommandBlockOverrideToggle, RemoveCommandBlocksToggle] = commandblocksResult.formValues;
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Get Dynamic Property Boolean
-    //get the current scores
+    // ダイナミック・プロパティ・ブール値の取得
+    //現在のスコアを得る
     const cmdsscore = ScoreManager.getScore("cmds", player);
     const commandblocksscore = ScoreManager.getScore("commandblocks", player);
     let removecmdblocksBoolean;
@@ -55,32 +55,32 @@ async function handleUICommandBlocks(commandblocksResult: ModalFormResponse, pla
         removecmdblocksBoolean = true;
     }
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to configure Command Blocks`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fコマンドブロックを設定するには、パラドックス・オップである必要があります。`);
     }
     if (CommandBlockOverrideToggle === true && cmdoBoolean === false) {
-        // Allow
+        // 許可する
         player.runCommand(`scoreboard players set paradox:config cmds 1`);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f has set CommandBlocksEnabled as §6enabled§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has set CommandBlocksEnabled as §6enabled§f!`);
     }
     if (CommandBlockOverrideToggle === false && cmdoBoolean === true) {
-        // Deny
+        // 拒否する
         player.runCommand(`scoreboard players set paradox:config cmds 2`);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f has set CommandBlocksEnabled as §4disabled§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has set CommandBlocksEnabled as §4disabled§f!`);
     }
     player.runCommand(`scoreboard players operation @a cmds = paradox:config cmds`);
     if (RemoveCommandBlocksToggle === true && removecmdblocksBoolean === false) {
-        // Allow
+        // 許可する
         player.runCommand(`scoreboard players set paradox:config commandblocks 1`);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6Anti Command Blocks§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6Anti Command Blocks§f!`);
     }
     if (RemoveCommandBlocksToggle === false && removecmdblocksBoolean === true) {
-        // Deny
+        // 拒否する
         player.runCommand(`scoreboard players set paradox:config commandblocks 0`);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4Anti Command Blocks§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4Anti Command Blocks§f!`);
     }
     player.runCommand(`scoreboard players operation @a commandblocks = paradox:config commandblocks`);
-    //show the main ui to the player once complete.
+    //完了したら、プレイヤーにメインUIを表示する。
     return paradoxui(player);
 }

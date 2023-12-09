@@ -16,7 +16,7 @@ import { ModalFormResponse } from "@minecraft/server-ui";
 export function uiFREEZE(freezeResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUIFreeze(freezeResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -29,7 +29,7 @@ export function uiFREEZE(freezeResult: ModalFormResponse, onlineList: string[], 
 
 async function handleUIFreeze(freezeResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!freezeResult || freezeResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [value] = freezeResult.formValues;
@@ -41,35 +41,36 @@ async function handleUIFreeze(freezeResult: ModalFormResponse, onlineList: strin
             break;
         }
     }
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
-    // Make sure the user has permissions to run the command
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはパラドックス・オップされる必要がある。`);
     }
 
     const boolean = member.hasTag("paradoxFreeze");
 
     if (boolean) {
         member.removeTag("paradoxFreeze");
-        member.runCommand(`effect @s clear`);
-        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f あなたはフリーズから開放されました`);
-        sendMsg(`@a[tag=paradoxOpped]`, `${member.name}§f がフリーズから開放されたよ.`);
+        const effectsToRemove = [MinecraftEffectTypes.Blindness, MinecraftEffectTypes.MiningFatigue, MinecraftEffectTypes.Weakness, MinecraftEffectTypes.Slowness];
+
+        for (const effectType of effectsToRemove) {
+            member.removeEffect(effectType);
+        }
+        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§fあなたはもはや凍っていない。`);
+        sendMsg(`a[tag=paradoxOpped]`, `§7${member.name}§f フリーズが解かれました`);
         return;
     }
 
     if (!boolean) {
-        // Blindness
-        member.addEffect(MinecraftEffectTypes.Blindness, 1000000, { amplifier: 255, showParticles: true });
-        // Mining Fatigue
-        member.addEffect(MinecraftEffectTypes.MiningFatigue, 1000000, { amplifier: 255, showParticles: true });
-        // Weakness
-        member.addEffect(MinecraftEffectTypes.Weakness, 1000000, { amplifier: 255, showParticles: true });
-        // Slowness
-        member.addEffect(MinecraftEffectTypes.Slowness, 1000000, { amplifier: 255, showParticles: true });
+        const effectsToAdd = [MinecraftEffectTypes.Blindness, MinecraftEffectTypes.MiningFatigue, MinecraftEffectTypes.Weakness, MinecraftEffectTypes.Slowness];
+
+        for (const effectType of effectsToAdd) {
+            member.addEffect(effectType, 1000000, { amplifier: 255, showParticles: true });
+        }
         member.addTag("paradoxFreeze");
-        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f あなたはフリーズしました`);
-        sendMsg(`@a[tag=paradoxOpped]`, `${member.name}§f がフリーズしました.`);
+        sendMsgToPlayer(member, `§f§4[§6パラドックス§4]§f あなたは今凍っている。`);
+        sendMsg(`a[tag=paradoxOpped]`, `§7${member.name}§f 今あなたはフリーズしています.`);
         return;
     }
 

@@ -3,12 +3,12 @@ import { ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry";
 import { sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui";
-import { EncryptionManager } from "../../classes/EncryptionManager";
+import { WorldExtended } from "../../classes/WorldExtended/World";
 
 export function uiManagePlayerSavedLocations(managePlayerSavedLocationsUIResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -28,19 +28,19 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
             break;
         }
     }
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
-    // Make sure the user has permissions to run the command
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはパラドックス・オップされる必要がある。`);
     }
 
-    // Are they online?
+    // オンラインですか？
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
     }
 
-    //Grab the selected player saved locations.
+    //選択した選手の保存場所を取得する。
     const salt = world.getDynamicProperty("crypt");
     const tags = member.getTags();
     const tagsLength = tags.length;
@@ -49,18 +49,18 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
     const coordsArray: string[] = [];
     for (let i = 0; i < tagsLength; i++) {
         if (tags[i].startsWith("1337")) {
-            // Decode it so we can verify it
-            tags[i] = EncryptionManager.decryptString(tags[i], salt as string);
-            // If invalid then skip it
+            // それを検証するためにデコードする
+            tags[i] = (world as WorldExtended).decryptString(tags[i], salt as string);
+            // 無効な場合はスキップする
             if (tags[i].startsWith("LocationHome:") === false) {
                 continue;
             }
-            // Split string into array
+            // 文字列を配列に分割する
             const coordinatesArray = tags[i].split(" ");
             const coordArrayLength = coordinatesArray.length;
             counter = ++counter;
             for (let i = 0; i < coordArrayLength; i++) {
-                // Get their location from the array
+                // 配列から位置を取得する
                 coordsArray.push(coordinatesArray[i]);
                 if (coordinatesArray[i].includes("LocationHome:")) {
                     Locations.push(coordinatesArray[i].replace("LocationHome:", ""));
@@ -74,34 +74,34 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
         So if there is no data we push a line to keep the array with at least 1 value.
         If there are saved locations then it will continue as normal.
         */
-        Locations.push("このプレイヤーは座標を保存していません");
+        Locations.push("This player has not saved a Location");
     }
     /*no we have the selected player and have the locations in an array we will build a UI
     to show the player, where they can then remove the location if needed.
     */
     const managePlayerSavedLocationsUI = new ModalFormData();
-    managePlayerSavedLocationsUI.title(`§4メニュー - §6${member.name}'の座標`);
-    managePlayerSavedLocationsUI.dropdown(`\n§f座標を選択:§f\n\n以下の座標が保存されています\n`, Locations);
-    managePlayerSavedLocationsUI.toggle("座標を消去", false);
+    managePlayerSavedLocationsUI.title(`§4§6${member.name}'の §4座標！`);
+    managePlayerSavedLocationsUI.dropdown(`\n場所選択：§f 保存場所：§f`, Locations);
+    managePlayerSavedLocationsUI.toggle("消去", false);
     managePlayerSavedLocationsUI
         .show(player)
         .then((managePlayerSavedLocationsUIResult) => {
             const [selectedLocationvalue, deleteToggle] = managePlayerSavedLocationsUIResult.formValues;
             if (deleteToggle == true) {
                 const salt = world.getDynamicProperty("crypt");
-                // Find and delete this saved home location
+                // この保存されたホームロケーションを検索して削除する
                 let encryptedString: string = "";
                 const tags = member.getTags();
                 const tagsLength = tags.length;
                 for (let i = 0; i < tagsLength; i++) {
                     if (tags[i].startsWith("1337")) {
                         encryptedString = tags[i];
-                        // Decode it so we can verify it
-                        tags[i] = EncryptionManager.decryptString(tags[i], salt as string);
+                        // それを検証するためにデコードする
+                        tags[i] = (world as WorldExtended).decryptString(tags[i], salt as string);
                     }
                     if (tags[i].startsWith("LocationHome:" && Locations[selectedLocationvalue as number] + " X", 13)) {
                         member.removeTag(encryptedString);
-                        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ${member.name}の座標を消去しました　消去した座標＝＞ '${Locations[selectedLocationvalue as number]}'!`);
+                        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 座標を消去しました！！ '§7${Locations[selectedLocationvalue as number]}§f'!`);
                         break;
                     }
                 }
@@ -111,7 +111,7 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
         })
         .catch((error) => {
             console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
+            // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {

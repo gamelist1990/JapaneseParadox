@@ -4,23 +4,23 @@ import { uiEWIPE } from "../../../moderation/uiEwipe";
 
 export function ecwipeHandler(player: Player) {
     const ewipeui = new ModalFormData();
-    ewipeui.title("§4エンダーチェストの中身を消す§4");
+    ewipeui.title("§4Wipe A Player's Enderchestメニュー§4");
     let onlineList: string[] = [];
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    ewipeui.dropdown(`\n§f消したいプレイヤーを指定:§f\n\n以下のプレイヤーがオンラインです\n`, onlineList);
+    ewipeui.dropdown(`\n§f指定したユーザーをエンダーチェストを消す:§f\n\n以下のプレイヤーがオンラインです\n`, onlineList);
     ewipeui
         .show(player)
         .then((ewipeResult) => {
             uiEWIPE(ewipeResult, onlineList, player);
         })
         .catch((error) => {
-            console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
+            console.error("パラドックスの未処理拒否：", error);
+            // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("Error originated from:", sourceInfo[0]);
+                    console.error("エラーの原因", sourceInfo[0]);
                 }
             }
         });

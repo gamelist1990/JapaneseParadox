@@ -1,28 +1,28 @@
 import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
-import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
-function muteHelp(player: Player, prefix: string) {
+function muteHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
-    if (!config.customcommands.mute) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: mute`,
+        `\n§o§4[§6コマンド§4]§f：ミュート`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: mute [optional]`,
-        `§4[§6Optional§4]§f: mute, reason, help`,
-        `§4[§6Description§4]§f: Mutes the specified user and optionally gives reason.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f: ミュート [オプション］`,
+        `§4[§6オプション§4]§f: ミュート、理性、ヘルプ`,
+        `§4[§6Description§4]§f：指定されたユーザをミュートし、オプションで理由を与える。`,
+        `§4[§6例§4]§f：`,
         `    ${prefix}mute ${player.name}`,
-        `        §4- §6Mute ${player.name} without specifying a reason§f`,
+        `        §4- §6理由を指定せずに${player.name}をミュート§f`,
         `    ${prefix}mute ${player.name} Stop spamming!`,
-        `        §4- §6Mute ${player.name} with the reason "Stop spamming!"§f`,
+        `        §4- §6理由"Stop spamming!"で${player.name}をミュート§f`,
         `    ${prefix}mute help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドのヘルプを表示§f`,
     ]);
 }
 
@@ -34,7 +34,7 @@ function muteHelp(player: Player, prefix: string) {
 export function mute(message: ChatSendAfterEvent, args: string[]) {
     handleMute(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -46,52 +46,54 @@ export function mute(message: ChatSendAfterEvent, args: string[]) {
 }
 
 async function handleMute(message: ChatSendAfterEvent, args: string[]) {
-    // validate that required params are defined
+    // 必要なパラメータが定義されていることを確認する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? ./commands/moderation/mute.js:30)");
     }
 
     const player = message.sender;
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
     }
 
-    // Check for custom prefix
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Was help requested
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.mute) {
-        return muteHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.mute) {
+        return muteHelp(player, prefix, configuration.customcommands.mute);
     }
 
-    // Are there arguements
+    // 反論はあるか
     if (!args.length) {
-        return muteHelp(player, prefix);
+        return muteHelp(player, prefix, configuration.customcommands.mute);
     }
 
-    // Modify the argument handling
+    // 引数処理の変更
     let playerName = args.shift();
     let reason = "No reason specified";
 
-    // Check if the command has a reason provided
+    // コマンドに理由があるかチェックする
     if (args.length > 1) {
-        // Remove double quotes from the reason if present
+        // 理由がある場合はダブルクォートを外す
         reason = args
             .slice(1)
             .join(" ")
             .replace(/(^"|"$)/g, "");
     }
 
-    // Remove double quotes from the player name if present
+    // 選手名にダブルクォーテーションがある場合は、それを削除する。
     playerName = playerName.replace(/(^"|"$)/g, "");
 
-    // try to find the player requested
+    // リクエストされた選手を探す
     let member: Player;
     const players = world.getPlayers();
     for (const pl of players) {
@@ -102,29 +104,29 @@ async function handleMute(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
     }
 
-    // Get unique ID
-    const uniqueId2 = dynamicPropertyRegistry.get(member?.id);
+    // ユニークIDの取得
+    const uniqueId2 = dynamicPropertyRegistry.getProperty(member, member?.id);
 
-    // Make sure they dont mute themselves
+    // 自分たちがミュートにならないようにする
     if (uniqueId2 === uniqueId) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot mute yourself.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 自分自身を無言にすることはできない。`);
     }
 
-    // Make sure staff dont mute staff
+    // スタッフがミュートしないようにする
     if (uniqueId2 === member.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot mute staff players.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fスタッフプレイヤーをミュートすることはできません。`);
     }
 
-    // If not already muted then tag
+    // まだミュートされていなければ、タグを付ける
     if (!member.hasTag("isMuted")) {
         member.addTag("isMuted");
     } else {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f This player is already muted.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのプレイヤーは既にミュートされている。`);
     }
-    // If Education Edition is enabled then legitimately mute them
+    // エデュケーション・エディションがBooleanであれば、合法的にミュートする。
     member.runCommandAsync(`ability @s mute true`);
     sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You have been muted. Reason: §7${reason}§f`);
     return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has muted §7${member.name}§f. Reason: §7${reason}§f`);

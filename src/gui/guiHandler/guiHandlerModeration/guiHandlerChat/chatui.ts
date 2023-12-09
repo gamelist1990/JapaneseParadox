@@ -7,19 +7,19 @@ import { unmuteHandler } from "./results/unmute";
 import { clearChatHandler } from "./results/clearchat";
 
 export function chatui(player: Player) {
-    //show chat ui
+    //ショーチャットUI
     const chatui = new ActionFormData();
-    chatui.title("§4Paradox - Configure Chat§4");
-    chatui.body("§eSettings related to chat.§e");
-    chatui.button("Notify", "textures/ui/chat_send");
-    chatui.button("Ranks", "textures/ui/saleribbon");
-    chatui.button("Mute", "textures/ui/mute_on");
-    chatui.button("Unmute", "textures/ui/mute_off");
-    chatui.button("Clear Chat", "textures/ui/cancel");
+    chatui.title("§4Configure Chatメニュー§4");
+    chatui.body("§eチャットに関する設定.§e");
+    chatui.button("通知", "textures/ui/chat_send");
+    chatui.button("階級", "textures/ui/saleribbon");
+    chatui.button("ミュート", "textures/ui/mute_on");
+    chatui.button("ミュート解除", "textures/ui/mute_off");
+    chatui.button("クリア・チャット", "textures/ui/cancel");
     chatui
         .show(player)
         .then((chatResult) => {
-            // Use a switch statement to handle different selections
+            // switch文を使用して、異なる選択を処理する
             switch (chatResult.selection) {
                 case 0:
                     notifyHandler(player);
@@ -41,13 +41,13 @@ export function chatui(player: Player) {
             }
         })
         .catch((error) => {
-            console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
+            console.error("パラドックスの未処理拒否：", error);
+            // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("Error originated from:", sourceInfo[0]);
+                    console.error("エラーの原因", sourceInfo[0]);
                 }
             }
         });

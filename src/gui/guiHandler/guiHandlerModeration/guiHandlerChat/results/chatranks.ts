@@ -2,32 +2,34 @@ import { Player, world } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../../../../penrose/WorldInitializeAfterEvent/registry";
 import { uiCHATRANKS } from "../../../../moderation/uiChatranks";
+import ConfigInterface from "../../../../../interfaces/Config";
 
 export function chatRanksHandler(player: Player) {
-    //Chat Ranks ui
+    //チャットランク
     const chatranksui = new ModalFormData();
     let onlineList: string[] = [];
-    const chatRanksBoolean = dynamicPropertyRegistry.get("chatranks_b") as boolean;
-    chatranksui.title("§4Change A Player's Chat Rank§4");
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+    const chatranksBoolean = configuration.modules.chatranks.enabled;
+    chatranksui.title("§4Change A Player's Chat Rankメニュー§4");
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
     const predefinedrank: string[] = ["Owner", "Admin", "Mod", "Member"];
-    chatranksui.dropdown(`\n§fSelect a player to change their rank:§f\n\n以下のプレイヤーがオンラインです\n`, onlineList);
-    chatranksui.dropdown(`\n§fSelect a pre defined rank or you can set a custom on below:§f`, predefinedrank);
-    chatranksui.textField("Enter a custom Rank:", "VIP");
-    chatranksui.toggle("Chat Ranks - Enables or Disables chat ranks:", chatRanksBoolean);
+    chatranksui.dropdown(`\n§f指定したユーザーをchange their rank:§f\n\n以下のユーザーがオンラインです！\n`, onlineList);
+    chatranksui.dropdown(`\n§f事前に定義されたランクを選択するか、以下のカスタムランクを設定することができます。:§f`, predefinedrank);
+    chatranksui.textField("カスタムランクを入力してください：", "ビップ");
+    chatranksui.toggle("チャットランク - チャットランクをBooleanまたは無効にします：", chatranksBoolean);
     chatranksui
         .show(player)
         .then((chatranksResult) => {
             uiCHATRANKS(chatranksResult, onlineList, predefinedrank, player);
         })
         .catch((error) => {
-            console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
+            console.error("パラドックスの未処理拒否：", error);
+            // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("Error originated from:", sourceInfo[0]);
+                    console.error("エラーの原因", sourceInfo[0]);
                 }
             }
         });

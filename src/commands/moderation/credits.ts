@@ -1,26 +1,26 @@
 import { ChatSendAfterEvent, Player } from "@minecraft/server";
-import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsgToPlayer } from "../../util.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
-function creditsHelp(player: Player, prefix: string) {
+function creditsHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
-    if (!config.customcommands.credits) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: credits`,
+        `\n§o§4[§6コマンド§4]§f: クレジット`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: credits [optional]`,
-        `§4[§6Optional§4]§f: help`,
-        `§4[§6Description§4]§f: Shows credits for Paradox Anti Cheat.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f：クレジット [オプション］`,
+        `§4[§6オプション§4]§f: ヘルプ`,
+        `§4[§6説明§4]§f：Paradox Anti Cheatのクレジットを表示する。`,
+        `§4[§6例§4]§f：`,
         `    ${prefix}credits`,
         `        §4- §6Show credits for Paradox Anti Cheat§f`,
         `    ${prefix}credits help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドを表示するヘルプ§f`,
     ]);
 }
 
@@ -30,63 +30,65 @@ function creditsHelp(player: Player, prefix: string) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function credits(message: ChatSendAfterEvent, args: string[]) {
-    // validate that required params are defined
+    // 必要なパラメータが定義されていることを確認する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/moderation/credits.js:26)");
     }
 
     const player = message.sender;
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
     }
 
-    // Check for custom prefix
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Was help requested
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.credits) {
-        return creditsHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.credits) {
+        return creditsHelp(player, prefix, configuration.customcommands.credits);
     }
 
     sendMsgToPlayer(player, [
         ` `,
-        `§l§6                    Based on Scythe AntiCheat`,
+        `§l§6 Scythe AntiCheatに基づく。`,
         `§l§4-----------------------------------------------------`,
         `§lGithub:§f https://https://github.com/MrDiamond64/Scythe-AntiCheat`,
-        `§lDeveloped and maintained by MrDiamond64`,
+        `§lMrDiamond64 によって開発され、維持されている。`,
         ` `,
-        `§l§6                 Major Contributers For Scythe`,
+        `§l§6鎌への主な貢献者`,
         `§l§4-----------------------------------------------------`,
-        `Visual1mpact#1435 - Porting function-based commands to GameTest commands and finding many bugs`,
+        `Visual1mpact#1435 - 関数ベースのコマンドを GameTest コマンドに移植し、多くのバグを見つける`,
         ` `,
-        `§l§6                    Paradox AntiCheat (archived)`,
+        `§l§6 Paradox・アンチチート (アーカイブ)`,
         `§l§4-----------------------------------------------------`,
         `§lGithub:§f https://github.com/Visual1mpact/Paradox_AntiCheat`,
-        `§lParadox AntiCheat§f - a utility to fight against malicious hackers on Bedrock Edition.`,
-        `§lDeveloped and maintained by Visual1mpact#1435`,
+        `§lParadox AntiCheat§f - Bedrock Edition上で悪意あるハッカーと戦うためのユーティリティ。`,
+        `§開発・保守：Visual1mpact#1435`,
         ` `,
-        `§l§6                    Paradox AntiCheat (archived)`,
+        `§l§6 Paradox・アンチチート (アーカイブ)`,
         `§l§4-----------------------------------------------------`,
         `§lGithub:§f https://github.com/frostice482/Paradox_AntiCheat`,
-        `§lDeveloped and maintained by FrostIce482#8139`,
+        `§FrostIce482#8139によって開発および保守されています。`,
         ` `,
-        `§l§6                    Paradox AntiCheat (Continued)`,
+        `§l§6Paradox・アンチチート(続き)`,
         `§l§4-----------------------------------------------------`,
         `§lGithub:§f https://github.com/Pete9xi/Paradox_AntiCheat`,
-        `§lDeveloped and maintained by Pete9xi#7928`,
+        `§Pete9xi#7928によって開発・保守されている。`,
         ` `,
-        `§l§6                 Major Contributers For Paradox`,
+        `§l§6Paradoxの主な要因`,
         `§l§4-----------------------------------------------------`,
-        `Glitch#8024 - Implementing features and bug fixes`,
-        `FrostIce482#8139 - Implementing features, enhancing debugging, and bug fixes`,
-        `Visual1mpact#1435 - Implementing Features, debugging, security, and bug fixes`,
-        `Pete9xi#7928 - Implementing Features, debugging, GUI guru, and bug fixes`,
+        `不具合#8024 - 機能の実装とバグ修正`,
+        `FrostIce482#8139 - 機能の実装、デバッグの強化、バグ修正`,
+        `Visual1mpact#1435 - 機能の実装、デバッグ、セキュリティ、およびバグ修正`,
+        `Pete9xi#7928 - 機能の実装、デバッグ、GUI グル、バグ修正`,
         ` `,
     ]);
     return;

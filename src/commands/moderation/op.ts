@@ -1,34 +1,33 @@
 import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
-import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
-import { EncryptionManager } from "../../classes/EncryptionManager.js";
-import { UUIDManager } from "../../classes/UUIDManager.js";
+import { WorldExtended } from "../../classes/WorldExtended/World.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
-function opHelp(player: Player, prefix: string) {
+function opHelp(player: Player, prefix: string, configuration: ConfigInterface) {
     let commandStatus: string;
-    if (!config.customcommands.op) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!configuration.customcommands.op) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
 
-    const passwordDescription = config.encryption.password ? `§4- §6Use your password to gain Paradox-Op§f` : `§4- §6Give yourself Paradox-Op§f`;
-    const commandUsage = config.encryption.password ? `${prefix}op <password>` : `${prefix}op`;
+    const passwordDescription = configuration.encryption.password ? `§4- §6パスワードを使ってParadox-Op§fを獲得する` : `§4-§6自分にParadoxを捧げよ-Op§f`;
+    const commandUsage = configuration.encryption.password ? `${prefix}op <password>` : `${prefix}op`;
 
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: op`,
+        `\n§o§4[§6コマンド§4]§f: op`,
         `§4[§6Status§4]§f: ${commandStatus}`,
         `§4[§6Usage§4]§f: ${prefix}op [optional]`,
-        `§4[§6Optional§4]§f: username, help`,
-        `§4[§6Description§4]§f: Grants permission to use Paradox AntiCheat features.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6オプション§4]§f: ユーザー名、ヘルプ`,
+        `§4[§6説明§4]§f：Paradox AntiCheat 機能の使用を許可する。`,
+        `§4[§6例§4]§f：`,
         `    ${commandUsage}`,
         `        ${passwordDescription}`,
         `    ${prefix}op help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドを表示するヘルプ§f`,
         `    ${prefix}op <player>`,
-        `        §4- §6Grant Paradox-Op to another player§f`,
+        `        §4- §6他のプレイヤーにParadox・オプを与える§f`,
     ]);
 }
 
@@ -38,7 +37,7 @@ function opHelp(player: Player, prefix: string) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function op(message: ChatSendAfterEvent, args: string[]) {
-    // Validate that required params are defined
+    // 必要なパラメータが定義されていることを検証する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/moderation/op.js:30)");
     }
@@ -50,23 +49,25 @@ export function op(message: ChatSendAfterEvent, args: string[]) {
     const operatorHash = operator.getDynamicProperty("hash");
     const operatorSalt = operator.getDynamicProperty("salt");
 
-    if (!operatorHash || !operatorSalt || (operatorHash !== EncryptionManager.hashWithSalt(operatorSalt as string, config.encryption.password || operator.id) && UUIDManager.isValidUUID(operatorSalt as string))) {
-        if (!config.encryption.password) {
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    if (!operatorHash || !operatorSalt || (operatorHash !== (world as WorldExtended).hashWithSalt(operatorSalt as string, configuration.encryption.password || operator.id) && (world as WorldExtended).isValidUUID(operatorSalt as string))) {
+        if (!configuration.encryption.password) {
             if (!operator.isOp()) {
-                return sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f You need to be Operator to use this command.`);
+                return sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§fこのコマンドを使うにはオペレータである必要がある。`);
             }
         }
     }
 
-    // Check if args is null, empty, or for help
+    // argsがNULL、空、またはヘルプかどうかをチェックする。
     if (args[0]?.toLowerCase() === "help") {
-        return opHelp(operator, prefix);
+        return opHelp(operator, prefix, configuration);
     }
 
-    if (args.length >= 1 && operatorHash === EncryptionManager.hashWithSalt(operatorSalt as string, config.encryption.password || operator.id)) {
-        // Operator wants to grant "Paradox-Op" to another player
+    if (args.length >= 1 && operatorHash === (world as WorldExtended).hashWithSalt(operatorSalt as string, configuration.encryption.password || operator.id)) {
+        // オペレーターが「Paradox・オプ」を他のプレーヤーに与えたい
         const targetPlayerName = args.join(" "); // Combine all arguments into a single string
-        // Try to find the player requested
+        // 要求された選手を見つけよう
         let targetPlayer: Player;
         if (args.length) {
             const players = world.getPlayers();
@@ -82,21 +83,21 @@ export function op(message: ChatSendAfterEvent, args: string[]) {
             const targetHash = targetPlayer.getDynamicProperty("hash");
 
             if (targetHash === undefined) {
-                const targetSalt = UUIDManager.generateRandomUUID();
+                const targetSalt = (world as WorldExtended).generateRandomUUID();
                 targetPlayer.setDynamicProperty("salt", targetSalt);
 
-                // Use either the operator's ID or the encryption password as the key
-                const targetKey = config.encryption.password ? config.encryption.password : targetPlayer.id;
+                // オペレーターのIDまたは暗号化パスワードのいずれかをキーとして使用する。
+                const targetKey = configuration.encryption.password ? configuration.encryption.password : targetPlayer.id;
 
-                // Generate the hash
-                const newHash = EncryptionManager.hashWithSalt(targetSalt, targetKey);
+                // ハッシュを生成する
+                const newHash = (world as WorldExtended).hashWithSalt(targetSalt, targetKey);
 
                 targetPlayer.setDynamicProperty("hash", newHash);
 
-                dynamicPropertyRegistry.set(targetPlayer.id, targetPlayer.name);
+                dynamicPropertyRegistry.setProperty(targetPlayer, targetPlayer.id, targetPlayer.name);
 
                 sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f You have granted Paradox-Op to §7${targetPlayer.name}§f.`);
-                sendMsgToPlayer(targetPlayer, `§f§4[§6Paradox§4]§f You are now op!`);
+                sendMsgToPlayer(targetPlayer, `§f§4[§6Paradox§4]§f あなたは今、操作している！`);
                 sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${targetPlayer.name}§f is now Paradox-Opped.`);
                 targetPlayer.addTag("paradoxOpped");
             } else {
@@ -105,44 +106,44 @@ export function op(message: ChatSendAfterEvent, args: string[]) {
         } else {
             sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f Could not find player §7${targetPlayerName}§f.`);
         }
-    } else if (args.length === 0 && !config.encryption.password) {
-        // Operator wants to change their own password
-        const targetSalt = UUIDManager.generateRandomUUID();
+    } else if (args.length === 0 && !configuration.encryption.password) {
+        // オペレータが自分のパスワードを変更したい
+        const targetSalt = (world as WorldExtended).generateRandomUUID();
 
-        // Use either the operator's ID or the encryption password as the key
-        const key = config.encryption.password ? config.encryption.password : operator.id;
+        // オペレーターのIDまたは暗号化パスワードのいずれかをキーとして使用する。
+        const key = configuration.encryption.password ? configuration.encryption.password : operator.id;
 
-        // Generate the hash
-        const newHash = EncryptionManager.hashWithSalt(targetSalt, key);
+        // ハッシュを生成する
+        const newHash = (world as WorldExtended).hashWithSalt(targetSalt, key);
 
         operator.setDynamicProperty("hash", newHash);
         operator.setDynamicProperty("salt", targetSalt);
         operator.addTag("paradoxOpped");
 
-        sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f You are now Paradox-Opped!`);
+        sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§fあなたは今、Paradoxに縛られている！`);
 
-        dynamicPropertyRegistry.set(operator.id, operator.name);
+        dynamicPropertyRegistry.setProperty(operator, operator.id, operator.name);
 
         return;
-    } else if (args.length === 1 && config.encryption.password) {
-        // Allow the user to gain Paradox-Op using the password
-        if (config.encryption.password === args[0]) {
-            const targetSalt = UUIDManager.generateRandomUUID();
+    } else if (args.length === 1 && configuration.encryption.password) {
+        // パスワードを使用して Paradox-Op を取得できるようにする。
+        if (configuration.encryption.password === args[0]) {
+            const targetSalt = (world as WorldExtended).generateRandomUUID();
 
-            // Generate the hash using the provided password
-            const newHash = EncryptionManager.hashWithSalt(targetSalt, args[0]);
+            // 提供されたパスワードを使ってハッシュを生成する
+            const newHash = (world as WorldExtended).hashWithSalt(targetSalt, args[0]);
 
             operator.setDynamicProperty("hash", newHash);
             operator.setDynamicProperty("salt", targetSalt);
             operator.addTag("paradoxOpped");
 
-            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f You are now Paradox-Opped using the password.`);
-            dynamicPropertyRegistry.set(operator.id, operator.name);
+            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§fあなたは今、パスワードを使ってParadox-Oppedされています。`);
+            dynamicPropertyRegistry.setProperty(operator, operator.id, operator.name);
         } else {
-            // Incorrect password
-            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§f Incorrect password. You need to be Operator to use this command.`);
+            // パスワードの誤り
+            sendMsgToPlayer(operator, `§f§4[§6Paradox§4]§fパスワードが間違っています。このコマンドを使用するには Operator である必要があります。`);
         }
     } else {
-        return opHelp(operator, prefix);
+        return opHelp(operator, prefix, configuration);
     }
 }

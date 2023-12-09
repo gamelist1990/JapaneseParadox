@@ -2,8 +2,15 @@ import { world, Vector3, PlayerPlaceBlockAfterEvent, system, EntityQueryOptions 
 import { flag } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 import { MinecraftBlockTypes } from "../../../node_modules/@minecraft/vanilla-data/lib/index.js";
+import ConfigInterface from "../../../interfaces/Config.js";
+
+function getRegistry() {
+    return dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+}
+
 function freeze(id: number) {
-    const antiScaffoldABoolean = dynamicPropertyRegistry.get("antiscaffolda_b");
+    const configuration = getRegistry();
+    const antiScaffoldABoolean = configuration.modules.antiscaffoldA.enabled;
     if (antiScaffoldABoolean === false) {
         system.clearRun(id);
         return;
@@ -23,7 +30,12 @@ function freeze(id: number) {
             player.removeTag("freezeScaffoldA");
             return;
         }
-        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f Frozen!", { subtitle: "§fContact Staff §4[§6AntiScaffoldA§4]§f", fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 60 });
+        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f 凍結!", {
+            subtitle: "§fスタッフに連絡 §4[§6AntiScaffoldA§4]§f",
+            fadeInDuration: 0,
+            fadeOutDuration: 0,
+            stayDuration: 60,
+        });
     }
 }
 
@@ -44,7 +56,8 @@ function isBlockInFrontAndBelowPlayer(blockLocation: Vector3, playerLocation: Ve
 
 async function scaffolda(object: PlayerPlaceBlockAfterEvent) {
     // Get Dynamic Property
-    const antiScaffoldABoolean = dynamicPropertyRegistry.get("antiscaffolda_b");
+    const configuration = getRegistry();
+    const antiScaffoldABoolean = configuration.modules.antiscaffoldA.enabled;
     // Unsubscribe if disabled in-game
     if (antiScaffoldABoolean === false) {
         world.afterEvents.playerPlaceBlock.unsubscribe(scaffolda);
@@ -55,7 +68,7 @@ async function scaffolda(object: PlayerPlaceBlockAfterEvent) {
     const { block, player, dimension } = object;
 
     // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
     // Skip if they have permission
     if (uniqueId === player.name) {
@@ -73,7 +86,19 @@ async function scaffolda(object: PlayerPlaceBlockAfterEvent) {
         // Check rotation and validate if its an integer and not a float
         const rot = player.getRotation();
 
-        if (rot.x % 1 === 0) {
+        // Block coordinates
+        const { x, y, z } = blockLocation;
+
+        // Block below placement
+        const belowBlockLocation = { x, y: y - 1, z };
+
+        // Is it air
+        const blockType = dimension.getBlock(belowBlockLocation).isAir;
+
+        // Are they sprinting
+        const isSprinting = player.isSprinting;
+
+        if (rot.x % 1 === 0 || (blockType && isSprinting)) {
             dimension.getBlock(blockLocation).setType(MinecraftBlockTypes.Air);
             flag(player, "Scaffold", "A", "Placement", null, null, null, null, false);
             const hasFreezeTag = player.hasTag("paradoxFreeze");

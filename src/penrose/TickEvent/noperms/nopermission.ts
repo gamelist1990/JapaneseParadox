@@ -1,8 +1,8 @@
 import { world, Player, EntityQueryOptions, system } from "@minecraft/server";
 import { sendMsg } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
-import config from "../../../data/config.js";
-import { EncryptionManager } from "../../../classes/EncryptionManager.js";
+import { WorldExtended } from "../../../classes/WorldExtended/World.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
 function noperms() {
     const filter: EntityQueryOptions = {
@@ -29,19 +29,21 @@ function noperms() {
         const hash = entity.getDynamicProperty("hash");
         const salt = entity.getDynamicProperty("salt");
 
+        const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
         // Use either the operator's ID or the encryption password as the key
-        const key = config.encryption.password ? config.encryption.password : entity.id;
+        const key = configuration.encryption.password ? configuration.encryption.password : entity.id;
 
         // Generate the hash
-        const encode = EncryptionManager.hashWithSalt(salt as string, key);
+        const encode = (world as WorldExtended).hashWithSalt(salt as string, key);
         entity.removeTag("paradoxOpped");
         if (encode && encode === hash) {
-            entity.removeDynamicProperty("hash");
-            entity.removeDynamicProperty("salt");
-            dynamicPropertyRegistry.delete(entity.id);
+            entity.setDynamicProperty("hash");
+            entity.setDynamicProperty("salt");
+            dynamicPropertyRegistry.deleteProperty(entity, entity.id);
         }
 
-        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f §7${entity.nameTag}§f had unauthorized permissions. Permissions removed!`);
+        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f§7${entity.nameTag}§f に権限のないアクセス許可があったため権限が削除されました。`);
     }
 }
 

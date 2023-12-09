@@ -12,8 +12,8 @@ import { modulesui } from "./guiHandler/guiHandlerModules/modulesui";
 import { prefixHandler } from "./guiHandler/results/prefix";
 import { statsHandler } from "./guiHandler/results/stats";
 import { chatChannelMainMenu } from "./guiHandler/results/chatChannelsMenu";
-import { managePlayerSavedLocationsHandler } from "./guiHandler/guiHandlerModeration/results/managePlayersSavedLocations";
 import { inventoryHandler } from "./guiHandler/guiHandlerModeration/results/inventoryui";
+import { managePlayerSavedLocationsHandler } from "./guiHandler/guiHandlerModeration/results/managePlayersSavedLocations";
 
 /**
  * @name paradoxui
@@ -38,7 +38,7 @@ async function handleParadoxUI(player: Player) {
 
     const hash = player.getDynamicProperty("hash");
     const salt = player.getDynamicProperty("salt");
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
     maingui.title("§4メニュー§4");
     maingui.body("§eこのメニューではTPリクエストや座標を保存そして報告機能が使えます！§e\n" + "§fVersion: §2" + versionFile.version);
     if (uniqueId !== player.name) {

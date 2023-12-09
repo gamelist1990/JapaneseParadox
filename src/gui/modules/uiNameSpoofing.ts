@@ -1,54 +1,57 @@
-import { Player, world } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { NamespoofA } from "../../penrose/TickEvent/namespoof/namespoof_a.js";
 import { NamespoofB } from "../../penrose/TickEvent/namespoof/namespoof_b.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
+import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiNAMESPOOFING(namespoofingResult: ModalFormResponse, player: Player) {
     if (!namespoofingResult || namespoofingResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [NameSpoofAToggle, NameSpoofBToggle] = namespoofingResult.formValues;
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Get Dynamic Property Boolean
-    const nameSpoofABoolean = dynamicPropertyRegistry.get("namespoofa_b");
-    const nameSpoofBBoolean = dynamicPropertyRegistry.get("namespoofb_b");
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to configure Name Spoofing`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f名前スプーフィングを設定するには、パラドックス・オッピングが必要です。`);
     }
+
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // ダイナミック・プロパティ・ブール値の取得
+    const nameSpoofABoolean = configuration.modules.namespoofA.enabled;
+    const nameSpoofBBoolean = configuration.modules.namespoofB.enabled;
+
     if (NameSpoofAToggle === true && nameSpoofABoolean === false) {
-        // Allow
-        dynamicPropertyRegistry.set("namespoofa_b", true);
-        world.setDynamicProperty("namespoofa_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6NamespoofA§f!`);
+        // 許可する
+        configuration.modules.namespoofA.enabled = true;
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6NamespoofA§f!`);
         NamespoofA();
     }
     if (NameSpoofAToggle === false && nameSpoofABoolean === true) {
-        // Deny
-        dynamicPropertyRegistry.set("namespoofa_b", false);
-        world.setDynamicProperty("namespoofa_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4NamespoofA§f!`);
+        // 拒否する
+        configuration.modules.namespoofA.enabled = false;
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4NamespoofA§f!`);
     }
     if (NameSpoofBToggle === true && nameSpoofBBoolean === false) {
-        // Allow
-        dynamicPropertyRegistry.set("namespoofb_b", true);
-        world.setDynamicProperty("namespoofb_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6NamespoofB§f!`);
+        // 許可する
+        configuration.modules.namespoofB.enabled = true;
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6NamespoofB§f!`);
         NamespoofB;
     }
     if (NameSpoofBToggle === false && nameSpoofBBoolean === true) {
-        // Deny
-        dynamicPropertyRegistry.set("namespoofb_b", false);
-        world.setDynamicProperty("namespoofb_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4NamespoofB§f!`);
+        // 拒否する
+        configuration.modules.namespoofB.enabled = false;
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4NamespoofB§f!`);
     }
 
-    //show the main ui to the player once complete.
+    dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+
+    //完了したら、プレイヤーにメインUIを表示する。
     return paradoxui(player);
 }

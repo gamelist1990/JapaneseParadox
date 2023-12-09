@@ -34,6 +34,7 @@ import { AutoBan } from "./penrose/TickEvent/ban/autoban.js";
 import { freeze, freezeJoin, freezeLeave } from "./penrose/TickEvent/freeze/freeze.js";
 import { AFK } from "./penrose/TickEvent/afk/afk.js";
 import { AntiPhaseA } from "./penrose/TickEvent/phase/phase_a.js";
+import { SpawnProtection } from "./penrose/TickEvent/spawnprotection/spawnProtection.js";
 // Import PlayerBlockBreakAfter Events
 import { XrayA } from "./penrose/PlayerBreakBlockAfterEvent/xray/xray_a.js";
 // Import PlayerBlockBreakBefore Events
@@ -53,7 +54,7 @@ import { ReachB } from "./penrose/EntityHitEntityAfterEvent/reach_b.js";
 import { KillAura } from "./penrose/EntityHitEntityAfterEvent/killaura.js";
 import { PVP } from "./penrose/EntityHitEntityAfterEvent/pvpManager.js";
 // Import WorldInitializeAfter Events
-import { Registry } from "./penrose/WorldInitializeAfterEvent/registry.js";
+import { Registry, dynamicPropertyRegistry } from "./penrose/WorldInitializeAfterEvent/registry.js";
 // Import SystemBefore Events
 import { WatchDog } from "./penrose/SystemEvent/watchdog.js";
 // Import ChatSendAfter Events
@@ -66,92 +67,120 @@ import { DeathCoordinates } from "./penrose/EntityDieAfterEvent/death_coordinate
 // Import PlayerLeaveAfter Events
 import { onChannelLeave } from "./commands/utility/channel.js";
 // Custom
-import config from "./data/config.js";
+import ConfigInterface from "./interfaces/Config.js";
 
-// WorldInitializeAfter Events
-Registry();
+async function main() {
+    // WorldInitializeAfter Events
+    await Registry().catch((error) => {
+        console.error("Paradox Unhandled Rejection: ", error);
+        // Extract stack trace information
+        if (error instanceof Error) {
+            const stackLines = error.stack.split("\n");
+            if (stackLines.length > 1) {
+                const sourceInfo = stackLines;
+                console.error("Error originated from:", sourceInfo[0]);
+            }
+        }
+    });
 
-// ChatSendBefore Events
-BadPackets1();
-SpammerA();
-SpammerB();
-SpammerC();
-beforeAntiSpam();
-BeforePrefixCommand();
-beforeChatFilter();
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-// ChatSendAfter Events
-AfterPrefixCommand();
-TpRequestListener();
-afterAntiSpam();
-afterChatFilter();
+    // ChatSendBefore Events
+    BadPackets1();
+    SpammerA();
+    SpammerB();
+    SpammerC();
+    beforeAntiSpam();
+    BeforePrefixCommand();
+    beforeChatFilter();
 
-// Tick Events
-ClearLag();
-BadPackets2();
-VerifyPermission;
-OPS();
-Hotbar();
-NoPerms;
-Vanish;
-IllegalItemsC();
-Survival();
-Adventure();
-Creative();
-WorldBorder();
-ServerBan;
-NamespoofA();
-NamespoofB();
-BedrockValidate();
-JesusA();
-SpeedA();
-IllegalItemsA();
-InvalidSprintA();
-FlyA();
-AntiKnockbackA();
-AntiFallA();
-AutoBan();
-AFK();
-AntiPhaseA();
-if (config.customcommands.freeze || config.modules.antiKillAura || config.modules.antinukerA) {
-    freeze;
-    freezeLeave();
-    freezeJoin();
+    // ChatSendAfter Events
+    AfterPrefixCommand();
+    TpRequestListener();
+    afterAntiSpam();
+    afterChatFilter();
+
+    // Tick Events
+    ClearLag();
+    BadPackets2();
+    VerifyPermission;
+    OPS();
+    Hotbar();
+    NoPerms;
+    Vanish;
+    IllegalItemsC();
+    Survival();
+    Adventure();
+    Creative();
+    WorldBorder();
+    ServerBan;
+    NamespoofA();
+    NamespoofB();
+    BedrockValidate();
+    JesusA();
+    SpeedA();
+    IllegalItemsA();
+    InvalidSprintA();
+    FlyA();
+    AntiKnockbackA();
+    AntiFallA();
+    AutoBan();
+    AFK();
+    AntiPhaseA();
+    SpawnProtection();
+    if (configuration.customcommands.freeze || configuration.modules.antiKillAura || configuration.modules.antinukerA) {
+        freeze;
+        freezeLeave();
+        freezeJoin();
+    }
+
+    // PlayerBlockBreakAfter Events
+    XrayA();
+
+    // PlayerBlockBreakBefore Events
+    BeforeNukerA();
+
+    // playerSpawnAfter Events
+    onJoin();
+    GlobalBanList();
+    hashCode();
+    onJoinrules(); // GUI
+
+    // PlayerBlockPlaceAfter Events
+    ScaffoldA();
+    IllegalItemsB();
+
+    // PlayerBlockPlaceBefore Events
+    BeforeReachA();
+
+    // EntityHitEntityAfter Events
+    ReachB();
+    KillAura();
+    if (configuration.customcommands.pvp === true) {
+        PVP();
+    }
+
+    // EntityDieAfter Events
+    DeathCoordinates();
+
+    // SystemBefore Events
+    WatchDog();
+
+    // playerLeaveAfter Events
+    if (configuration.customcommands.channel === true) {
+        onChannelLeave();
+    }
 }
 
-// PlayerBlockBreakAfter Events
-XrayA();
-
-// PlayerBlockBreakBefore Events
-BeforeNukerA();
-
-// playerSpawnAfter Events
-onJoin();
-GlobalBanList();
-hashCode();
-onJoinrules(); // GUI
-
-// PlayerBlockPlaceAfter Events
-ScaffoldA();
-IllegalItemsB();
-
-// PlayerBlockPlaceBefore Events
-BeforeReachA();
-
-// EntityHitEntityAfter Events
-ReachB();
-KillAura();
-if (config.customcommands.pvp === true) {
-    PVP();
-}
-
-// EntityDieAfter Events
-DeathCoordinates();
-
-// SystemBefore Events
-WatchDog();
-
-// playerLeaveAfter Events
-if (config.customcommands.channel === true) {
-    onChannelLeave();
-}
+// Initialize Paradox
+main().catch((error) => {
+    console.error("Paradox Unhandled Rejection: ", error);
+    // Extract stack trace information
+    if (error instanceof Error) {
+        const stackLines = error.stack.split("\n");
+        if (stackLines.length > 1) {
+            const sourceInfo = stackLines;
+            console.error("Error originated from:", sourceInfo[0]);
+        }
+    }
+});

@@ -1,28 +1,29 @@
 import { ChatSendAfterEvent, EntityEquippableComponent, EquipmentSlot, ItemEnchantsComponent, ItemStack, Player, world } from "@minecraft/server";
 import { MinecraftEnchantmentTypes } from "../../node_modules/@minecraft/vanilla-data/lib/index";
-import config from "../../data/config.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
-import { getPrefix, sendMsgToPlayer, getGamemode } from "../../util.js";
+import { getPrefix, sendMsgToPlayer } from "../../util.js";
 import { ScoreManager } from "../../classes/ScoreManager";
+import { PlayerExtended } from "../../classes/PlayerExtended/Player";
+import ConfigInterface from "../../interfaces/Config";
 
-function statsHelp(player: Player, prefix: string) {
+function statsHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
-    if (!config.customcommands.stats) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: stats`,
+        `§6コマンド§4]§f: スタッツ`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: stats [optional]`,
-        `§4[§6Optional§4]§f: username, help`,
-        `§4[§6Description§4]§f: Shows logs from the specified user.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f：統計 [オプション］`,
+        `§4[§6オプション§4]§f: ユーザー名、ヘルプ`,
+        `§4[§6説明§4]§f：指定されたユーザーのログを表示する。`,
+        `§4[§6例§4]§f：`,
         `    ${prefix}stats ${player.name}`,
-        `        §4- §6Show logs for the specified user§f`,
+        `        §指定されたユーザのログを表示する§f`,
         `    ${prefix}stats help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドを表示するヘルプ§f`,
     ]);
 }
 
@@ -34,7 +35,7 @@ function statsHelp(player: Player, prefix: string) {
 export function stats(message: ChatSendAfterEvent, args: string[]) {
     handleStats(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -46,40 +47,42 @@ export function stats(message: ChatSendAfterEvent, args: string[]) {
 }
 
 async function handleStats(message: ChatSendAfterEvent, args: string[]) {
-    // validate that required params are defined
+    // 必要なパラメータが定義されていることを確認する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/utility/stats.js:29)");
     }
 
     const player = message.sender;
 
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
     }
 
-    // Check for custom prefix
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Are there arguements
+    // 反論はあるか
     if (!args.length) {
-        return statsHelp(player, prefix);
+        return statsHelp(player, prefix, configuration.customcommands.stats);
     }
 
-    // Was help requested
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.stats) {
-        return statsHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.stats) {
+        return statsHelp(player, prefix, configuration.customcommands.stats);
     }
 
     if (!player.hasTag("notify")) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to enable cheat notifications.`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fチート通知をBooleanにする必要があります。`);
     }
 
-    // try to find the player requested
+    // リクエストされた選手を探す
     let member: Player;
     const players = world.getPlayers();
     for (const pl of players) {
@@ -90,12 +93,12 @@ async function handleStats(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
     }
 
     const reportBody = [
         `\n§f§4[§6Paradox§4]§f Getting all Paradox Logs from: §6${member.name}§f`,
-        `§f§4[§6Paradox§4]§f §6${member.name}§f is in Gamemode: §7${getGamemode(member)}§f`,
+        `§f§4[§6Paradox§4]§f §6${member.name}§f is in Gamemode: §7${(member as PlayerExtended).getGameMode()}§f`,
         `§f§4[§6Paradox§4]§f §6${member.name}§f is currently at X= §7${member.location.x.toFixed(0)}§f Y= §7${member.location.y.toFixed(0)}§f Z= §7${member.location.z.toFixed(0)}§f`,
     ];
 

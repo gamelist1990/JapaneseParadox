@@ -1,26 +1,27 @@
 import { ChatSendAfterEvent, Player, world } from "@minecraft/server";
-import config from "../../data/config.js";
 import { getPrefix, sendMsgToPlayer } from "../../util.js";
-import { EncryptionManager } from "../../classes/EncryptionManager.js";
+import { WorldExtended } from "../../classes/WorldExtended/World.js";
+import ConfigInterface from "../../interfaces/Config.js";
+import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 
-function delhomeHelp(player: Player, prefix: string) {
+function delhomeHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
-    if (!config.customcommands.delhome) {
-        commandStatus = "§6[§4DISABLED§6]§f";
+    if (!setting) {
+        commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§aENABLED§6]§f";
+        commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6Command§4]§f: delhome`,
+        `\n§o§4[§6コマンド§4]§f: delhome`,
         `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: delhome [optional]`,
-        `§4[§6Optional§4]§f: name, help`,
-        `§4[§6Description§4]§f: Will delete specified saved home location.`,
-        `§4[§6Examples§4]§f:`,
+        `§4[§6使用§4]§f: delhome [オプション］`,
+        `§4[§6オプション§4]§f: 名前、ヘルプ`,
+        `§4[§6説明§4]§f：指定された保存されたホームの場所を削除する。`,
+        `§4[§6例§4]§f：`,
         `    ${prefix}delhome cave`,
-        `        §4- §6Delete the saved home location named "cave"§f`,
+        `        §4- §6保存されている "cave "という名前のホームロケーションを削除する§f`,
         `    ${prefix}delhome help`,
-        `        §4- §6Show command help§f`,
+        `        §4- §6コマンドを表示するヘルプ§f`,
     ]);
 }
 
@@ -30,39 +31,41 @@ function delhomeHelp(player: Player, prefix: string) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function delhome(message: ChatSendAfterEvent, args: string[]) {
-    // Validate that required params are defined
+    // 必要なパラメータが定義されていることを検証する
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? ./commands/utility/delhome.js:26)");
     }
 
     const player = message.sender;
 
-    // Check for custom prefix
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
+    // カスタム接頭辞のチェック
     const prefix = getPrefix(player);
 
-    // Cache
+    // キャッシュ
     const length = args.length;
 
-    // Are there arguements
+    // 反論はあるか
     if (!length) {
-        return delhomeHelp(player, prefix);
+        return delhomeHelp(player, prefix, configuration.customcommands.delhome);
     }
 
-    // Was help requested
+    // 助けを求められたか
     const argCheck = args[0];
-    if ((argCheck && args[0].toLowerCase() === "help") || !config.customcommands.delhome) {
-        return delhomeHelp(player, prefix);
+    if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.delhome) {
+        return delhomeHelp(player, prefix, configuration.customcommands.delhome);
     }
 
-    // Don't allow spaces
+    // スペースを許可しない
     if (length > 1) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f No spaces in names please!`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f名前にスペースを入れないでください！`);
     }
 
-    // Hash the coordinates for security
+    // 安全のために座標をハッシュ化する
     const salt = world.getDynamicProperty("crypt");
 
-    // Find and delete this saved home location
+    // この保存されたホームロケーションを検索して削除する
     let verify = false;
     let encryptedString: string = "";
     const tags = player.getTags();
@@ -70,19 +73,19 @@ export function delhome(message: ChatSendAfterEvent, args: string[]) {
     for (let i = 0; i < tagsLength; i++) {
         if (tags[i].startsWith("1337")) {
             encryptedString = tags[i];
-            // Decode it so we can verify it
-            tags[i] = EncryptionManager.decryptString(tags[i], salt as string);
+            // それを検証するためにデコードする
+            tags[i] = (world as WorldExtended).decryptString(tags[i], salt as string);
         }
         if (tags[i].startsWith(args[0].toString() + " X", 13)) {
             verify = true;
             player.removeTag(encryptedString);
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Successfully deleted home '§7${args[0]}§f'!`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f '§7${args[0]}§f'というホームを正常に削除しました！`);
             break;
         }
     }
     if (verify === true) {
         return;
     } else {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Home '§7${args[0]}§f' does not exist!`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f '§7${args[0]}§f'というホームは存在しません！`);
     }
 }

@@ -1,23 +1,24 @@
 import { ChatSendBeforeEvent, PlayerLeaveAfterEvent, world } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 import { sendMsgToPlayer } from "../../../util.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
 const spamTime = 2 * 1000; // The time frame during which the player's messages will be counted.
 const offenseCount = 5; // Total strikes until you are kicked out.
 const strikeReset = 30 * 1000; // The time frame until the strike is reduced
-const lastChanceWarning = "Final warning: Continued rapid messaging will result in a ban.";
+const lastChanceWarning = "最終警告: 迅速なメッセージ送信を続けると、禁止されます。";
 
 const warningMessages = [
-    "Please refrain from sending messages too quickly.",
-    "Messaging too frequently may result in disruptions.",
-    "Slow down your messaging pace to maintain chat quality.",
-    "Sending messages rapidly can lead to temporary restrictions.",
-    "Avoid spamming the chat with quick messages.",
-    "Remember to allow some time between messages.",
-    "Excessive messaging speed can lead to chat limitations.",
-    "Maintain a reasonable pace while using the chat.",
-    "Help keep the chat readable by sending messages thoughtfully.",
-    "Keep in mind that messaging too quickly might be limited.",
+    "早口でのメッセージ送信はお控えください.",
+    "メッセージの頻度が高すぎると、混乱が生じる可能性があります.",
+    "チャットの品質を維持するために、メッセージングのペースを遅くします。",
+    "メッセージをすばやく送信すると、一時的な制限が発生する場合があります.",
+    "クイックメッセージでチャットをスパムしないようにする.",
+    "メッセージとメッセージの間には、ある程度の時間を確保してください.",
+    "メッセージの速度が速すぎると、チャットが制限される可能性があります.",
+    "チャットを使用している間、適度なペースを維持する.",
+    "メッセージを送信してチャットを読みやすくするのを手伝ってください .",
+    "メッセージの送信が速すぎると、制限される可能性があることに注意してください.",
 ];
 
 interface ChatRecord {
@@ -29,10 +30,21 @@ interface ChatRecord {
 
 const chatRecords = new Map<string, ChatRecord>();
 
+function getRegistry() {
+    return dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+}
+
 function onPlayerLogout(event: PlayerLeaveAfterEvent): void {
     // Remove the player's data from the map when they log off
     const playerName = event.playerId;
     chatRecords.delete(playerName);
+
+    const configuration = getRegistry();
+
+    if (!configuration.modules.antispam.enabled) {
+        // Unsubscribe from the playerLeave event
+        world.afterEvents.playerLeave.unsubscribe(onPlayerLogout);
+    }
 }
 
 function getRandomWarningMessage() {
@@ -42,12 +54,12 @@ function getRandomWarningMessage() {
 
 function beforeantispam(msg: ChatSendBeforeEvent) {
     // Get Dynamic Property
-    const antiSpamBoolean = dynamicPropertyRegistry.get("antispam_b");
+    const configuration = getRegistry();
+    const antiSpamBoolean = configuration.modules.antispam.enabled;
 
     // Unsubscribe if disabled in-game
     if (antiSpamBoolean === false) {
         chatRecords.clear();
-        world.afterEvents.playerLeave.unsubscribe(onPlayerLogout);
         world.beforeEvents.chatSend.unsubscribe(beforeantispam);
         return;
     }
@@ -56,7 +68,7 @@ function beforeantispam(msg: ChatSendBeforeEvent) {
     const player = msg.sender;
 
     // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
     // Ignore those with permissions
     if (uniqueId !== player.name) {

@@ -1,9 +1,10 @@
-import { Player, world } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry";
 import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
 import { KillAura } from "../../penrose/EntityHitEntityAfterEvent/killaura";
+import ConfigInterface from "../../interfaces/Config";
 
 /**
  * Handles the result of a modal form used for toggling anti-kill aura mode.
@@ -15,7 +16,7 @@ import { KillAura } from "../../penrose/EntityHitEntityAfterEvent/killaura";
 export function uiANTIKILLAURA(antikillauraResult: ModalFormResponse, player: Player) {
     handleUIAntiKillAura(antikillauraResult, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // Extract stack trace information
+        // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -28,31 +29,32 @@ export function uiANTIKILLAURA(antikillauraResult: ModalFormResponse, player: Pl
 
 async function handleUIAntiKillAura(antikillauraResult: ModalFormResponse, player: Player) {
     if (!antikillauraResult || antikillauraResult.canceled) {
-        // Handle canceled form or undefined result
+        // キャンセルされたフォームまたは未定義の結果を処理する
         return;
     }
     const [AntiKillAuraToggle] = antikillauraResult.formValues;
-    // Get unique ID
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    // ユニークIDの取得
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // Get Dynamic Property Boolean
-
-    // Make sure the user has permissions to run the command
+    // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 管理者しか実行できません to configure Anti Killaura`);
+        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f アンチ・キラウラを設定するには、パラドックス・オップである必要がある。`);
     }
+
+    const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+
     if (AntiKillAuraToggle === false) {
-        // Deny
-        dynamicPropertyRegistry.set("antikillaura_b", false);
-        world.setDynamicProperty("antikillaura_b", false);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が無効です！＝＞ §4AntiKillAura§f!`);
+        // 拒否する
+        configuration.modules.antiKillAura.enabled = false;
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4AntiKillAura§f!`);
     } else if (AntiKillAuraToggle === true) {
-        // Allow
-        dynamicPropertyRegistry.set("antikillaura_b", true);
-        world.setDynamicProperty("antikillaura_b", true);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f ${player.name}§f 以下の機能が有効です！＝＞ §6AntiKillAura§f!`);
+        // 許可する
+        configuration.modules.antiKillAura.enabled = true;
+        dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6AntiKillAura§f!`);
         KillAura();
     }
-    //show the main ui to the player once complete.
+    //完了したら、プレイヤーにメインUIを表示する。
     return paradoxui(player);
 }

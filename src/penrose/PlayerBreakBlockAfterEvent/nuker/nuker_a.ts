@@ -1,9 +1,14 @@
-import { world, PlayerBreakBlockAfterEvent, system, EntityQueryOptions, PlayerLeaveAfterEvent, EntityInventoryComponent, ItemEnchantsComponent } from "@minecraft/server";
+import { world, PlayerBreakBlockAfterEvent, system, EntityQueryOptions, PlayerLeaveAfterEvent, EntityInventoryComponent, ItemEnchantsComponent, PlayerBreakBlockBeforeEvent } from "@minecraft/server";
 import { flag } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
-import { MinecraftEffectTypes } from "../../../node_modules/@minecraft/vanilla-data/lib/index.js";
+import { MinecraftBlockTypes, MinecraftEffectTypes } from "../../../node_modules/@minecraft/vanilla-data/lib/index.js";
+import ConfigInterface from "../../../interfaces/Config.js";
 
 const lastBreakTime = new Map<string, number>();
+
+function getRegistry() {
+    return dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+}
 
 function onPlayerLogout(event: PlayerLeaveAfterEvent): void {
     // Remove the player's data from the map when they log off
@@ -11,18 +16,28 @@ function onPlayerLogout(event: PlayerLeaveAfterEvent): void {
     lastBreakTime.delete(playerName);
 }
 
-async function afternukera(object: PlayerBreakBlockAfterEvent, breakData: Map<string, { breakCount: number; lastBreakTimeBefore: number }>, playerBreakBlockCallback: (arg: PlayerBreakBlockAfterEvent) => void): Promise<void> {
-    const antiNukerABoolean = dynamicPropertyRegistry.get("antinukera_b");
+async function afternukera(
+    object: PlayerBreakBlockAfterEvent,
+    breakData: Map<string, { breakCount: number; lastBreakTimeBefore: number }>,
+    beforePlayerBreakBlockCallback: (object: PlayerBreakBlockBeforeEvent) => void,
+    afterPlayerBreakBlockCallback: (object: PlayerBreakBlockAfterEvent) => void,
+    afterPlayerLeaveCallback: (object: PlayerLeaveAfterEvent) => void
+): Promise<void> {
+    const configuration = getRegistry();
+    const antiNukerABoolean = configuration.modules.antinukerA.enabled;
     if (antiNukerABoolean === false) {
+        breakData.clear();
         lastBreakTime.clear();
         world.afterEvents.playerLeave.unsubscribe(onPlayerLogout);
-        world.afterEvents.playerBreakBlock.unsubscribe(playerBreakBlockCallback);
+        world.afterEvents.playerLeave.unsubscribe(afterPlayerLeaveCallback);
+        world.afterEvents.playerBreakBlock.unsubscribe(afterPlayerBreakBlockCallback);
+        world.beforeEvents.playerBreakBlock.unsubscribe(beforePlayerBreakBlockCallback);
         return;
     }
 
     const { block, player, dimension, brokenBlockPermutation } = object;
     const { x, y, z } = block.location;
-    const uniqueId = dynamicPropertyRegistry.get(player?.id);
+    const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
     if (uniqueId === player.name) {
         return;
     }
@@ -43,12 +58,11 @@ async function afternukera(object: PlayerBreakBlockAfterEvent, breakData: Map<st
          * Oak, Spruce, Birch, Jungle, Acacia, Dark Oak,
          * Azalea, Flowering Azalea, Mangrove, Cherry.
          */
-        "minecraft:leaves",
-        "minecraft:leaves2",
-        "minecraft:azalea_leaves",
-        "minecraft:azalea_leaves_flowered",
-        "minecraft:cherry_leaves",
-        "minecraft:mangrove_leaves",
+        MinecraftBlockTypes.Leaves,
+        MinecraftBlockTypes.Leaves2,
+        MinecraftBlockTypes.AzaleaLeaves,
+        MinecraftBlockTypes.CherryLeaves,
+        MinecraftBlockTypes.MangroveLeaves,
 
         /**
          * Saplings
@@ -57,9 +71,9 @@ async function afternukera(object: PlayerBreakBlockAfterEvent, breakData: Map<st
          * Azalea, Flowering Azalea, Mangove Propagule, Cherry,
          * Bamboo.
          */
-        "minecraft:bamboo_sapling",
-        "minecraft:sapling",
-        "minecraft:cherry_sapling",
+        MinecraftBlockTypes.BambooSapling,
+        MinecraftBlockTypes.Sapling,
+        MinecraftBlockTypes.CherrySapling,
 
         /**
          * Flowers
@@ -69,12 +83,12 @@ async function afternukera(object: PlayerBreakBlockAfterEvent, breakData: Map<st
          * Peony, Pink Tulip, Poppy, Red Tulip, Rose Bush, Sunflower,
          * White Tulip, Wither Rose, Chorus.
          */
-        "minecraft:yellow_flower",
-        "minecraft:red_flower",
-        "minecraft:chorus_flower",
-        "minecraft:flowering_azalea",
-        "minecraft:azalea_leaves_flowered",
-        "minecraft:wither_rose",
+        MinecraftBlockTypes.AzaleaLeavesFlowered,
+        MinecraftBlockTypes.FloweringAzalea,
+        MinecraftBlockTypes.RedFlower,
+        MinecraftBlockTypes.ChorusFlower,
+        MinecraftBlockTypes.YellowFlower,
+        MinecraftBlockTypes.WitherRose,
 
         /**
          * Mushrooms
@@ -82,10 +96,10 @@ async function afternukera(object: PlayerBreakBlockAfterEvent, breakData: Map<st
          * Brown Mushroom, Brown Mushroom Block, Mushroom Stem,
          * Red Mushroom, Red Mushroom Block.
          */
-        "minecraft:brown_mushroom",
-        "minecraft:red_mushroom",
-        "minecraft:brown_mushroom_block",
-        "minecraft:red_mushroom_block",
+        MinecraftBlockTypes.RedMushroom,
+        MinecraftBlockTypes.RedMushroomBlock,
+        MinecraftBlockTypes.BrownMushroom,
+        MinecraftBlockTypes.BrownMushroomBlock,
 
         /**
          * Crops
@@ -94,17 +108,17 @@ async function afternukera(object: PlayerBreakBlockAfterEvent, breakData: Map<st
          * Melon, Pumpkin, Sugar Cane, Potatoes, Carrots
          * Beetroot, Wheat.
          */
-        "minecraft:melon_block",
-        "minecraft:melon_stem",
-        "minecraft:potatoes",
-        "minecraft:pumpkin",
-        "minecraft:carved_pumpkin",
-        "minecraft:pumpkin_stem",
-        "minecraft:beetroot",
-        "minecraft:bamboo",
-        "minecraft:wheat",
-        "minecraft:carrots",
-        "minecraft:reeds",
+        MinecraftBlockTypes.MelonBlock,
+        MinecraftBlockTypes.MelonStem,
+        MinecraftBlockTypes.Potatoes,
+        MinecraftBlockTypes.Pumpkin,
+        MinecraftBlockTypes.CarvedPumpkin,
+        MinecraftBlockTypes.PumpkinStem,
+        MinecraftBlockTypes.Beetroot,
+        MinecraftBlockTypes.Bamboo,
+        MinecraftBlockTypes.Wheat,
+        MinecraftBlockTypes.Carrots,
+        MinecraftBlockTypes.Reeds,
 
         /**
          * Cave Plants
@@ -113,17 +127,16 @@ async function afternukera(object: PlayerBreakBlockAfterEvent, breakData: Map<st
          * Moss Block, Moss Carpet, Small Dripleaf,
          * Spore Blossom, Cave Vines.
          */
-        "minecraft:glow_lichen",
-        "minecraft:small_dripleaf_block",
-        "minecraft:big_dripleaf",
-        "minecraft:cave_vines",
-        "minecraft:cave_vines_body_with_berries",
-        "minecraft:cave_vines_head_with_berries",
-        "minecraft:moss_block",
-        "minecraft:moss_carpet",
-        "minecraft:hanging_roots",
-        "minecraft:spore_blossom",
-        "minecraft:glow_berries",
+        MinecraftBlockTypes.GlowLichen,
+        MinecraftBlockTypes.SmallDripleafBlock,
+        MinecraftBlockTypes.BigDripleaf,
+        MinecraftBlockTypes.CaveVines,
+        MinecraftBlockTypes.CaveVinesBodyWithBerries,
+        MinecraftBlockTypes.CaveVinesHeadWithBerries,
+        MinecraftBlockTypes.MossBlock,
+        MinecraftBlockTypes.MossCarpet,
+        MinecraftBlockTypes.HangingRoots,
+        MinecraftBlockTypes.SporeBlossom,
 
         /**
          * Shrubbery
@@ -131,13 +144,14 @@ async function afternukera(object: PlayerBreakBlockAfterEvent, breakData: Map<st
          * Dead Bush, Fern, Grass, Large Fern,
          * Lily Pad, Tall Grass, Vines
          */
-        "minecraft:double_plant",
-        "minecraft:tallgrass",
-        "minecraft:deadbush",
-        "minecraft:vine",
-        "minecraft:twisting_vines",
-        "minecraft:weeping_vines",
-        "minecraft:chorus_plant",
+        MinecraftBlockTypes.Azalea,
+        MinecraftBlockTypes.DoublePlant,
+        MinecraftBlockTypes.Tallgrass,
+        MinecraftBlockTypes.Deadbush,
+        MinecraftBlockTypes.Vine,
+        MinecraftBlockTypes.TwistingVines,
+        MinecraftBlockTypes.WeepingVines,
+        MinecraftBlockTypes.ChorusPlant,
 
         /**
          * Nether
@@ -145,33 +159,33 @@ async function afternukera(object: PlayerBreakBlockAfterEvent, breakData: Map<st
          * Crimson Fungus, Warped Fungus, Nether Wart,
          * Nether Sprouts, Crimson Roots, Warped Roots.
          */
-        "minecraft:crimson_fungus",
-        "minecraft:warped_fungus",
-        "minecraft:nether_wart",
-        "minecraft:nether_sprouts",
-        "minecraft:crimson_roots",
-        "minecraft:warped_roots",
+        MinecraftBlockTypes.CrimsonFungus,
+        MinecraftBlockTypes.WarpedFungus,
+        MinecraftBlockTypes.NetherWart,
+        MinecraftBlockTypes.NetherSprouts,
+        MinecraftBlockTypes.CrimsonRoots,
+        MinecraftBlockTypes.WarpedRoots,
 
         /**
          * Water Plants
          *
          * Water Lily, Sea Grass, Kelp
          */
-        "minecraft:waterlily",
-        "minecraft:seagrass",
-        "minecraft:kelp",
+        MinecraftBlockTypes.Waterlily,
+        MinecraftBlockTypes.Seagrass,
+        MinecraftBlockTypes.Kelp,
 
         /**
          * Miscellaneous
          *
          * Blocks that I am too lazy to sort out right now
          */
-        "minecraft:cocoa",
-        "minecraft:cactus",
-        "minecraft:azalea",
-        "minecraft:sweet_berry_bush",
-        "minecraft:sweet_berries",
-        "minecraft:snow_layer",
+        MinecraftBlockTypes.Cocoa,
+        MinecraftBlockTypes.Cactus,
+        MinecraftBlockTypes.SweetBerryBush,
+        MinecraftBlockTypes.SnowLayer,
+        MinecraftBlockTypes.PowderSnow,
+        MinecraftBlockTypes.RedstoneWire,
     ];
 
     const efficiencyLevels: Record<number, number> = {
@@ -196,8 +210,8 @@ async function afternukera(object: PlayerBreakBlockAfterEvent, breakData: Map<st
 
     const requiredTimeDifference = efficiencyLevels[itemEfficiencyLevel];
 
-    if (vegetation.indexOf(brokenBlockPermutation.type.id) === -1 && lastBreakInSeconds && lastBreakInSeconds < requiredTimeDifference) {
-        if (counter >= 3) {
+    if (!vegetation.includes(brokenBlockPermutation.type.id as MinecraftBlockTypes) && lastBreakInSeconds && lastBreakInSeconds < requiredTimeDifference) {
+        if (counter >= 5) {
             const blockLoc = dimension.getBlock({ x: x, y: y, z: z });
             const blockID = brokenBlockPermutation.clone();
 
@@ -239,7 +253,8 @@ async function afternukera(object: PlayerBreakBlockAfterEvent, breakData: Map<st
 }
 
 function freeze(id: number) {
-    const antiNukerABoolean = dynamicPropertyRegistry.get("antinukera_b");
+    const configuration = getRegistry();
+    const antiNukerABoolean = configuration.modules.antinukerA.enabled;
     if (antiNukerABoolean === false) {
         system.clearRun(id);
         return;
@@ -259,25 +274,33 @@ function freeze(id: number) {
             player.removeTag("freezeNukerA");
             return;
         }
-        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f Frozen!", { subtitle: "§fContact Staff §4[§6AntiNukerA§4]§f", fadeInDuration: 0, fadeOutDuration: 0, stayDuration: 60 });
+        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f 凍結!", {
+            subtitle: "§fスタッフに連絡 §4[§6AntiNukerA§4]§f",
+            fadeInDuration: 0,
+            fadeOutDuration: 0,
+            stayDuration: 60,
+        });
     }
 }
 
-const AfterNukerA = (breakData: Map<string, { breakCount: number; lastBreakTimeBefore: number }>) => {
-    const playerBreakBlockCallback = (object: PlayerBreakBlockAfterEvent) => {
-        afternukera(object, breakData, playerBreakBlockCallback).catch((error) => {
-            console.error("Paradox Unhandled Rejection: ", error);
-            // Extract stack trace information
-            if (error instanceof Error) {
-                const stackLines = error.stack.split("\n");
-                if (stackLines.length > 1) {
-                    const sourceInfo = stackLines;
-                    console.error("Error originated from:", sourceInfo[0]);
-                }
+const AfterNukerA = (
+    object: PlayerBreakBlockAfterEvent,
+    breakData: Map<string, { breakCount: number; lastBreakTimeBefore: number }>,
+    beforePlayerBreakBlockCallback: (object: PlayerBreakBlockBeforeEvent) => void,
+    afterPlayerBreakBlockCallback: (object: PlayerBreakBlockAfterEvent) => void,
+    afterPlayerLeaveCallback: (object: PlayerLeaveAfterEvent) => void
+) => {
+    afternukera(object, breakData, beforePlayerBreakBlockCallback, afterPlayerBreakBlockCallback, afterPlayerLeaveCallback).catch((error) => {
+        console.error("Paradox Unhandled Rejection: ", error);
+        // Extract stack trace information
+        if (error instanceof Error) {
+            const stackLines = error.stack.split("\n");
+            if (stackLines.length > 1) {
+                const sourceInfo = stackLines;
+                console.error("Error originated from:", sourceInfo[0]);
             }
-        });
-    };
-    world.afterEvents.playerBreakBlock.subscribe(playerBreakBlockCallback);
+        }
+    });
     world.afterEvents.playerLeave.subscribe(onPlayerLogout);
     const id = system.runInterval(() => {
         freeze(id);

@@ -1,5 +1,10 @@
 import { world, EntityQueryOptions, Player, system } from "@minecraft/server";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
+import ConfigInterface from "../../../interfaces/Config.js";
+
+function getRegistry() {
+    return dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
+}
 
 function setTimeoutAsync(delay: number): Promise<void> {
     return new Promise((resolve) => system.runTimeout(resolve, delay));
@@ -7,15 +12,17 @@ function setTimeoutAsync(delay: number): Promise<void> {
 
 async function queueSleep(player: Player) {
     await Promise.all([player.runCommandAsync(`time set 126553000`), player.runCommandAsync(`weather clear`)]);
-    const hotbarBoolean = dynamicPropertyRegistry.get("hotbar_b");
+    const configuration = getRegistry();
+    const hotbarBoolean = configuration.modules.hotbar.enabled;
     if (hotbarBoolean === undefined || hotbarBoolean === false) {
-        player.runCommand(`title @a[tag=!vanish] actionbar おはよ～`);
+        player.runCommand(`title @a[tag=!vanish] actionbar おはよ`);
     }
 }
 
 async function ops(opsId: number) {
     // Get Dynamic Property
-    const opsBoolean = dynamicPropertyRegistry.get("ops_b");
+    const configuration = getRegistry();
+    const opsBoolean = configuration.modules.ops.enabled;
 
     // Unsubscribe if disabled in-game
     if (opsBoolean === false) {

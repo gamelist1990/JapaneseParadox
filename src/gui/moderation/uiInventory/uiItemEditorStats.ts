@@ -40,16 +40,16 @@ export function uiItemEditorStats(player: Player, targetPlayer: Player, itemSlot
         const maxDurability = durability.maxDurability;
         let currentDamage = durability.damage;
         //Show the stats for the item.
-        statsMenu.title("§4インベントリ：アイテムステータス§4");
+        statsMenu.title("§4アイテムステータス§4");
         statsMenu.body(
-            "現在のオンラインリスト: §6" +
+            "現在のプレイヤーのインベントリ: §6" +
                 targetPlayer.name +
                 "\n" +
-                "§rアイテムを指定: §6" +
+                "§r指定したアイテム: §6" +
                 item.typeId.replace("minecraft:", "") +
-                "§r\n\n現在のエンチャント: \n" +
+                "§r\n\nエンチャ: \n" +
                 formattedEnchantments +
-                "\n\n§rアイテム説明欄: \n" +
+                "\n\n§r追加: \n" +
                 formattedLore +
                 "\n\n耐久性: §6" +
                 (currentDamage = maxDurability - currentDamage) +
