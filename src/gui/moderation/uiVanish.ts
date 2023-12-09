@@ -45,12 +45,12 @@ async function handleUIVanish(vanishResult: ModalFormResponse, onlineList: strin
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはパラドックス・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
     }
 
     // オンラインですか？
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
     }
     if (member.hasTag("vanish")) {
         member.addTag("novanish");
@@ -68,7 +68,7 @@ async function handleUIVanish(vanishResult: ModalFormResponse, onlineList: strin
         for (const effectType of effectsToRemove) {
             player.removeEffect(effectType);
         }
-        sendMsgToPlayer(member, `§f§4[§6パラドックス§4]§fもはやあなたは消えていない。`);
+        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§fもはやあなたは消えていない。`);
         sendMsg(`a[tag=paradoxOpped]`, `§7${member.name}§f is no longer in vanish.`);
     }
 
@@ -78,7 +78,7 @@ async function handleUIVanish(vanishResult: ModalFormResponse, onlineList: strin
 
     if (member.hasTag("vanish") && !member.hasTag("novanish")) {
         member.triggerEvent("vanish");
-        sendMsgToPlayer(member, `§f§4[§6パラドックス§4]§fあなたは今、消滅した！`);
+        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§fあなたは今、消滅した！`);
         sendMsg(`a[tag=paradoxOpped]`, `§7${member.name}§f is now vanished!`);
     }
 

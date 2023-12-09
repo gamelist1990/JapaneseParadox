@@ -36,7 +36,7 @@ async function handleUIEnchantedArmor(enchantedarmorResult: ModalFormResponse, p
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f エンチャント・アーマーを設定するには、パラドックス・オッ プする必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f エンチャント・アーマーを設定するには、Paradox・オッ プする必要がある。`);
     }
     if (EnchantedArmorToggle === true) {
         // 許可する

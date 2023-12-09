@@ -45,7 +45,7 @@ async function handleUIFreeze(freezeResult: ModalFormResponse, onlineList: strin
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはパラドックス・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
     }
 
     const boolean = member.hasTag("paradoxFreeze");
@@ -69,7 +69,7 @@ async function handleUIFreeze(freezeResult: ModalFormResponse, onlineList: strin
             member.addEffect(effectType, 1000000, { amplifier: 255, showParticles: true });
         }
         member.addTag("paradoxFreeze");
-        sendMsgToPlayer(member, `§f§4[§6パラドックス§4]§f あなたは今凍っている。`);
+        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f あなたは今凍っている。`);
         sendMsg(`a[tag=paradoxOpped]`, `§7${member.name}§f 今あなたはフリーズしています.`);
         return;
     }

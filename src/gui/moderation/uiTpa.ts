@@ -23,11 +23,11 @@ export function uiTPA(tpaResult: ModalFormResponse, onlineList: string[], player
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはパラドックス・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
     }
     // オンラインですか？
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
     }
     // 選手が両方のオプションをBooleanにしていないか確認する。
     if (toggleTargetTo === true && toggleToTarget === true) {
@@ -36,7 +36,7 @@ export function uiTPA(tpaResult: ModalFormResponse, onlineList: string[], player
     }
     //は、プレーヤーがBoolean＝＞少なくとも1つの選択肢を持っていることを確認します。
     if (toggleTargetTo === false && toggleToTarget === false) {
-        sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f 一つのオプションをBooleanにしなければならない。`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 一つのオプションをBooleanにしなければならない。`);
         return paradoxui(player);
     }
     if (toggleToTarget === true) {

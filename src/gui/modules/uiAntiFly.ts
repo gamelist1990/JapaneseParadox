@@ -17,7 +17,7 @@ export function uiANTIFLY(antiflyResult: ModalFormResponse, player: Player) {
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fアンチフライを設定するには、パラドックス・オッピングが必要です。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fアンチフライを設定するには、Paradox・オッピングが必要です。`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;

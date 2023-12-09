@@ -50,7 +50,7 @@ async function handleUIMute(muteResult: ModalFormResponse, onlineList: string[],
 
     // 自分たちがミュートにならないようにする
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f 自分自身を無言にすることはできない。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 自分自身を無言にすることはできない。`);
     }
 
     // スタッフがミュートしないようにする

@@ -38,7 +38,7 @@ async function handleUIAntiKnockback(antiknockbackResult: ModalFormResponse, pla
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fアンチノックバックの設定にはパラドックス・オッ プが必要です。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fアンチノックバックの設定にはParadox・オッ プが必要です。`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;

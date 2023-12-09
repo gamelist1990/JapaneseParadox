@@ -19,7 +19,7 @@ export function uiILLEGALITEMS(illegalitemsResult: ModalFormResponse, player: Pl
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f 違法アイテムの設定には、パラドックス・オプが必要です。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 違法アイテムの設定には、Paradox・オプが必要です。`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;

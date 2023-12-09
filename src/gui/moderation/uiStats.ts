@@ -30,7 +30,7 @@ export function uiSTATS(statsResult: ModalFormResponse, onlineList: string[], pl
 
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
     if (uniqueId !== player.name) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはパラドックス・オップされる必要がある。`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
         return;
     }
 

@@ -38,7 +38,7 @@ async function handleUIAntiFall(antifallResult: ModalFormResponse, player: Playe
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f アンチフォールを設定するには、パラドックス・オプ状態にする必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f アンチフォールを設定するには、Paradox・オプ状態にする必要がある。`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;

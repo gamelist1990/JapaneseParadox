@@ -17,7 +17,7 @@ export function uiANTINUKER(antinukerResult: ModalFormResponse, player: Player) 
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fアンチ・ヌーカーの設定にはパラドックス・オップが必要です。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fアンチ・ヌーカーの設定にはParadox・オップが必要です。`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;

@@ -16,14 +16,14 @@ export function uiUNBAN(unbanResult: ModalFormResponse, player: Player) {
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fプレイヤーをBANするにはパラドックス・オッ プする必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fプレイヤーをBANするにはParadoxOPする必要がある。`);
     }
     if (deleteUnban === true) {
         queueUnban.delete(textField as string);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${textField}§f has been removed from the unban queue!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${textField}§f が禁止解除キューから削除されました。`);
     }
     // 選手をキューに追加
     queueUnban.add(textField as string);
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${textField}§f is queued to be unbanned!`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${textField}§f は禁止解除のキューに入れられています。`);
     return paradoxui(player);
 }

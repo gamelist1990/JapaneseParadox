@@ -16,7 +16,7 @@ export function uiEXPSALVAGESYSTEM(expsalvagesystemResult: ModalFormResponse, pl
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f Expサルベージシステムを設定するには、パラドックス・オプする必要があります。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Expサルベージシステムを設定するには、Paradox・オプする必要があります。`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;

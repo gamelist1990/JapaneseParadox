@@ -36,7 +36,7 @@ async function handleUIDespawner(despawnerResult: ModalFormResponse, player: Pla
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはパラドックス・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
     }
 
     // エンティティを見つけるか、要求があればすべてをデスポーンしてみる。
@@ -63,7 +63,7 @@ async function handleUIDespawner(despawnerResult: ModalFormResponse, player: Pla
         if (counter > 0) {
             sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Despawned:\n\n §o§6|§f §4[§f${requestedEntity}§4]§f §6Amount: §4x${counter}§f`);
         } else {
-            sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f デスポーンする実体が見つからない！`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f デスポーンする実体が見つからない！`);
         }
     }
     if (DespawnAllToggle === true) {
@@ -97,10 +97,10 @@ async function handleUIDespawner(despawnerResult: ModalFormResponse, player: Pla
             }
         }
         if (totalCounter > 0) {
-            sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f デスポーンした：`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f デスポーンした：`);
             sendMsgToPlayer(player, entityMessage);
         } else {
-            sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f デスポーンする実体が見つからない！`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f デスポーンする実体が見つからない！`);
         }
     }
     return paradoxui;

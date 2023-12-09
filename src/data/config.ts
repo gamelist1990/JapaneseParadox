@@ -249,7 +249,7 @@ export default {
         banAppeal: {
             enabled: true,
             //ここは個人に応じて変えてください
-            discordLink: "何か質問があればdiscordまで(@koukun_)",
+            discordLink: "何か異論があればdiscordまで(@koukun_)",
         },
         autoBan: {
             enabled: false,

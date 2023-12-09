@@ -23,16 +23,16 @@ export function uiBAN(banResult: ModalFormResponse, onlineList: string[], player
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fプレイヤーをBANするにはパラドックス・オッ プする必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fプレイヤーをBANするにはParadox・オッ プする必要がある。`);
     }
 
     //プレーヤーが自分自身を追放しないようにする。
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f 自分自身を禁止することはできない。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 自分自身を禁止することはできない。`);
     }
     // 理由が空白でないことを確認してください。
     if (!textField) {
-        sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f 禁止の理由を含めなければならない!`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 禁止の理由を含めなければならない!`);
         return paradoxui(player);
     }
 

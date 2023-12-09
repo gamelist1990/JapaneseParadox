@@ -65,17 +65,17 @@ export function uiOP(opResult: ModalFormResponse | ActionFormResponse, salt: str
 
                 dynamicPropertyRegistry.setProperty(targetPlayer, targetPlayer.id, targetPlayer.name);
 
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You have granted Paradox-Op to §7${targetPlayer.name}§f.`);
-                sendMsgToPlayer(targetPlayer, `§f§4[§6パラドックス§4]§f あなたは今、操作している！`);
-                sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${targetPlayer.name}§f is now Paradox-Opped.`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Paradox操作を§7${targetPlayer.name}§fに付与しました。`);
+                sendMsgToPlayer(targetPlayer, `§f§4[§6Paradox§4]§f あなたは今、操作している！`);
+                sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${targetPlayer.name}§f は Paradox-Opped になりました。`);
                 targetPlayer.addTag("paradoxOpped");
                 return paradoxui(player);
             } else {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f §7${targetPlayer.name}§f is already Paradox-Opped.`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f§7${targetPlayer.name}§f は既にParadoxOPである。`);
                 return paradoxui(player);
             }
         } else {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Could not find player §7${targetPlayer.name}§f.`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fプレーヤーが見つかりませんでした§7${targetPlayer.name}§f.`);
             return paradoxui(player);
         }
     } else if ("selection" in opResult) {
@@ -89,7 +89,7 @@ export function uiOP(opResult: ModalFormResponse | ActionFormResponse, salt: str
             player.setDynamicProperty("salt", targetSalt);
             player.addTag("paradoxOpped");
 
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたは今、パラドックスに縛られている！`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたは今、Paradoxに縛られている！`);
 
             dynamicPropertyRegistry.setProperty(player, player.id, player.name);
 

@@ -17,7 +17,7 @@ export function uiANTIJESUS(antijesusResult: ModalFormResponse, player: Player) 
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f アンチ・イエスを構成するためには、パラドックスに陥る必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f アンチ・イエスを構成するためには、Paradoxに陥る必要がある。`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;

@@ -32,12 +32,12 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはパラドックス・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
     }
 
     // オンラインですか？
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
     }
 
     //選択した選手の保存場所を取得する。

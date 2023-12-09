@@ -14,7 +14,7 @@ export function uiTPR(requester: string, player: Player, respons: string) {
 
     // オンラインですか？
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
     }
 
     // このTPRリクエストを完成させよう

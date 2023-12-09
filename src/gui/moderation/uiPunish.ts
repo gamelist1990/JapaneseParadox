@@ -44,21 +44,21 @@ async function handleUIPunish(punishResult: ModalFormResponse, onlineList: strin
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f罰則を使うにはパラドックス・オップである必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f罰則を使うにはParadox・オップである必要がある。`);
     }
 
     // オンラインですか？
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
     }
 
     // 自分自身を罰することがないようにする
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f あなた自身を罰することはできない。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f あなた自身を罰することはできない。`);
     }
     //スタッフに罰を与えないようにする！
     if (member.hasTag("paradoxOpped")) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f スタッフを罰することはできない。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f スタッフを罰することはできない。`);
     }
     // 0から29までの30個のスロットがある。
     // エンダーの胸を一掃しよう
@@ -80,8 +80,8 @@ async function handleUIPunish(punishResult: ModalFormResponse, onlineList: strin
         } catch {}
     }
     // 罰が行われたことをスタッフと選手に通知する。
-    sendMsgToPlayer(member, `§f§4[§6パラドックス§4]§f あなたがたは自分の行いのために罰を受けた！`);
+    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f あなたがたは自分の行いのために罰を受けた！`);
     // タグ「通知」を誰も持っていない場合は、try/catchを使用する。
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has punished §7${member.name}§f`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f は §7${member.name}§f を罰した`);
     return paradoxui(player);
 }

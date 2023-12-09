@@ -18,7 +18,7 @@ export function uiBADPACKETS(badpacketsResult: ModalFormResponse, player: Player
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fバッドパケットを設定するには、パラドックス・オップである必要があります。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fバッドパケットを設定するには、Paradox・オップである必要があります。`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;

@@ -3,7 +3,7 @@ import { ModalFormData } from "@minecraft/server-ui";
 import { uiItemEditorEnchantments } from "./uiItemEditor";
 export function uiItemEditorEnchantmentsMenu(player: Player, targetPlayer: Player, itemSlot: number) {
     const itemEditor = new ModalFormData();
-    itemEditor.title("§4パラドックス - アイテムエディター・エンチャント§4");
+    itemEditor.title("§4Paradox - アイテムエディター・エンチャント§4");
     itemEditor.toggle("エンチャントを追加", false);
     itemEditor.textField("魅惑", "ノックバック");
     itemEditor.textField("エンチャント値", "3");
@@ -15,7 +15,7 @@ export function uiItemEditorEnchantmentsMenu(player: Player, targetPlayer: Playe
             uiItemEditorEnchantments(InvEditorUIResult, player, targetPlayer, itemSlot);
         })
         .catch((error) => {
-            console.error("パラドックスの未処理拒否：", error);
+            console.error("Paradoxの未処理拒否：", error);
             // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");

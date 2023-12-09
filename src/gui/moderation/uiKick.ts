@@ -41,19 +41,19 @@ async function handleUIKick(banResult: ModalFormResponse, onlineList: string[], 
     }
 
     if (!member) {
-        sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
         return paradoxui(player);
     }
 
     // 自分たちで蹴らないようにする
     if (member === player) {
-        sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f 自分を蹴ることはできない。`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 自分を蹴ることはできない。`);
         return paradoxui(player);
     }
 
     player.runCommandAsync(`kick "${member.name}" §f\n\n${reason}`).catch((error) => {
         console.warn(`${new Date()} | ` + error);
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手を蹴ることができなかった．`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手を蹴ることができなかった．`);
     });
     sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f が §7${member.name}をキックしました§f. 理由: §7${reason}§f`);
     return paradoxui(player);

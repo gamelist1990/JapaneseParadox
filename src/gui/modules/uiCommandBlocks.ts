@@ -57,7 +57,7 @@ async function handleUICommandBlocks(commandblocksResult: ModalFormResponse, pla
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fコマンドブロックを設定するには、パラドックス・オップである必要があります。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fコマンドブロックを設定するには、Paradox・オップである必要があります。`);
     }
     if (CommandBlockOverrideToggle === true && cmdoBoolean === false) {
         // 許可する

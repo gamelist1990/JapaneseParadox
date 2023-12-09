@@ -84,7 +84,7 @@ export function banMessage(player: Player) {
     }
 
     if (configuration.modules.banAppeal.enabled === true) {
-        const appealLink = `\n§4[§6Appeal§4]§f: §b${configuration.modules.banAppeal.discordLink}`;
+        const appealLink = `\n§4[§6discord§4]§f: §b${configuration.modules.banAppeal.discordLink}`;
         player.runCommandAsync(`kick "${player.name}" §f\n§l§4あなたは禁止されています!§r\n§4[§6禁止By§4]§f: §7${by || "§7N/A"}§f\n§4[§6理由§4]§f: §7${reason || "§7N/A"}§f${appealLink}`).catch(() => {
             // If we can't kick them with /kick, then we instantly despawn them
             kickablePlayers.add(player);
@@ -99,7 +99,7 @@ export function banMessage(player: Player) {
     }
 
     // Notify staff that a player was banned
-    sendMsg("@a[tag=paradoxOpped]", [`§f§4[§6Paradox§4]§f §7${player.name}§f '§4[§6禁止令§4]§f: §7${by || "§7N/A"}§f', '§4[§6理由§4]§f: §7${reason || "§7該当なし"}§f`]);
+    sendMsg("@a[tag=paradoxOpped]", [`§f§4[§6Paradox§4]§f §7${player.name}§f '§4[§6禁止§4]§f: §7${by || "§7N/A"}§f', '§4[§6理由§4]§f: §7${reason || "§7該当なし"}§f`]);
 }
 
 /**

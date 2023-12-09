@@ -17,7 +17,7 @@ export function uiANTISHULKER(antishulkerResult: ModalFormResponse, player: Play
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f アンチ・シュルカーを設定するためには、パラドックス・オプテッドである必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f アンチ・シュルカーを設定するためには、Paradox・オプテッドである必要がある。`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;

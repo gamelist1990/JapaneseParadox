@@ -44,7 +44,7 @@ export function uiPREFIX(prefixResult: ModalFormResponse, onlineList: string[], 
          * Make sure we are not attempting to set a prefix that can break commands
          */
         if (textField === "/") {
-            sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f 接頭辞 '§7/§f' の使用は許されない！`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 接頭辞 '§7/§f' の使用は許されない！`);
             return paradoxui;
         }
 
@@ -62,7 +62,7 @@ export function uiPREFIX(prefixResult: ModalFormResponse, onlineList: string[], 
     // リセットが切り替えられた
     if (toggle) {
         resetPrefix(player, configuration);
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Prefix has been reset for §7${member.name}§f!`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレフィックスがリセットされました §7${member.name}§f!`);
     }
     return paradoxui(player);
 }

@@ -17,7 +17,7 @@ export function uiWORLDBORDER(worldborderResult: ModalFormResponse, player: Play
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fワールド・ボーダーを設定するには、パラドックス・オッピングが必要です。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fワールド・ボーダーを設定するには、Paradox・オッピングが必要です。`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;

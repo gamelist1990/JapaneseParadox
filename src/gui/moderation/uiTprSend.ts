@@ -21,7 +21,7 @@ export function uiTPRSEND(tprSendRequestResult: ModalFormResponse, onlineList: s
 
     // オンラインですか？
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
     }
     //プレーヤーとリクエストされたメンバーに基づいて、テレポートのリクエストを送信します。
     const prefix = getPrefix(player);

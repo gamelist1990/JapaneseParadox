@@ -44,21 +44,21 @@ async function handleUIEWipe(ewipeResult: ModalFormResponse, onlineList: string[
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはパラドックス・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
     }
 
     // オンラインですか？
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
     }
 
     // 自分自身を罰することがないようにする
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f 自分自身を拭くことはできない。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 自分自身を拭くことはできない。`);
     }
     //スタッフに罰を与えないようにする！
     if (member.hasTag("paradoxOpped")) {
-        return sendMsgToPlayer(player, `§f§4[§6パラドックス§4]§f スタッフを消すことはできない。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f スタッフを消すことはできない。`);
     }
     // 0から29までの30個のスロットがある。
     // エンダーの胸を一掃しよう
@@ -66,7 +66,7 @@ async function handleUIEWipe(ewipeResult: ModalFormResponse, onlineList: string[
         member.runCommand(`replaceitem entity @s slot.enderchest ${slot} air`);
     }
     // 罰が行われたことをスタッフと選手に通知する。
-    sendMsgToPlayer(member, `§f§4[§6パラドックス§4]§f あなたのエンダーチェストは拭かれた！`);
+    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f あなたのエンダーチェストは拭かれた！`);
     // タグ「通知」を誰も持っていない場合は、try/catchを使用する。
     sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f が §7${member.name}'s§f のエンダーチェストを消した!`);
     return paradoxui(player);

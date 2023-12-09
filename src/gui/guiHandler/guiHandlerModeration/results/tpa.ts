@@ -16,7 +16,7 @@ export function tpaHandler(player: Player) {
             uiTPA(tpaResult, onlineList, player);
         })
         .catch((error) => {
-            console.error("パラドックスの未処理拒否：", error);
+            console.error("Paradoxの未処理拒否：", error);
             // スタックトレース情報の抽出
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
