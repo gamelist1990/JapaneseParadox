@@ -62,7 +62,7 @@ function clearLag(id: number) {
 
     const countdown = createCountdown(configuration);
 
-    const msSettings = countdown.days * 24 * 60 * 60 + countdown.hours * 60 * 60 + countdown.minutes * 60 + countdown.seconds * 1000;
+    const msSettings = countdown.days * 24 * 60 * 60 * 1000 + countdown.hours * 60 * 60 * 1000 + countdown.minutes * 60 * 1000 + countdown.seconds * 1000;
     const timePassed = Date.now() - cooldownVerify;
     const timeLeft = msSettings - timePassed;
 

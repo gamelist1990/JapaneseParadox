@@ -104,12 +104,12 @@ export default {
             enabled: true,
         },
         namespoofA: {
-            enabled: true,
+            enabled: false,
             minNameLength: 3,
             maxNameLength: 16,
         },
         namespoofB: {
-            enabled: true,
+            enabled: false,
             // eslint-disable-next-line no-control-regex
             banregex: /[^\x00-\x7F]|[/:\\*?"<>]|^\.$|\.$/gu,
             // Deny any invalid character not within the scope of this regex
@@ -220,7 +220,7 @@ export default {
             message: "ホットバー通知", // Put Message inside the quotes
         },
         ops: {
-            enabled: false,
+            enabled: true,
         },
         salvage: {
             enabled: false,
@@ -284,9 +284,9 @@ export default {
      * This is required for Realm users to gain Paradox-Op.
      *
      * Anyone else is welcome to use this if they like but
-     * are not obligated.
+     * レルムズの人はここにパスワードを入れてください！！
      */
     encryption: {
-        password: "HACKERBAN",
+        password: "",
     },
 };

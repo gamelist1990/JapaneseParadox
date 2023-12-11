@@ -24,7 +24,6 @@ import { Survival } from "./penrose/TickEvent/gamemode/survival.js";
 import { Adventure } from "./penrose/TickEvent/gamemode/adventure.js";
 import { Creative } from "./penrose/TickEvent/gamemode/creative.js";
 import { IllegalItemsC } from "./penrose/TickEvent/illegalitems/illegalitems_c.js";
-import { OPS } from "./penrose/TickEvent/oneplayersleep/oneplayersleep.js";
 import { Hotbar } from "./penrose/TickEvent/hotbar/hotbar.js";
 import { VerifyPermission } from "./penrose/TickEvent/noperms/verifypermission.js";
 import { BadPackets2 } from "./penrose/TickEvent/badpackets2/badpackets2.js";
@@ -104,7 +103,6 @@ async function main() {
     ClearLag();
     BadPackets2();
     VerifyPermission;
-    OPS();
     Hotbar();
     NoPerms;
     Vanish;

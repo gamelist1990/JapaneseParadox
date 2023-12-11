@@ -117,7 +117,7 @@ export function modules(message: ChatSendAfterEvent, args: string[]) {
     //ベクター
     const spawnProtectionVector3 = configuration.modules.spawnprotection.vector3;
 
-    const status = (b: string | number | boolean | Vector3) => (b ? "§aBoolean" : "§4無効");
+    const status = (b: string | number | boolean | Vector3) => (b ? "§a有効" : "§4無効");
 
     sendMsgToPlayer(player, [
         `§f§4[§6Paradox§4]§f モジュールのリスト．`,
@@ -139,8 +139,8 @@ export function modules(message: ChatSendAfterEvent, args: string[]) {
         `§o§6|§f InvalidSprintA: ${status(InvalidSprintABoolean)}`,
         `§o§6|§f FlyA: ${status(flyABoolean)}`,
         `§o§6|§f AntiFallA: ${status(antiFallABoolean)}`,
-        `§o§6|§f IllegalItemsA: ${illegalItemsABoolean ? `§aBoolean§f [Ban Illegal Stacks: ${status(stackBanBoolean)}§f]` : "§4無効"}.`,
-        `§o§6|§f IllegalItemsB: ${illegalItemsBBoolean ? `§aBoolean§f [Ban Illegal Stacks: ${status(stackBanBoolean)}§f]` : "§4無効"}.`,
+        `§o§6|§f IllegalItemsA: ${illegalItemsABoolean ? `§a有効§f [Ban Illegal Stacks: ${status(stackBanBoolean)}§f]` : "§4無効"}.`,
+        `§o§6|§f IllegalItemsB: ${illegalItemsBBoolean ? `§a有効§f [Ban Illegal Stacks: ${status(stackBanBoolean)}§f]` : "§4無効"}.`,
         `§o§6|§f IllegalItemsC: ${status(illegalItemsCBoolean)}`,
         `§o§6|§f IllegalEnchantments: ${status(illegalEnchantmentBoolean)}`,
         `§o§6|§f IllegalLores: ${status(illegalLoresBoolean)}`,
@@ -160,12 +160,12 @@ export function modules(message: ChatSendAfterEvent, args: string[]) {
         `§o§6|§f Anti-KillAura: ${status(antiKillAuraBoolean)}`,
         `§o§6|§f Anti-Enchanted: ${status(encharmor)}`,
         `§o§6|§f Autoclicker: ${status(autoclickerBoolean)}`,
-        `§o§6|§f World Border: ${worldBorderBoolean ? `§aBoolean§f (Overworld: §6${worldBorderOverworldNumber}§f Nether: §6${worldBorderNetherNumber}§f End: §6${worldBorderEndNumber}§f)` : "§4無効"}.`,
+        `§o§6|§f World Border: ${worldBorderBoolean ? `§a有効§f (Overworld: §6${worldBorderOverworldNumber}§f Nether: §6${worldBorderNetherNumber}§f End: §6${worldBorderEndNumber}§f)` : "§4無効"}.`,
         `§o§6|§f ClearLag: ${status(clearLagBoolean)}`,
         `§o§6|§f ShowRules: ${status(showrulesBoolean)}`,
         `§o§6|§f AutoBan: ${status(autobanBoolean)}`,
         `§o§6|§f AFK: ${status(afkBoolean)}`,
         `§o§6|§f AntiPhaseA: ${status(antiPhaseABoolean)}`,
-        `§o§6|§f Spawn Protection: ${spawnprotectionBoolean ? `§aBoolean§f (X: §6${spawnProtectionVector3.x}§f Y: §6${spawnProtectionVector3.y}§f Z: §6${spawnProtectionVector3.z}§f Radius: §6${spawnProtectionRadius}§f)` : "§4無効"}.`,
+        `§o§6|§f Spawn Protection: ${spawnprotectionBoolean ? `§a有効§f (X: §6${spawnProtectionVector3.x}§f Y: §6${spawnProtectionVector3.y}§f Z: §6${spawnProtectionVector3.z}§f Radius: §6${spawnProtectionRadius}§f)` : "§4無効"}.`,
     ]);
 }

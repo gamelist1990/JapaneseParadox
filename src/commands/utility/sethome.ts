@@ -109,6 +109,7 @@ function setHomeHelp(player: Player, prefix: string, configuration: ConfigInterf
         `       §4[§7セットホーム§4の現在のステータスを表示する]§f`,
         `§4[§6例§4]§f：`,
         `    ${prefix}sethome --name barn`,
+        `    ${prefix}sethome --n barn`,
         `    ${prefix}sethome --help`,
         `    ${prefix}sethome --max ${configuration.modules.setHome.max}`,
         `    ${prefix}sethome --disable`,

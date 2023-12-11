@@ -1,9 +1,9 @@
 {
     "format_version": 2,
     "header": {
-        "name": "Paradox AntiCheat",
-        "description": "A utility to fight against malicious hackers on Bedrock Edition ~ v3.4.4",
-        "uuid": "54edfea5-ab51-47ca-b992-724e255b5560",
+        "name": "Paradox AntiCheat3.4.6日本語！！",
+        "description": "Bedrock Edition で悪意のあるハッカーと戦うためのアンチチート日本語版 ~ v3.4.6",
+        "uuid": "46bbb93f-f68e-4c4c-823b-526a768f95bf",
         "version": [
             3,
             4,
@@ -17,7 +17,7 @@
     },
     "metadata": {
         "authors": [
-            "Visual1mpact, Pete9xi"
+            "Visual1mpact, Pete9xi, koukun_"
         ],
         "license": "GPLv3",
         "url": "https://github.com/Pete9xi/Paradox_AntiCheat"
@@ -25,7 +25,7 @@
     "modules": [
         {
             "type": "data",
-            "uuid": "d8395127-6923-4fb7-93d2-977cecd463e0",
+            "uuid": "de17215f-5a9a-4c18-bfb3-5f594a851f9f",
             "version": [
                 1,
                 0,
@@ -36,7 +36,7 @@
             "description": "Paradox AntiCheat Gametest Features",
             "language": "javascript",
             "type": "script",
-            "uuid": "1326c87b-37f3-4543-9f0f-0d03893134e1",
+            "uuid": "ff22c5e4-908c-48e5-bf88-5ab73c86fbab",
             "version": [
                 0,
                 0,

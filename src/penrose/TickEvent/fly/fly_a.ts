@@ -151,7 +151,11 @@ function flya(id: number) {
         if (uniqueId === player.name) {
             continue;
         }
-
+        //Check if the player is gliding... temp fix!
+        const glideCheck = player.isGliding;
+        if (glideCheck) {
+            continue;
+        }
         const fallCheck = player.isFalling;
         if (fallCheck) {
             // Record falling data

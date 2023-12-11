@@ -1,6 +1,5 @@
 import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import { ChatSendAfterEvent, Player } from "@minecraft/server";
-import { OPS } from "../../penrose/TickEvent/oneplayersleep/oneplayersleep.js";
 import { dynamicPropertyRegistry } from "../../penrose/WorldInitializeAfterEvent/registry.js";
 import ConfigInterface from "../../interfaces/Config.js";
 
@@ -111,7 +110,8 @@ async function handleOps(message: ChatSendAfterEvent, args: string[]) {
                     configuration.modules.ops.enabled = true;
                     dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
                     sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 以下の機能が有効です=> §6OPS§f!`);
-                    OPS();
+                    //Use the native inbuilt gamerule
+                    player.runCommandAsync(`/gamerule playersSleepingPercentage 1`);
                 }
                 break;
             case "-d":
@@ -124,6 +124,8 @@ async function handleOps(message: ChatSendAfterEvent, args: string[]) {
                     configuration.modules.ops.enabled = false;
                     dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
                     sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f は無効 §4OPS§f!`);
+                    //Use the native inbuilt gamerule
+                    player.runCommandAsync(`/gamerule playersSleepingPercentage 100`);
                 }
                 break;
         }

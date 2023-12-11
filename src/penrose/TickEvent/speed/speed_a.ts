@@ -1,4 +1,4 @@
-import { world, system, EntityQueryOptions, GameMode, PlayerLeaveAfterEvent, EntityHurtAfterEvent, PlayerSpawnAfterEvent } from "@minecraft/server";
+import { world, system, EntityQueryOptions, GameMode, PlayerLeaveAfterEvent, EntityHurtAfterEvent, PlayerSpawnAfterEvent, EntityEquippableComponent, EquipmentSlot, Enchantment, ItemEnchantsComponent } from "@minecraft/server";
 import { flag, isTimerExpired } from "../../../util.js";
 import { dynamicPropertyRegistry } from "../../WorldInitializeAfterEvent/registry.js";
 import ConfigInterface from "../../../interfaces/Config.js";
@@ -103,6 +103,26 @@ function speeda(id: number) {
         const rideCheck = player.hasTag("riding");
         if (rideCheck) {
             continue;
+        }
+        //trident check
+        const equipment = player.getComponent("equippable") as EntityEquippableComponent;
+        const mainhand = equipment.getEquipment(EquipmentSlot.Mainhand);
+        if (mainhand && mainhand.typeId === "minecraft:trident") {
+            const enchantmentsComponent = mainhand.getComponent("minecraft:enchantments") as ItemEnchantsComponent;
+            const enchantmentList = enchantmentsComponent.enchantments;
+            const iterator = enchantmentList[Symbol.iterator]();
+            let iteratorResult = iterator.next();
+            let targetEnchant = false;
+            while (!iteratorResult.done) {
+                const enchantment: Enchantment = iteratorResult.value;
+                if (enchantment.type.id === "riptide") {
+                    targetEnchant = true;
+                }
+                iteratorResult = iterator.next();
+            }
+            if (targetEnchant === true) {
+                continue;
+            }
         }
 
         const playerName = player.id;
