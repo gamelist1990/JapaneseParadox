@@ -12,8 +12,8 @@ interface TeleportRequest {
 
 const teleportRequests: TeleportRequest[] = [];
 
-// これにより、teleportRequests 配列から
-// その内容を誤って変更することで、メモリリークを引き起こす。
+// This allows us to read from the teleportRequests array without
+// creating a memory leak by accidentally modifying its contents.
 export function getTeleportRequests(): TeleportRequest[] {
     return teleportRequests;
 }
@@ -26,29 +26,29 @@ function tprHelp(player: Player, prefix: string, setting: boolean) {
         commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `§n§o§4[§6コマンド§4]§f: tpr`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6使用§4]§f: tpr [オプション］`,
-        `§4[§6オプション§4]§f: 名前、ヘルプ`,
-        `§4[§6解説§4]§f：プレイヤーにTPのリクエストを送る。`,
-        `§4[§6例§4]§f：`,
+        `\n§o§4[§6コマンド§4]§f: tpr`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
+        `§4[§6使用法§4]§f: tpr [optional]`,
+        `§4[§6Optional§4]§f: name, help`,
+        `§4[§6説明§4]§f: Will send requests to tp to players.`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}tpr ${player.name}`,
-        `        §4- §6指定したプレイヤーにテレポート要請を出す§f`,
+        `        §4- §6Send a teleport request to the specified player§f`,
         `    ${prefix}tpr help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
-// これはリクエストの提出を処理する。
+// This handles the submission of requests
 function teleportRequestHandler({ sender, message }: ChatSendAfterEvent, configuration: ConfigInterface) {
     const player = sender;
     const args = message.split(" ");
     if (args.length < 2) return;
 
-    // メッセージからターゲット名を取り出す。
+    // Extract the target name from the message, including the "@" symbol
     const targetName = args[1].trim();
 
-    // 要求されたプレーヤーを"@"記号を含めて探してみる。
+    // Try to find the player requested, including the "@" symbol
     let target: Player | undefined;
     const players = world.getPlayers();
     for (const pl of players) {
@@ -86,14 +86,14 @@ function teleportRequestHandler({ sender, message }: ChatSendAfterEvent, configu
     teleportRequests.push({
         requester: player,
         target,
-        expiresAt: Date.now() + durationInMs, // Expires in the time specified in '継続時間'
+        expiresAt: Date.now() + durationInMs, // Expires in the time specified in 'durationInMs'
     });
 
     sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Teleport request sent to §7${target.name}§f. Waiting for approval...`);
     sendMsgToPlayer(target, `§f§4[§6Paradox§4]§f You have received a teleport request from §7${player.name}§f. Type '§7approved§f' or '§7denied§f' in chat to respond.`);
 }
 
-// 承認待ちのリクエストを処理します。
+// This handles requests pending approval
 function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
     const { sender, message } = object;
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
@@ -102,7 +102,7 @@ function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
     let extractedPhrase: string;
     if (configuration.modules.chatranks.enabled) {
         lowercaseMessage = (world as WorldExtended).decryptString(message, sender.id).toLowerCase();
-        // 復号化された文字列からレスポンスを取り出す
+        // Extract the response from the decrypted string
         refChar = lowercaseMessage.split("§r");
         extractedPhrase = refChar[1];
     } else {
@@ -119,9 +119,9 @@ function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
 
     object.sendToTargets = true;
 
-    // ターゲットはリクエストしたプレーヤー、プレーヤーはリクエストに応答した同じターゲットである。
+    // Target is the player with the request and player is the same target responding to the request
     const requestIndex = teleportRequests.findIndex((r) => r.target === player);
-    // ターゲットは存在しない。
+    // Target doesn't exist so return
     if (requestIndex === -1) return;
 
     const request = teleportRequests[requestIndex];
@@ -150,30 +150,30 @@ function teleportRequestApprovalHandler(object: ChatSendAfterEvent) {
 }
 
 export function TeleportRequestHandler({ sender, message }: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを検証する
+    // Validate that required params are defined
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? ./commands/utility/tpr.js:71)");
+        return console.warn(`${new Date()} | ` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? ./commands/utility/tpr.js:71)");
     }
 
     const player = sender;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // 反論はあるか
+    // Are there arguements
     if (!args.length) {
         return tprHelp(player, prefix, configuration.customcommands.tpr);
     }
 
-    // 助けを求められたか
+    // Was help requested
     const argCheck = args[0];
     if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.tpr) {
         return tprHelp(player, prefix, configuration.customcommands.tpr);
     }
 
-    // 提出されたリクエストはここで扱う
+    // Handle submitted requests here
     if (message.startsWith(`${prefix}tpr`)) {
         const event = {
             sender,
@@ -182,7 +182,7 @@ export function TeleportRequestHandler({ sender, message }: ChatSendAfterEvent, 
         teleportRequestHandler(event, configuration);
     }
 
-    // これは承認または拒否を送信する際のGUI用である。
+    // This is for the GUI when sending approvals or denials
     const validMessages = ["approved", "approve", "denied", "deny"];
 
     if (validMessages.some((msg) => msg === message)) {
@@ -194,9 +194,9 @@ export function TeleportRequestHandler({ sender, message }: ChatSendAfterEvent, 
     }
 }
 
-// teleportRequestApprovalHandler にサブスクライブする。
+// Subscribe to teleportRequestApprovalHandler
 const TpRequestListener = () => {
-    // TPRが無効でない場合
+    // If TPR is not disabled
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const validate = configuration.customcommands.tpr;
     if (validate) {

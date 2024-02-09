@@ -29,32 +29,32 @@ import { paradoxui } from "../../paradoxui";
 export function modulesui(player: Player) {
     //Modules ui
     const modulesui = new ActionFormData();
-    modulesui.title("§4アンチチート設定§4");
-    modulesui.button("禁止するゲームモード", "textures/items/totem");
-    modulesui.button("移動系", "textures/ui/move");
-    modulesui.button("KillAura検知", "textures/items/diamond_sword");
-    modulesui.button("Nukerを対策", "textures/blocks/tnt_side");
-    modulesui.button("シュルカーを禁止", "textures/blocks/shulker_top_purple");
-    modulesui.button("スパム", "textures/ui/mute_off");
-    modulesui.button("AutoCliker検知", "textures/ui/cursor_gamecore");
-    modulesui.button("Badpackets検知", "textures/ui/upload_glyph");
-    modulesui.button("Bedrock Validationを設定", "textures/blocks/bedrock");
-    modulesui.button("エンチャントアーマーを無効化", "textures/items/diamond_leggings");
-    modulesui.button("禁止アイテムを検知", "textures/items/netherite_pickaxe");
-    modulesui.button("サーバー最適化", "textures/ui/interact");
-    modulesui.button("Name spoofingを検知", "textures/items/fishing_rod_uncast");
-    modulesui.button("一人寝たら朝になるよ！", "textures/items/bed_red");
-    modulesui.button("ワールドでのコマブロを禁止", "textures/blocks/command_block");
-    modulesui.button("リーチを確認", "textures/ui/crossout");
-    modulesui.button("Salvage System【よくわからん】", "textures/blocks/smithing_table_front");
-    modulesui.button("スパム設定", "textures/ui/mute_on");
-    modulesui.button("ワールドボーダーを設定", "textures/blocks/barrier");
-    modulesui.button("Xray誰がなんの鉱石手に入れたか分かる", "textures/blocks/diamond_ore");
-    modulesui.button("ホットバーメッセージ", "textures/items/paper");
-    modulesui.button("放置民キック", "textures/ui/keyboard_and_mouse_glyph_color");
-    modulesui.button("壁抜け検知", "textures/blocks/end_portal");
-    modulesui.button("座標を保護します", "textures/blocks/barrier");
-    modulesui.button("戻る");
+    modulesui.title("§4Paradox - Modules§4");
+    modulesui.button("Configure Anti Gamemodes", "textures/items/totem");
+    modulesui.button("Configure Movement Modules", "textures/ui/move");
+    modulesui.button("Configure Anti KillAura", "textures/items/diamond_sword");
+    modulesui.button("Configure Anti Nuker", "textures/blocks/tnt_side");
+    modulesui.button("Configure Anti Shulker", "textures/blocks/shulker_top_purple");
+    modulesui.button("Configure Anti Spam", "textures/ui/mute_off");
+    modulesui.button("Configure Anti AutoClicker", "textures/ui/cursor_gamecore");
+    modulesui.button("Configure Badpackets", "textures/ui/upload_glyph");
+    modulesui.button("Configure Bedrock Validation", "textures/blocks/bedrock");
+    modulesui.button("Configure Enchanted Armor", "textures/items/diamond_leggings");
+    modulesui.button("Configure Illegal Items", "textures/items/netherite_pickaxe");
+    modulesui.button("Configure Lag Clearing", "textures/ui/interact");
+    modulesui.button("Configure Name spoofing", "textures/items/fishing_rod_uncast");
+    modulesui.button("Configure One Player Sleep(OPS)", "textures/items/bed_red");
+    modulesui.button("Configure Command Blocks", "textures/blocks/command_block");
+    modulesui.button("Configure Anti Reach", "textures/ui/crossout");
+    modulesui.button("Configure Salvage System", "textures/blocks/smithing_table_front");
+    modulesui.button("Configure Spam Modules", "textures/ui/mute_on");
+    modulesui.button("Configure World Borders", "textures/blocks/barrier");
+    modulesui.button("Configure Xray", "textures/blocks/diamond_ore");
+    modulesui.button("Configure Hotbar", "textures/items/paper");
+    modulesui.button("Configure AFK", "textures/ui/keyboard_and_mouse_glyph_color");
+    modulesui.button("Configure Anti Phase", "textures/blocks/end_portal");
+    modulesui.button("Configure Spawn Protection", "textures/blocks/barrier");
+    modulesui.button("Back");
     modulesui
         .show(player)
         .then((ModulesUIResult) => {

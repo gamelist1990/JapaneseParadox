@@ -8,17 +8,17 @@ import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiAUTOBAN(autobanResult: ModalFormResponse, player: Player) {
     if (!autobanResult || autobanResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [autobanToggle] = autobanResult.formValues;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped.`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
@@ -26,17 +26,17 @@ export function uiAUTOBAN(autobanResult: ModalFormResponse, player: Player) {
     const autoBanBoolean = configuration.modules.autoBan.enabled;
 
     if (autobanToggle === true && autoBanBoolean === false) {
-        // 許可する
+        // Allow
         configuration.modules.autoBan.enabled = true;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6autoban§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6autoban§f!`);
         AutoBan();
     }
     if (autobanToggle === false && autoBanBoolean === true) {
-        // 拒否する
+        // Deny
         configuration.modules.autoBan.enabled = false;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4autoban§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4autoban§f!`);
     }
 
     return paradoxui(player);

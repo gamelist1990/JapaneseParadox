@@ -8,21 +8,21 @@ export function antiPhaseAHandler(player: Player) {
     const modulesantiphaseui = new ModalFormData();
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const antiPhaseBoolean = configuration.modules.antiphaseA.enabled;
-    modulesantiphaseui.title("§4 Anti Phaseメニュー§4");
-    modulesantiphaseui.toggle("アンチフェイズ - プレイヤーのフェイズブロックをチェックする：", antiPhaseBoolean);
+    modulesantiphaseui.title("§4Paradox Modules - Anti Phase§4");
+    modulesantiphaseui.toggle("Anti Phase - Checks player's for phasing blocks:", antiPhaseBoolean);
     modulesantiphaseui
         .show(player)
         .then((antiphaseResult) => {
             uiANTIPHASE(antiphaseResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

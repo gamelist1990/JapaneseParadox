@@ -5,25 +5,25 @@ import { uiSPEED } from "../../../../modules/uiSpeed";
 import ConfigInterface from "../../../../../interfaces/Config";
 
 export function speedAHandler(player: Player) {
-    //スピードA
+    //SpeedA
     const modulesspeedui = new ModalFormData();
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const speedABoolean = configuration.modules.speedA.enabled;
-    modulesspeedui.title("§4Speedメニュー§4");
-    modulesspeedui.toggle("スピード - 選手のスピードハッキングをチェックする：", speedABoolean);
+    modulesspeedui.title("§4Paradox Modules - Speed§4");
+    modulesspeedui.toggle("Speed - Checks for player's speed hacking:", speedABoolean);
     modulesspeedui
         .show(player)
         .then((invalidsprintResult) => {
             uiSPEED(invalidsprintResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

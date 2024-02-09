@@ -7,21 +7,21 @@ import { paradoxui } from "../paradoxui.js";
 import ConfigInterface from "../../interfaces/Config.js";
 
 const configMessageBackup = new WeakMap();
-// ダミーオブジェクト
+// Dummy object
 const dummy: object = [];
 
 export function uiHOTBAR(hotbarResult: ModalFormResponse, player: Player) {
     if (!hotbarResult || hotbarResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [HotbarMessage, HotbarToggle, HotbarRestDefaultMessageToggle] = hotbarResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fホットバーを設定するには、Paradox-Opped にする必要があります。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to configure the hotbar`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
@@ -30,21 +30,21 @@ export function uiHOTBAR(hotbarResult: ModalFormResponse, player: Player) {
         configMessageBackup.set(dummy, configuration.modules.hotbar.message);
     }
     if (HotbarToggle === true && HotbarRestDefaultMessageToggle === false) {
-        // 許可する
+        // Allow
         configuration.modules.hotbar.enabled = true;
         configuration.modules.hotbar.message = HotbarMessage as string;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§7${player.name}§f Boolean＝＞ §6Hotbar`);
+        sendMsg("@a[tag=paradoxOpped]", `§7${player.name}§f has enabled §6Hotbar`);
         Hotbar();
     }
     if (HotbarToggle === false) {
-        // 拒否する
+        // Deny
         configuration.modules.hotbar.enabled = false;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§7${player.name}§f 無効＝＞ §6Hotbar`);
+        sendMsg("@a[tag=paradoxOpped]", `§7${player.name}§f has disabled §6Hotbar`);
     }
     if (HotbarToggle === false && HotbarRestDefaultMessageToggle === true) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fメッセージをリセットするには、ホットバーのトグルをBooleanにする必要があります！`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to enable the hotbar toggle to reset the message!`);
         return paradoxui(player);
     }
     if (HotbarToggle === true && HotbarRestDefaultMessageToggle === true) {
@@ -53,6 +53,6 @@ export function uiHOTBAR(hotbarResult: ModalFormResponse, player: Player) {
         Hotbar();
     }
 
-    //完了したら、プレイヤーにメインUIを表示する。
+    //show the main ui to the player once complete.
     return paradoxui(player);
 }

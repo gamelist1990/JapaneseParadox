@@ -4,23 +4,23 @@ import { uiManagePlayerSavedLocations } from "../../../moderation/uiManagePlayer
 
 export function managePlayerSavedLocationsHandler(player: Player) {
     const managePlayerSavedLocationsUI = new ModalFormData();
-    managePlayerSavedLocationsUI.title("§4座標を管理§4");
+    managePlayerSavedLocationsUI.title("§4Paradox - Players Saved Locations§4");
     let onlineList: string[] = [];
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    managePlayerSavedLocationsUI.dropdown(`\n§fユーザーを選択管理：§f\n\n以下のプレイヤーがオンラインです\n`, onlineList);
+    managePlayerSavedLocationsUI.dropdown(`\n§fSelect a player:§f\n\nPlayer's Online\n`, onlineList);
     managePlayerSavedLocationsUI
         .show(player)
         .then((managePlayerSavedLocationsUIResult) => {
             uiManagePlayerSavedLocations(managePlayerSavedLocationsUIResult, onlineList, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

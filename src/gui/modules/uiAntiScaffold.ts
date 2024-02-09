@@ -16,7 +16,7 @@ import ConfigInterface from "../../interfaces/Config.js";
 export function uiANTISCAFFOLD(antiscaffoldResult: ModalFormResponse, player: Player) {
     handleUIAntiScaffold(antiscaffoldResult, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -29,34 +29,34 @@ export function uiANTISCAFFOLD(antiscaffoldResult: ModalFormResponse, player: Pl
 
 async function handleUIAntiScaffold(antiscaffoldResult: ModalFormResponse, player: Player) {
     if (!antiscaffoldResult || antiscaffoldResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [AntiScaffoldToggle] = antiscaffoldResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fアンチ・スカフォールドを設定するには、Paradox・オッピングが必要です。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to configure Anti Scaffold`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
     if (AntiScaffoldToggle === true) {
-        // 許可する
+        // Allow
         configuration.modules.antiscaffoldA.enabled = true;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6AntiScaffoldA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6AntiScaffoldA§f!`);
         ScaffoldA();
     }
     if (AntiScaffoldToggle === false) {
-        // 拒否する
+        // Deny
         configuration.modules.antiscaffoldA.enabled = false;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4AntiScaffoldA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4AntiScaffoldA§f!`);
     }
 
-    //完了したら、プレイヤーにメインUIを表示する。
+    //show the main ui to the player once complete.
     return paradoxui(player);
 }

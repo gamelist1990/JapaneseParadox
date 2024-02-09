@@ -47,22 +47,22 @@ async function showrules(id: number) {
         }
 
         const form = new MessageFormData();
-        form.title("ルール");
+        form.title("Server Rules");
         form.body(CompleteRules);
-        form.button1("はい");
-        form.button2("いいえ");
+        form.button1("I Agree");
+        form.button2("Decline");
         const r = await form.show(player);
 
         if (r.selection === 0) {
             playersAwaitingResponse.delete(player.id); // Player has responded, remove from set.
             player.removeTag("ShowRulesOnJoin");
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ルールを呼んでくれてありがとう！！ ${player.name}.`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Thank you for accepting the rules §7${player.name}§f.`);
             return;
         }
         if (r.selection === 1) {
             playersAwaitingResponse.delete(player.id); // Player has responded, remove from set.
             if (configuration.modules.showrules.kick === true) {
-                const reason = "ルールに同意してくれなかった為キックされました";
+                const reason = "You must agree to the rules to join.";
                 player.runCommandAsync(`kick "${player.name}" §f\n\n${reason}`).catch(() => {
                     kickablePlayers.add(player);
                     player.triggerEvent("paradox:kick");

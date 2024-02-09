@@ -10,82 +10,82 @@ import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiGAMEMODES(gamemodeResult: ModalFormResponse, player: Player) {
     if (!gamemodeResult || gamemodeResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [AdventureGM, CreativeGM, SurvivalGM] = gamemodeResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fゲームモードを設定するには、Paradox-Oppedになる必要があります。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to configure gamemodes`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
     if (AdventureGM === true && CreativeGM === true && SurvivalGM === true) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f全てのゲームモードを無効にすることはできません！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You can't disable all gamemodes!`);
     }
-    //アドベンチャー・ゲームモード
+    //Adventure gamemode
     if (AdventureGM === true && configuration.modules.adventureGM.enabled === false) {
-        // 許可する
+        // Allow
         configuration.modules.adventureGM.enabled = true;
-        // すべてがロックされた場合、深刻な問題を引き起こす可能性があるため、少なくとも1つは許可されていることを確認する。
-        // この場合、アドベンチャー・モードを許可する
+        // Make sure at least one is allowed since this could cause serious issues if all were locked down
+        // We will allow Adventure Mode in this case
         if (configuration.modules.survivalGM.enabled === true && configuration.modules.creativeGM.enabled === true) {
             configuration.modules.adventureGM.enabled = false;
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f全てのゲームモードが禁止されたため、アドベンチャーモードがBooleanになりました。`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f Since all gamemodes were disallowed, Adventure mode has been enabled.`);
             Adventure();
         }
         sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disallowed §4Gamemode 2 (Adventure)§f to be used!`);
         Adventure();
     }
     if (AdventureGM === false && configuration.modules.adventureGM.enabled === true) {
-        // 拒否する
+        // Deny
         configuration.modules.adventureGM.enabled = false;
         sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has allowed §6Gamemode 2 (Adventure)§f to be used!`);
     }
-    //クリエイティブなゲームモード
+    //Creative gamemode
     if (CreativeGM === true && configuration.modules.creativeGM.enabled === false) {
-        // 許可する
+        // Allow
         configuration.modules.creativeGM.enabled = true;
-        // すべてがロックされた場合、深刻な問題を引き起こす可能性があるため、少なくとも1つは許可されていることを確認する。
-        // この場合、アドベンチャー・モードを許可する
+        // Make sure at least one is allowed since this could cause serious issues if all were locked down
+        // We will allow Adventure Mode in this case
         if (configuration.modules.adventureGM.enabled === true && configuration.modules.survivalGM.enabled === false) {
             configuration.modules.adventureGM.enabled = false;
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f全てのゲームモードが使用不可となったため、アドベンチャーモ ードを使用可能にしました。`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f Since all gamemodes were disallowed, Adventure mode has been enabled.`);
             Adventure();
         }
         sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disallowed §4Gamemode 1 (Creative)§f to be used!`);
         Creative();
     }
     if (CreativeGM === false && configuration.modules.creativeGM.enabled === true) {
-        // 拒否する
+        // Deny
         configuration.modules.creativeGM.enabled = false;
         sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has allowed §6Gamemode 1 (Creative)§f to be used!`);
     }
     if (SurvivalGM === true && configuration.modules.survivalGM.enabled === false) {
-        // 許可する
+        // Allow
         configuration.modules.survivalGM.enabled = true;
-        // すべてがロックされた場合、深刻な問題を引き起こす可能性があるため、少なくとも1つは許可されていることを確認する。
-        // この場合、アドベンチャー・モードを許可する
+        // Make sure at least one is allowed since this could cause serious issues if all were locked down
+        // We will allow Adventure Mode in this case
         if (configuration.modules.adventureGM.enabled === true && configuration.modules.creativeGM.enabled === true) {
             configuration.modules.adventureGM.enabled = false;
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f全てのゲームモードが禁止されたため、アドベンチャーモードがBooleanになりました。`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f Since all gamemodes were disallowed, Adventure mode has been enabled.`);
             Adventure();
         }
         sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disallowed §4Gamemode 0 (Survival)§f to be used!`);
         Survival();
     }
     if (SurvivalGM === false && configuration.modules.survivalGM.enabled === true) {
-        // 拒否する
+        // Deny
         configuration.modules.survivalGM.enabled = false;
         sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has allowed §6Gamemode 0 (Survival)§f to be used!`);
     }
 
     dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
 
-    //メインUIをプレイヤーに表示する。
+    //show the main ui to the player one complete.
     return paradoxui(player);
 }

@@ -20,23 +20,23 @@ import { paradoxui } from "../../paradoxui";
 export function moderationui(player: Player) {
     //new window for Moderation
     const moderationui = new ActionFormData();
-    moderationui.title("§4管理者メニュー§4");
+    moderationui.title("§4Paradox Moderation§4");
     moderationui.button("Ban", "textures/ui/hammer_l");
-    moderationui.button("Ban解除", "textures/ui/check");
-    moderationui.button("ルール", "textures/items/book_writable");
-    moderationui.button("チャット", "textures/ui/newOffersIcon");
-    moderationui.button("メンテナンス", "textures/ui/lock_color");
-    moderationui.button("アイテム削除", "textures/ui/trash");
-    moderationui.button("テレポート", "textures/blocks/portal_placeholder");
-    moderationui.button("キック", "textures/items/gold_boots");
-    moderationui.button("エンダーチェスト消去", "textures/blocks/ender_chest_front");
-    moderationui.button("フリーズ", "textures/ui/frozen_effect");
-    moderationui.button("飛行モード", "textures/ui/flyingascend");
-    moderationui.button("透明", "textures/items/potion_bottle_invisibility");
-    moderationui.button("モブをキル", "textures/ui/trash");
-    moderationui.button("自動Ban", "textures/ui/hammer_l");
-    moderationui.button("インベントリ", "textures/blocks/chest_front");
-    moderationui.button("戻る");
+    moderationui.button("Un-ban", "textures/ui/check");
+    moderationui.button("Rules", "textures/items/book_writable");
+    moderationui.button("Chat", "textures/ui/newOffersIcon");
+    moderationui.button("Lockdown", "textures/ui/lock_color");
+    moderationui.button("Punish", "textures/ui/trash");
+    moderationui.button("Teleport Assistance", "textures/blocks/portal_placeholder");
+    moderationui.button("Kick a player", "textures/items/gold_boots");
+    moderationui.button("Wipe an Enderchest", "textures/blocks/ender_chest_front");
+    moderationui.button("Freeze a player", "textures/ui/frozen_effect");
+    moderationui.button("Allow a player to fly", "textures/ui/flyingascend");
+    moderationui.button("Vanish", "textures/items/potion_bottle_invisibility");
+    moderationui.button("Despawn entities", "textures/ui/trash");
+    moderationui.button("Auto Ban", "textures/ui/hammer_l");
+    moderationui.button("Inventory", "textures/blocks/chest_front");
+    moderationui.button("Back");
 
     moderationui
         .show(player)

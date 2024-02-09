@@ -5,25 +5,25 @@ import { dynamicPropertyRegistry } from "../../../../../penrose/WorldInitializeA
 import ConfigInterface from "../../../../../interfaces/Config";
 
 export function invalidSprintHandler(player: Player) {
-    //無効なスプリント
+    //Invalid Sprint
     const modulesinvalidsprintui = new ModalFormData();
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const invalidSprintABoolean = configuration.modules.invalidsprintA.enabled;
-    modulesinvalidsprintui.title("§4Invalid Sprintメニュー§4");
-    modulesinvalidsprintui.toggle("無効スプリント - 失明効果による不正なスプリントをチェックする：", invalidSprintABoolean);
+    modulesinvalidsprintui.title("§4Paradox Modules - Invalid Sprint§4");
+    modulesinvalidsprintui.toggle("Invalid Sprint - Checks for illegal sprinting with blindness effect:", invalidSprintABoolean);
     modulesinvalidsprintui
         .show(player)
         .then((invalidsprintResult) => {
             uiINVALIDSPRINT(invalidsprintResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

@@ -4,11 +4,11 @@ import { sendMsg, sendMsgToPlayer } from "../../util";
 import { paradoxui } from "../paradoxui.js";
 import { ModalFormResponse } from "@minecraft/server-ui";
 function mayflydisable(player: Player, member: Player) {
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ fly mode for ${player === member ? "themselves" : "§7" + member.name}.`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled fly mode for ${player === member ? "themselves" : "§7" + member.name}.`);
 }
 
 function mayflyenable(player: Player, member: Player) {
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ fly mode for ${player === member ? "themselves" : "§7" + member.name}.`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled fly mode for ${player === member ? "themselves" : "§7" + member.name}.`);
 }
 
 /**
@@ -22,7 +22,7 @@ function mayflyenable(player: Player, member: Player) {
 export function uiFLY(flyResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUIFly(flyResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -35,7 +35,7 @@ export function uiFLY(flyResult: ModalFormResponse, onlineList: string[], player
 
 async function handleUIFly(flyResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!flyResult || flyResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [value] = flyResult.formValues;
@@ -47,16 +47,16 @@ async function handleUIFly(flyResult: ModalFormResponse, onlineList: string[], p
             break;
         }
     }
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped.`);
     }
 
-    // オンラインですか？
+    // Are they online?
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
     const membertag = member.getTags();
 
@@ -68,7 +68,7 @@ async function handleUIFly(flyResult: ModalFormResponse, onlineList: string[], p
                 mayflyenable(player, member);
             })
             .catch(() => {
-                return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f教育版はこの世界では無効である。`);
+                return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Education Edition is disabled in this world.`);
             });
 
         return;
@@ -87,7 +87,7 @@ async function handleUIFly(flyResult: ModalFormResponse, onlineList: string[], p
                 member.removeTag("noflying");
             })
             .catch(() => {
-                return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f教育版はこの世界では無効である。`);
+                return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Education Edition is disabled in this world.`);
             });
         return;
     }

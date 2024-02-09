@@ -12,26 +12,26 @@ import ConfigInterface from "../../interfaces/Config.js";
  * @param {boolean} setting - The status of the overridecbe custom command setting.
  */
 function overrideCBEHelp(player: Player, prefix: string, cmdsscore: number, setting: boolean): void {
-    // コマンドとモジュールのステータスを決定する
-    const commandStatus: string = setting ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
-    const moduleStatus: string = cmdsscore <= 0 ? "§6[§4無効§6]§f" : "§6[§a有効§6]§f";
+    // Determine the status of the command and module
+    const commandStatus: string = setting ? "§6[§aENABLED§6]§f" : "§6[§4DISABLED§6]§f";
+    const moduleStatus: string = cmdsscore <= 0 ? "§6[§4DISABLED§6]§f" : "§6[§aENABLED§6]§f";
 
-    // 選手にヘルプ情報を表示する
+    // Display help information to the player
     sendMsgToPlayer(player, [
-        `§6コマンド§4]§f: オーバーライド`,
+        `\n§o§4[§6Command§4]§f: overridecbe`,
         `§4[§6Status§4]§f: ${commandStatus}`,
         `§4[§6Module§4]§f: ${moduleStatus}`,
         `§4[§6Usage§4]§f: ${prefix}overridecbe [options]`,
-        `§4[§6Description§4]§f：commandblocksBoolean gamerule を常にBooleanまたは無効にする。`,
-        `§4[§6オプション§4]§f：`,
+        `§4[§6Description§4]§f: Forces the commandblocksenabled gamerule to be enabled or disabled at all times.`,
+        `§4[§6Options§4]§f:`,
         `    -h, --help`,
-        `       §4[§7このヘルプメッセージを表示する§4]§f`,
+        `       §4[§7Display this help message§4]§f`,
         `    -s, --status`,
-        `       §4[§7CommandBlocksBooleanモジュールの現在の状態を表示する§4]§f`,
+        `       §4[§7Display the current status of CommandBlocksEnabled module§4]§f`,
         `    -e, --enable`,
-        `       §4[§7Enable CommandBlocksBoolean モジュール§4]§f`,
+        `       §4[§7Enable CommandBlocksEnabled module§4]§f`,
         `    -d, --disable`,
-        `       §4[§7CommandBlocksBoolean モジュールを無効にする§4]§f`,
+        `       §4[§7Disable CommandBlocksEnabled module§4]§f`,
     ]);
 }
 
@@ -43,7 +43,7 @@ function overrideCBEHelp(player: Player, prefix: string, cmdsscore: number, sett
 export function overridecbe(message: ChatSendAfterEvent, args: string[]) {
     handleOverrideCBE(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -60,68 +60,68 @@ export function overridecbe(message: ChatSendAfterEvent, args: string[]) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 async function handleOverrideCBE(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを検証する
+    // Validate that required params are defined
     if (!message) {
         return console.warn(`${new Date()} | ` + `Error: ${message} isnt defined. Did you forget to pass it? (./commands/settings/overridecbe.js:7)`);
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     const cmdsscore = ScoreManager.getScore("cmds", player);
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 位置以外の引数をチェックする
+    // Check for additional non-positional arguments
     const length = args.length;
     let validFlagFound = false; // Flag to track if any valid flag is encountered
     for (let i = 0; i < length; i++) {
         const additionalArg: string = args[i].toLowerCase();
 
-        // 追加引数の処理
+        // Handle additional arguments
         switch (additionalArg) {
             case "-h":
             case "--help":
-                // ヘルプメッセージを表示する
+                // Display help message
                 validFlagFound = true;
                 overrideCBEHelp(player, prefix, cmdsscore, configuration.customcommands.overidecommandblocksenabled);
                 break;
             case "-s":
             case "--status":
-                // CommandBlocksBooleanモジュールの現在のステータスを表示する。
+                // Display current status of CommandBlocksEnabled module
                 validFlagFound = true;
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f CommandBlocksBoolean module is currently ${cmdsscore <= 0 ? "§4無効" : "§aBoolean"}§f.`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f CommandBlocksEnabled module is currently ${cmdsscore <= 0 ? "§4DISABLED" : "§aENABLED"}§f.`);
                 break;
             case "-e":
             case "--enable":
-                // CommandBlocksBooleanモジュールをBooleanにする
+                // Enable CommandBlocksEnabled module
                 validFlagFound = true;
                 if (cmdsscore <= 0) {
                     player.runCommand(`scoreboard players set paradox:config cmds 1`);
-                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has set CommandBlocksBoolean as §aBoolean§f!`);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has set CommandBlocksEnabled as §aenabled§f!`);
                 } else {
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fCommandBlocksBooleanモジュールは既にBooleanです。`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f CommandBlocksEnabled module is already enabled`);
                 }
                 break;
             case "-d":
             case "--disable":
-                // CommandBlocksBooleanモジュールを無効にする
+                // Disable CommandBlocksEnabled module
                 validFlagFound = true;
                 if (cmdsscore <= 0) {
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fコマンドブロックBooleanモジュールが既に無効`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f CommandBlocksEnabled module is already disabled`);
                 } else {
                     player.runCommand(`scoreboard players set paradox:config cmds 0`);
-                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has set CommandBlocksBoolean as §4無効§f!`);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has set CommandBlocksEnabled as §4disabled§f!`);
                 }
                 break;
         }

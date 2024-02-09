@@ -5,14 +5,11 @@ import { UIREPORTPLAYER } from "../../playerui/uiReport";
 export function reportHandler(player: Player) {
     //Non Opped player Report UI
     const reportplayerui = new ModalFormData();
-    reportplayerui.title("§4報告§4");
+    reportplayerui.title("§4Paradox - Report A Player§4");
     let onlineList: string[] = [];
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    reportplayerui.dropdown(
-        `\n§r報告したいプレイヤーがを選択してください！バグなどは【FairImpala41312】がオンラインだと思うのでその人に送ってね！荒らしやチーターはその荒らしのユーザーをオンラインの中から指定してこの人荒らしなどの理由で報告してね具体的だと運営としてはうれしい§r\n\n以下のプレイヤーがオンラインです\n`,
-        onlineList
-    );
-    reportplayerui.textField("報告したい内容を入れてください", "");
+    reportplayerui.dropdown(`\n§fSelect a player from the list, your report will then be sent to staff members:§f\n\nPlayer's Online\n`, onlineList);
+    reportplayerui.textField("Please provide a reason as to why you are reporting this player:", "");
     reportplayerui
         .show(player)
         .then((reportResult) => {

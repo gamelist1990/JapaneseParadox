@@ -8,33 +8,33 @@ import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiANTINUKER(antinukerResult: ModalFormResponse, player: Player) {
     if (!antinukerResult || antinukerResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [AntiNukerToggle] = antinukerResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fアンチ・ヌーカーの設定にはParadox・オップが必要です。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to configure Anti Nuker`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
     if (AntiNukerToggle === true) {
-        // 許可する
+        // Allow
         configuration.modules.antinukerA.enabled = true;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6AntiNukerA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6AntiNukerA§f!`);
         BeforeNukerA();
     }
     if (AntiNukerToggle === false) {
         configuration.modules.antinukerA.enabled = false;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4AntiNukerA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4AntiNukerA§f!`);
     }
 
-    //完了したら、プレイヤーにメインUIを表示する。
+    //show the main ui to the player once complete.
     return paradoxui(player);
 }

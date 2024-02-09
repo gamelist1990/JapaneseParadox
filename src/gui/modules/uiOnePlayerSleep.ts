@@ -8,16 +8,16 @@ import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiOPS(opsResult: ModalFormResponse, player: Player) {
     if (!opsResult || opsResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [OnePlayerSleepToggle] = opsResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f OPSを設定するには、Paradox・オップである必要があります。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to configure OPS`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
@@ -25,16 +25,16 @@ export function uiOPS(opsResult: ModalFormResponse, player: Player) {
     if (OnePlayerSleepToggle === true) {
         configuration.modules.ops.enabled = true;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6OPS§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6OPS§f!`);
         OPS();
     }
     if (OnePlayerSleepToggle === false) {
-        // 拒否する
+        // Deny
         configuration.modules.ops.enabled = false;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4OPS§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4OPS§f!`);
     }
 
-    //完了したら、プレイヤーにメインUIを表示する。
+    //show the main ui to the player once complete.
     return paradoxui(player);
 }

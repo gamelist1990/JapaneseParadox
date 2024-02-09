@@ -9,7 +9,7 @@ import { PlayerExtended } from "../../classes/PlayerExtended/Player";
 
 export function uiSTATS(statsResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!statsResult || statsResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [value] = statsResult.formValues;
@@ -24,13 +24,13 @@ export function uiSTATS(statsResult: ModalFormResponse, onlineList: string[], pl
     }
 
     if (!member) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fプレイヤーがオンラインでない。`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f The player is not online.`);
         return;
     }
 
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
     if (uniqueId !== player.name) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped.`);
         return;
     }
 
@@ -116,19 +116,19 @@ export function uiSTATS(statsResult: ModalFormResponse, onlineList: string[], pl
     }
 
     const ResultsUI = new ActionFormData();
-    ResultsUI.title("§4Report for §4" + member.name);
+    ResultsUI.title("§4Paradox - Report for §4" + member.name);
     const tempstring = reportBody.toString().replaceAll(",", "");
     ResultsUI.body(tempstring);
     ResultsUI.button("Close");
     ResultsUI.show(player)
         .then(() => {
-            //単にメインUIを表示し直す
+            //Simply re show the main UI
             paradoxui(player);
             return;
         })
         .catch((error) => {
             console.error("Paradox Unhandled Rejection: ", error);
-            // スタックトレース情報の抽出
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
@@ -137,5 +137,5 @@ export function uiSTATS(statsResult: ModalFormResponse, onlineList: string[], pl
                 }
             }
         });
-    //リターンプレーヤー；
+    //return player;
 }

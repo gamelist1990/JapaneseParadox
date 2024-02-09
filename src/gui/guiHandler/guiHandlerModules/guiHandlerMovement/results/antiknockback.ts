@@ -5,25 +5,25 @@ import { uiANTIKNOCKBACK } from "../../../../modules/uiAntiKnockback";
 import ConfigInterface from "../../../../../interfaces/Config";
 
 export function antiKnockBackHandler(player: Player) {
-    //アンチノックバックUI
+    //Anti Knockback UI
     const modulesantiknockbackui = new ModalFormData();
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const antikbBoolean = configuration.modules.antikbA.enabled;
-    modulesantiknockbackui.title("§4Anti KnockBackメニュー§4");
-    modulesantiknockbackui.toggle("アンチノックバック - すべてのプレイヤーにアンチノックバックを：", antikbBoolean);
+    modulesantiknockbackui.title("§4Paradox Modules - Anti KnockBack§4");
+    modulesantiknockbackui.toggle("Anti Knockback - Anti Knockback for all players:", antikbBoolean);
     modulesantiknockbackui
         .show(player)
         .then((antikbResult) => {
             uiANTIKNOCKBACK(antikbResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

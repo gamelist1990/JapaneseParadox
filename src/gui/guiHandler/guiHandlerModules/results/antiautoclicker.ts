@@ -8,21 +8,21 @@ export function antiAutoClickerHandler(player: Player) {
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const autoClickerBoolean = configuration.modules.autoclicker.enabled;
     const modulesantiautoclickerui = new ModalFormData();
-    modulesantiautoclickerui.title("§4Anti AutoClickerメニュー§4");
-    modulesantiautoclickerui.toggle("アンチオートクリッカー - 攻撃中にオートクリッカーを使っているプレイヤーをチェックする：", autoClickerBoolean);
+    modulesantiautoclickerui.title("§4Paradox Modules - Anti AutoClicker§4");
+    modulesantiautoclickerui.toggle("Anti AutoClicker - Checks for players using autoclickers while attacking:", autoClickerBoolean);
     modulesantiautoclickerui
         .show(player)
         .then((antiautoclickerResult) => {
             uiANTIAUTOCLICKER(antiautoclickerResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

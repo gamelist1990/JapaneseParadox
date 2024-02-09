@@ -8,21 +8,21 @@ function unmuteHelp(player: Player, prefix: string, setting: boolean) {
     if (!setting) {
         commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§a有効§6]§f";
+        commandStatus = "§6[§a有効§6]§f。";
     }
     return sendMsgToPlayer(player, [
-        `\n[コマンド§4]§f: ミュート解除`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
+        `\n§o§4[§6コマンド§4]§f: unmute`,
+        `§4[§6ステータス§4]§f: ${commandStatus}.`,
         `§4[§6使用§4]§f: ミュート解除 [オプション］`,
-        `§4[§6オプション§4]§f: ユーザー名、理由、ヘルプ`,
-        `§4[§6Description§4]§f：指定されたユーザのミュートを解除し、オプションで理由を示す。`,
+        `§4[§6Optional§4]§f: username, reason, help`,
+        `§4[§6説明§4]§f：指定されたユーザのミュートを解除し、オプションで理由を示す。`,
         `§4[§6例§4]§f：`,
         `    ${prefix}unmute ${player.name}`,
-        `        §4- §6理由を指定せずに${player.name}のミュートを解除§f`,
-        `    ${prefix}unmute ${player.name} You may chat`,
-        `        §4- §6理由"You may chat"で${player.name}のミュートを解除§f`,
+        `        §4- §6Unmute ${player.name}理由を明示せずに§f`,
+        `    ${prefix}unmute ${player.name} チャットしてもいいですよ`,
+        `        §4- §6Unmute ${player.name} 「チャットしてもいいよ」という理由で§f`,
         `    ${prefix}unmute help`,
-        `        §4- §6コマンドのヘルプを表示§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -33,13 +33,13 @@ function unmuteHelp(player: Player, prefix: string, setting: boolean) {
  */
 export function unmute(message: ChatSendAfterEvent, args: string[]) {
     handleUnmute(message, args).catch((error) => {
-        console.error("Paradox Unhandled Rejection: ", error);
+        console.error("Paradoxの未処理拒否：", error);
         // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
                 const sourceInfo = stackLines;
-                console.error("Error originated from:", sourceInfo[0]);
+                console.error("エラーの原因", sourceInfo[0]);
             }
         }
     });
@@ -48,7 +48,7 @@ export function unmute(message: ChatSendAfterEvent, args: string[]) {
 async function handleUnmute(message: ChatSendAfterEvent, args: string[]) {
     // 必要なパラメータが定義されていることを確認する
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? ./commands/moderation/unmute.js:30)");
+        return console.warn(`新しい日付()}。|` + "エラー: ${message} が定義されていません。渡し忘れですか？./commands/moderation/unmute.js:30)");
     }
 
     const player = message.sender;
@@ -58,7 +58,11 @@ async function handleUnmute(message: ChatSendAfterEvent, args: string[]) {
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
@@ -79,7 +83,7 @@ async function handleUnmute(message: ChatSendAfterEvent, args: string[]) {
 
     // 引数処理の変更
     let playerName = args.shift();
-    let reason = "No reason specified";
+    let reason = "理由なし";
 
     // コマンドに理由があるかチェックする
     if (args.length > 1) {
@@ -113,8 +117,8 @@ async function handleUnmute(message: ChatSendAfterEvent, args: string[]) {
     } else {
         return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのプレイヤーはミュートされていない。`);
     }
-    // エデュケーション・エディションがBooleanになっている場合は、合法的にミュートを解除する。
-    member.runCommandAsync(`ability @s mute false`);
+    // エデュケーション・エディションが有効になっている場合は、合法的にミュートを解除する。
+    member.runCommandAsync(`能力 @s ミュート false`);
     sendMsgToPlayer(member, `§f§4[§6Paradox§4]§fあなたはミュートを解かれた。`);
-    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§fミュート §7${member.name}§f. 理由: §7${reason}§f`);
+    return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f は §7${member.name}§f のミュートを解除しました。理由: §7${reason}§f`);
 }

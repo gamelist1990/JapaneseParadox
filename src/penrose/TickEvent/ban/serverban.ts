@@ -40,8 +40,8 @@ function serverban() {
             });
 
             // Let staff and player know they are unbanned
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 禁止が解除されました.`);
-            sendMsg(`@a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f §7${player.name}§f 禁止が解除されました。`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You have been unbanned.`);
+            sendMsg(`@a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f §7${player.name}§f has been unbanned.`);
             continue;
         }
         // Ban message

@@ -5,15 +5,15 @@ import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 
 function versionHelp(player: Player, prefix: string) {
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6コマンド§4]§f：バージョン`,
-        `§4[§6使用§4]§f: バージョン [オプション］`,
-        `§4[§6オプション§4]§f: ヘルプ`,
-        `§4[§6説明§4]§f：インストールされている paradox のバージョンを表示する。`,
-        `§4[§6例§4]§f：`,
+        `\n§o§4[§6コマンド§4]§f: version`,
+        `§4[§6使用法§4]§f: version [optional]`,
+        `§4[§6Optional§4]§f: help`,
+        `§4[§6説明§4]§f: Will print out the installed version of paradox`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}version`,
-        `        §4- §6インストールされたParadoxのプリントアウト§f`,
+        `        §4- §6Print out the installed version of paradox§f`,
         `    ${prefix}version help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -23,25 +23,29 @@ function versionHelp(player: Player, prefix: string) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function paradoxVersion(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./utility/paradoxVersion.js:26)");
+        return console.warn(`${new Date()} | ` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? (./utility/paradoxVersion.js:26)");
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 助けを求められたか
+    // Was help requested
     const argCheck = args[0];
     if (argCheck && args[0].toLowerCase() === "help") {
         return versionHelp(player, prefix);

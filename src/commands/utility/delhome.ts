@@ -13,15 +13,15 @@ function delhomeHelp(player: Player, prefix: string, setting: boolean) {
     }
     return sendMsgToPlayer(player, [
         `\n§o§4[§6コマンド§4]§f: delhome`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6使用§4]§f: delhome [オプション］`,
-        `§4[§6オプション§4]§f: 名前、ヘルプ`,
-        `§4[§6説明§4]§f：指定された保存されたホームの場所を削除する。`,
-        `§4[§6例§4]§f：`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
+        `§4[§6使用法§4]§f: delhome [optional]`,
+        `§4[§6Optional§4]§f: name, help`,
+        `§4[§6説明§4]§f: Will delete specified saved home location.`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}delhome cave`,
-        `        §4- §6保存されている "cave "という名前のホームロケーションを削除する§f`,
+        `        §4- §6Delete the saved home location named "cave"§f`,
         `    ${prefix}delhome help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -31,41 +31,41 @@ function delhomeHelp(player: Player, prefix: string, setting: boolean) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function delhome(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを検証する
+    // Validate that required params are defined
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? ./commands/utility/delhome.js:26)");
+        return console.warn(`${new Date()} | ` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? ./commands/utility/delhome.js:26)");
     }
 
     const player = message.sender;
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // キャッシュ
+    // Cache
     const length = args.length;
 
-    // 反論はあるか
+    // Are there arguements
     if (!length) {
         return delhomeHelp(player, prefix, configuration.customcommands.delhome);
     }
 
-    // 助けを求められたか
+    // Was help requested
     const argCheck = args[0];
     if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.delhome) {
         return delhomeHelp(player, prefix, configuration.customcommands.delhome);
     }
 
-    // スペースを許可しない
+    // Don't allow spaces
     if (length > 1) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f名前にスペースを入れないでください！`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f No spaces in names please!`);
     }
 
-    // 安全のために座標をハッシュ化する
+    // Hash the coordinates for security
     const salt = world.getDynamicProperty("crypt");
 
-    // この保存されたホームロケーションを検索して削除する
+    // Find and delete this saved home location
     let verify = false;
     let encryptedString: string = "";
     const tags = player.getTags();
@@ -73,19 +73,19 @@ export function delhome(message: ChatSendAfterEvent, args: string[]) {
     for (let i = 0; i < tagsLength; i++) {
         if (tags[i].startsWith("1337")) {
             encryptedString = tags[i];
-            // それを検証するためにデコードする
+            // Decode it so we can verify it
             tags[i] = (world as WorldExtended).decryptString(tags[i], salt as string);
         }
         if (tags[i].startsWith(args[0].toString() + " X", 13)) {
             verify = true;
             player.removeTag(encryptedString);
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f '§7${args[0]}§f'というホームを正常に削除しました！`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Successfully deleted home '§7${args[0]}§f'!`);
             break;
         }
     }
     if (verify === true) {
         return;
     } else {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f '§7${args[0]}§f'というホームは存在しません！`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Home '§7${args[0]}§f' does not exist!`);
     }
 }

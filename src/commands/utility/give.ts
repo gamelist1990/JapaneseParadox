@@ -13,22 +13,22 @@ function giveHelp(player: Player, prefix: string, setting: boolean) {
         commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6コマンド§4]§f: 与える`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6使用§4]§f：与える [任意］`,
-        `§4[§6オプション§4]§f: ユーザー名項目量データ、ヘルプ`,
-        `§4[§6解説§4]§f：プレイヤーにアイテムを与えます。`,
-        `§4[§6例§4]§f：`,
-        `${prefix}give ${player.name} diamond 64`,
-        `    §4- §6${player.name}にダイヤモンドを64個与える§f`,
-        `${prefix}give ${player.name} iron_ore 64`,
-        `    §4- §6${player.name}に鉄鉱石を64個与える§f`,
-        `${prefix}give ${player.name} tropical_fish 64`,
-        `    §4- §6${player.name}に熱帯魚を64個与える§f`,
-        `${prefix}give ${player.name} log2 64 1`,
-        `    §4- §6${player.name}にスプルースの原木を64個与える§f`,
-        `${prefix}give help`,
-        `    §4- §6コマンドのヘルプを表示する§f`,
+        `\n§o§4[§6コマンド§4]§f: give`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
+        `§4[§6使用法§4]§f: give [optional]`,
+        `§4[§6Optional§4]§f: username item amount data, help`,
+        `§4[§6説明§4]§f: Gives player items.`,
+        `§4[§6Examples§4]§f:`,
+        `    ${prefix}give ${player.name} diamond 64`,
+        `        §4- §6Give ${player.name} 64 diamonds§f`,
+        `    ${prefix}give ${player.name} iron_ore 64`,
+        `        §4- §6Give ${player.name} 64 iron ore§f`,
+        `    ${prefix}give ${player.name} tropical_fish 64`,
+        `        §4- §6Give ${player.name} 64 tropical fish§f`,
+        `    ${prefix}give ${player.name} log2 64 1`,
+        `        §4- §6Give ${player.name} 64 spruce logs§f`,
+        `    ${prefix}give help`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -38,38 +38,42 @@ function giveHelp(player: Player, prefix: string, setting: boolean) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function give(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/utility/give.js:36)");
+        return console.warn(`${new Date()} | ` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? (./commands/utility/give.js:36)");
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 助けを求められたか
+    // Was help requested
     const argCheck = args[0];
     if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.give) {
         return giveHelp(player, prefix, configuration.customcommands.give);
     }
 
-    // 反論はあるか
+    // Are there arguements
     if (!args.length) {
         return giveHelp(player, prefix, configuration.customcommands.give);
     }
 
-    // 要求された選手を見つけよう
+    // Try to find the player requested
     let member: Player;
     if (args.length) {
         const players = world.getPlayers();
@@ -81,9 +85,13 @@ export function give(message: ChatSendAfterEvent, args: string[]) {
         }
     }
 
-    // オンラインですか？
+    // Are they online?
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f そのプレーヤーが見つかりませんでした!
+`
+        );
     }
 
     /**
@@ -115,7 +123,7 @@ export function give(message: ChatSendAfterEvent, args: string[]) {
             args.splice(3, 1, "0");
         }
 
-        // 新しいItemStackを作成し、そのアイテムの最大許容額を検証できるようにする。
+        // Make a new ItemStack so we can validate the max allowed amount for that item
         const newItemStack = new ItemStack(args[1]);
         const maxStack = newItemStack.maxAmount;
         if (maxStack >= Number(args[2])) {
@@ -132,6 +140,6 @@ export function give(message: ChatSendAfterEvent, args: string[]) {
             return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f This stack is too high! §7${maxStack}§f is the max. Try again.`);
         }
     } else {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこの項目は見つかりませんでした！もう一度試してください。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f This item could not be found! Try again.`);
     }
 }

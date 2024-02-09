@@ -12,7 +12,7 @@ const beforeChatFilter = () => {
 
         // Check if the player is muted
         if (player.hasTag("isMuted")) {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 現在ミュートされています.`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You are currently muted.`);
             msg.cancel = true; // Cancel the chat message
             return;
         }

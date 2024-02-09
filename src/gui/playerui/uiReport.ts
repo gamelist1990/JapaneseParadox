@@ -19,20 +19,20 @@ export function UIREPORTPLAYER(reportplayerResult: ModalFormResponse, onlineList
 
     if (!member) {
         sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f !report <player> <reason>§f`);
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレイヤーが存在しない又はオフラインです`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
         return;
     }
 
     // Make sure they dont report themselves
     if (member === player) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f自分自身には実行できません.`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot report yourself.`);
         return;
     }
 
-    sendMsgToPlayer(player, `§r§4[§6Paradox§4]§r  ${member.name}§rが報告されました報告内容＝＞ ${reason}`);
+    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Reported §7${member.name}§f with reason: §7${reason}§f`);
 
-    sendMsg("@a[tag=notify]", `§r§4[§6Paradox§4]§r ${player.name}§r が ${member.name}§r宛てに報告しました！報告内容＝＞ ${reason}`);
+    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f §7${player.name}§f has reported §7${member.name}§f with reason: §7${reason}§f`);
 
-    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 報告内容を相手に送信できました`);
+    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Your Report has been sent.`);
     return;
 }

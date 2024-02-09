@@ -10,19 +10,19 @@ import { uiItemEditorStats } from "./uiItemEditorStats";
 import { uiItemEditorRepairMenu } from "./uiInvEditorRepairItemMenu";
 export function uiInvEditorMenu(player: Player, targetPlayer: Player, itemSlot: number) {
     const menu = new ActionFormData();
-    menu.title("§4インベントリアイテムエディターメニュー§4");
+    menu.title("§4Paradox - Inventory Item Editor Menu§4");
     const inv = targetPlayer.getComponent("inventory") as EntityInventoryComponent;
     const container = inv.container;
     const item = container.getItem(itemSlot);
-    menu.body("§r現在のプレイヤーのインベントリ：§6" + targetPlayer.name + "\n" + "§r選択したアイテム：§6" + item.typeId.replace("minecraft:", ""));
-    menu.button("アイテムステータス");
-    menu.button("エンチャント");
-    menu.button("ネーミングとロア");
-    menu.button("アイテムの置換または削除");
-    menu.button("アイテムの転送");
-    menu.button("アイテムの耐久性");
-    menu.button("プレイヤーリストに戻る");
-    menu.button("ヘルプメニュー");
+    menu.body("§rCurrent Players Inventory: §6" + targetPlayer.name + "\n" + "§rSelected Item: §6" + item.typeId.replace("minecraft:", ""));
+    menu.button("Item Stats");
+    menu.button("Enchantments");
+    menu.button("Naming And Lore");
+    menu.button("Replace Or Delete Item");
+    menu.button("Transfer Item");
+    menu.button("Item Durability");
+    menu.button("Return To Player List");
+    menu.button("Help Menu");
     menu.show(player)
         .then((InvEditorMenuUIResult) => {
             if (InvEditorMenuUIResult.selection == 0) {

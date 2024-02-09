@@ -10,7 +10,7 @@ function punishment(event: EntityDieAfterEvent) {
     const criminal = damageSource.damagingEntity;
 
     if (deadEntity instanceof Player && criminal instanceof Player && (criminal.hasTag("pvpDisabled") || deadEntity.hasTag("pvpDisabled"))) {
-        sendMsgToPlayer(criminal, `§f§4[§6Paradox§4]§f  §7${deadEntity.name}を倒した§f PvPが無効になっている間。攻撃できません!`);
+        sendMsgToPlayer(criminal, `§f§4[§6Paradox§4]§f You killed §7${deadEntity.name}§f while pvp was disabled. You were punished!`);
         criminal.kill();
         return;
     }
@@ -30,7 +30,7 @@ function pvp(obj: EntityHitEntityAfterEvent) {
     }
 
     if (hitEntity.hasTag("pvpDisabled")) {
-        sendMsgToPlayer(damagingEntity, `§f§4[§6Paradox§4]§f このプレイヤーにはPvP無効があります!`);
+        sendMsgToPlayer(damagingEntity, `§f§4[§6Paradox§4]§f This player has PVP Disabled!`);
 
         const effectsToAdd = [MinecraftEffectTypes.InstantHealth];
         for (const effectType of effectsToAdd) {
@@ -48,7 +48,7 @@ function pvp(obj: EntityHitEntityAfterEvent) {
         }
 
         if (pvpDataForHitEntity.counter === 10) {
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${damagingEntity.name}§fが攻撃しました §7${hitEntity.name}§f は §7${hitEntity.name}§f PVPが無効になっています.`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${damagingEntity.name}§f has attacked §7${hitEntity.name}§f while §7${hitEntity.name}§f has PVP disabled.`);
             pvpDataForHitEntity.counter = 0;
         }
 
@@ -58,7 +58,7 @@ function pvp(obj: EntityHitEntityAfterEvent) {
 
     if (damagingEntity.hasTag("pvpDisabled")) {
         // Prevent attacking player with PvP disabled
-        sendMsgToPlayer(damagingEntity, `§f§4[§6Paradox§4]§f PvP無効化中は攻撃できません!`);
+        sendMsgToPlayer(damagingEntity, `§f§4[§6Paradox§4]§f You cannot attack while you have PvP Disabled!`);
 
         // Heal the player being attacked
         const effectsToAdd = [MinecraftEffectTypes.InstantHealth];

@@ -14,16 +14,16 @@ function fullReportHelp(player: Player, prefix: string, setting: boolean) {
         commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `§6コマンド§4]§f：フルレポート`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: fullreport [オプション].`,
-        `§4[§6オプション§4]§f: ユーザー名、ヘルプ`,
-        `§4[§6解説§4]§f：現在オンラインになっているすべてのプレイヤーのログを見る。`,
-        `§4[§6例§4]§f：`,
+        `\n§o§4[§6コマンド§4]§f: fullreport`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
+        `§4[§6使用法§4]§f: fullreport [optional]`,
+        `§4[§6Optional§4]§f: username, help`,
+        `§4[§6説明§4]§f: View logs from all player's currently online.`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}fullreport`,
-        `        §4- §6 現在オンライン中の全プレーヤーのログを見る§f`,
+        `        §4- §6View logs from all currently online players§f`,
         `    ${prefix}fullreport help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -35,7 +35,7 @@ function fullReportHelp(player: Player, prefix: string, setting: boolean) {
 export function fullreport(message: ChatSendAfterEvent, args: string[]) {
     handleFullReport(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -47,56 +47,57 @@ export function fullreport(message: ChatSendAfterEvent, args: string[]) {
 }
 
 async function handleFullReport(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/utility/fullreport.js:28)");
+        return console.warn(`${new Date()} | ` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? (./commands/utility/fullreport.js:28)");
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 助けを求められたか
+    // Was help requested
     const argCheck = args[0];
     if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.fullreport) {
         return fullReportHelp(player, prefix, configuration.customcommands.fullreport);
     }
 
     if (!player.hasTag("notify")) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fチート通知をBooleanにする必要があります。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to enable cheat notifications.`);
     }
 
     const players = world.getPlayers();
     for (const member of players) {
         const reportBody = [
-            `\n§f§4[§6Paradox§4]§f 以下のプレイヤーからParadox Logsを取得中: §6${member.name}§f`,
-            `§r§4[§6Paradox§4]§r §6${member.name}§rのプレイヤーIDは【 ${member.id} 】です`,
-            `§f§4[§6Paradox§4]§f §6${member.name}§fのゲームモード: §7${(member as PlayerExtended).getGameMode()}§f`,
-            `§f§4[§6Paradox§4]§f §6${member.name}§fの現在位置 X= §7${member.location.x.toFixed(0)}§f Y= §7${member.location.y.toFixed(0)}§f Z= §7${member.location.z.toFixed(0)}§f`,
+            `\n§f§4[§6Paradox§4]§f Getting all Paradox Logs from: §6${member.name}§f`,
+            `§f§4[§6Paradox§4]§f §6${member.name}§f is in Gamemode: §7${(member as PlayerExtended).getGameMode()}§f`,
+            `§f§4[§6Paradox§4]§f §6${member.name}§f is currently at X= §7${member.location.x.toFixed(0)}§f Y= §7${member.location.y.toFixed(0)}§f Z= §7${member.location.z.toFixed(0)}§f`,
         ];
 
         switch (true) {
             case member.hasTag("paradoxFreeze"):
-                reportBody.push(
-                    `§f§4[§6Paradox§4]§f §6${member.name}§fは${member.hasTag("freezeAura") ? "AntiKillAura" : member.hasTag("freezeNukerA") ? "AntiNukerA" : member.hasTag("freezeScaffoldA") ? "AntiScaffoldA" : "Staff"}によってフリーズされています`
-                );
+                reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f is frozen by ${member.hasTag("freezeAura") ? "AntiKillAura" : member.hasTag("freezeNukerA") ? "AntiNukerA" : member.hasTag("freezeScaffoldA") ? "AntiScaffoldA" : "Staff"}`);
                 break;
             case member.hasTag("flying"):
-                reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§fは飛んでいます`);
+                reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f is flying`);
                 break;
             case member.hasTag("vanish"):
-                reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§fは消えています`);
+                reportBody.push(`§f§4[§6Paradox§4]§f §6${member.name}§f is vanished`);
                 break;
         }
 
@@ -112,7 +113,7 @@ async function handleFullReport(message: ChatSendAfterEvent, args: string[]) {
                     divider = true;
                     reportBody.push(`§f§4[§6Paradox§4]§4 ----------------------------------§f`);
                 }
-                reportBody.push(`§f§4[§6Paradox§4]§f §f§4[§6${objective.replace("vl", "").toUpperCase()}§4]§f 違反数: §7${score}§f`);
+                reportBody.push(`§f§4[§6Paradox§4]§f §f§4[§6${objective.replace("vl", "").toUpperCase()}§4]§f Violations: §7${score}§f`);
             }
             if (vlCount === ScoreManager.allscores.length && divider === true) {
                 reportBody.push(`§f§4[§6Paradox§4]§4 ----------------------------------§f`);
@@ -140,12 +141,12 @@ async function handleFullReport(message: ChatSendAfterEvent, args: string[]) {
         };
 
         for (const [verification, armorType] of [
-            [helmet, "ヘルメット"],
-            [chest, "チェストプレート"],
-            [legs, "レギンス"],
-            [feet, "ブーツ"],
-            [mainhand, "メインハンド"],
-            [offhand, "オフハンド"],
+            [helmet, "Helmet"],
+            [chest, "Chestplate"],
+            [legs, "Leggings"],
+            [feet, "Boots"],
+            [mainhand, "Mainhand"],
+            [offhand, "Offhand"],
         ]) {
             if (!(verification instanceof ItemStack)) {
                 continue;
@@ -163,11 +164,11 @@ async function handleFullReport(message: ChatSendAfterEvent, args: string[]) {
                 }
             }
             let materialType = verification.typeId.split(":")[1].replace(/_\w+/, "");
-            if (armorType === "メインハンド" || armorType === "オフハンド") {
+            if (armorType === "Mainhand" || armorType === "Offhand") {
                 materialType = verification.typeId.split(":")[1];
             }
             const materialColor = materialColors[materialType] || materialColors["none"];
-            reportBody.push(`§f§4[§6Paradox§4]§f §7${armorType}§f: ${isEnchanted ? "§aエンチャント済み§f" : "§4エンチャント未済み§f"} || ${materialColor}${materialType}`);
+            reportBody.push(`§f§4[§6Paradox§4]§f §7${armorType}§f: ${isEnchanted ? "§aEnchanted§f" : "§4Unenchanted§f"} || ${materialColor}${materialType}`);
         }
 
         sendMsgToPlayer(player, reportBody);

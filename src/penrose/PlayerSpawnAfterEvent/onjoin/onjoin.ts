@@ -36,7 +36,7 @@ async function onJoinTime(object: PlayerSpawnAfterEvent) {
             return;
         }
 
-        const reason = "メンテナンス中!ご不便をおかけして申し訳ございません。";
+        const reason = "Under Maintenance! Sorry for the inconvenience.";
 
         // Kick players from server
         player.runCommandAsync(`kick "${player.name}" §f\n\n${reason}`).catch(() => {

@@ -12,26 +12,26 @@ import ConfigInterface from "../../interfaces/Config.js";
  * @param {boolean} setting - The status of the clearlag custom command setting.
  */
 function clearlagHelp(player: Player, prefix: string, clearLagBoolean: boolean, setting: boolean): void {
-    // コマンドとモジュールのステータスを決定する
-    const commandStatus: string = setting ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
-    const moduleStatus: string = clearLagBoolean ? "§6[§4無効§6]§f" : "§6[§a有効§6]§f";
+    // Determine the status of the command and module
+    const commandStatus: string = setting ? "§6[§aENABLED§6]§f" : "§6[§4DISABLED§6]§f";
+    const moduleStatus: string = clearLagBoolean ? "§6[§4DISABLED§6]§f" : "§6[§aENABLED§6]§f";
 
-    // 選手にヘルプ情報を表示する
+    // Display help information to the player
     sendMsgToPlayer(player, [
-        `§6コマンド§4]§f: クリアラグ`,
+        `\n§o§4[§6Command§4]§f: clearlag`,
         `§4[§6Status§4]§f: ${commandStatus}`,
         `§4[§6Module§4]§f: ${moduleStatus}`,
         `§4[§6Usage§4]§f: ${prefix}clearlag [options]`,
-        `§4[§6解説§4]§f：タイマーでアイテムやエンティティをクリアする。`,
-        `§4[§6オプション§4]§f：`,
+        `§4[§6Description§4]§f: Clears items and entities with a timer.`,
+        `§4[§6Options§4]§f:`,
         `    -h, --help`,
-        `       §4[§7このヘルプメッセージを表示する§4]§f`,
+        `       §4[§7Display this help message§4]§f`,
         `    -s, --status`,
-        `       §4[§7クリアラグモジュールの現在の状態を表示する§4]§f`,
+        `       §4[§7Display the current status of ClearLag module§4]§f`,
         `    -e, --enable`,
-        `       §4[§7クリアラグモジュールをBooleanにする§4]§f`,
+        `       §4[§7Enable ClearLag module§4]§f`,
         `    -d, --disable`,
-        `       §4[§7クリアラグを無効にするモジュール§4]§f`,
+        `       §4[§7Disable ClearLag module§4]§f`,
     ]);
 }
 
@@ -43,7 +43,7 @@ function clearlagHelp(player: Player, prefix: string, clearLagBoolean: boolean, 
 export function clearlag(message: ChatSendAfterEvent, args: string[]) {
     handleClearlag(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -60,34 +60,34 @@ export function clearlag(message: ChatSendAfterEvent, args: string[]) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 async function handleClearlag(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
         return console.warn(`${new Date()} | ` + `Error: ${message} isnt defined. Did you forget to pass it? (./commands/settings/clearlag.js:36)`);
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
-    // ダイナミック・プロパティ・ブール値の取得
+    // Get Dynamic Property Boolean
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 位置以外の引数をチェックする
+    // Check for additional non-positional arguments
     const length = args.length;
     let validFlagFound = false; // Flag to track if any valid flag is encountered
     for (let i = 0; i < length; i++) {
         const additionalArg: string = args[i].toLowerCase();
 
-        // 追加引数の処理
+        // Handle additional arguments
         switch (additionalArg) {
             case "-h":
             case "--help":
@@ -95,33 +95,33 @@ async function handleClearlag(message: ChatSendAfterEvent, args: string[]) {
                 return clearlagHelp(player, prefix, configuration.modules.clearLag.enabled, configuration.customcommands.clearlag);
             case "-s":
             case "--status":
-                // ハンドル状態フラグ
+                // Handle status flag
                 validFlagFound = true;
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ClearLagモジュールは現在、 ${configuration.modules.clearLag.enabled ? "有効" : "無効"}`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ClearLag module is currently ${configuration.modules.clearLag.enabled ? "enabled" : "disabled"}`);
                 break;
             case "-e":
             case "--enable":
-                // ハンドルイネーブルフラグ
+                // Handle enable flag
                 validFlagFound = true;
                 if (configuration.modules.clearLag.enabled) {
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fクリアラグモジュールが既に有効`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ClearLag module is already enabled`);
                 } else {
                     configuration.modules.clearLag.enabled = true;
                     dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 以下の機能が有効です=> §6ClearLag§f!`);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6ClearLag§f!`);
                     ClearLag();
                 }
                 break;
             case "-d":
             case "--disable":
-                // ハンドル無効フラグ
+                // Handle disable flag
                 validFlagFound = true;
                 if (!configuration.modules.clearLag.enabled) {
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fクリアラグ・モジュールは既に無効になっています。`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ClearLag module is already disabled`);
                 } else {
                     configuration.modules.clearLag.enabled = false;
                     dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f は 無効 §4ClearLag§f!`);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4ClearLag§f!`);
                 }
                 break;
         }

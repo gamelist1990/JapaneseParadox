@@ -8,7 +8,7 @@ import { WorldExtended } from "../../classes/WorldExtended/World";
 export function uiManagePlayerSavedLocations(managePlayerSavedLocationsUIResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -28,19 +28,19 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
             break;
         }
     }
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped.`);
     }
 
-    // オンラインですか？
+    // Are they online?
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
-    //選択した選手の保存場所を取得する。
+    //Grab the selected player saved locations.
     const salt = world.getDynamicProperty("crypt");
     const tags = member.getTags();
     const tagsLength = tags.length;
@@ -49,18 +49,18 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
     const coordsArray: string[] = [];
     for (let i = 0; i < tagsLength; i++) {
         if (tags[i].startsWith("1337")) {
-            // それを検証するためにデコードする
+            // Decode it so we can verify it
             tags[i] = (world as WorldExtended).decryptString(tags[i], salt as string);
-            // 無効な場合はスキップする
+            // If invalid then skip it
             if (tags[i].startsWith("LocationHome:") === false) {
                 continue;
             }
-            // 文字列を配列に分割する
+            // Split string into array
             const coordinatesArray = tags[i].split(" ");
             const coordArrayLength = coordinatesArray.length;
             counter = ++counter;
             for (let i = 0; i < coordArrayLength; i++) {
-                // 配列から位置を取得する
+                // Get their location from the array
                 coordsArray.push(coordinatesArray[i]);
                 if (coordinatesArray[i].includes("LocationHome:")) {
                     Locations.push(coordinatesArray[i].replace("LocationHome:", ""));
@@ -80,28 +80,28 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
     to show the player, where they can then remove the location if needed.
     */
     const managePlayerSavedLocationsUI = new ModalFormData();
-    managePlayerSavedLocationsUI.title(`§4§6${member.name}'の §4座標！`);
-    managePlayerSavedLocationsUI.dropdown(`\n場所選択：§f 保存場所：§f`, Locations);
-    managePlayerSavedLocationsUI.toggle("消去", false);
+    managePlayerSavedLocationsUI.title(`§4Paradox - §6${member.name}'s §4Locations`);
+    managePlayerSavedLocationsUI.dropdown(`\n§fSelect a Location:§f\n\nSaved Location's\n`, Locations);
+    managePlayerSavedLocationsUI.toggle("Delete", false);
     managePlayerSavedLocationsUI
         .show(player)
         .then((managePlayerSavedLocationsUIResult) => {
             const [selectedLocationvalue, deleteToggle] = managePlayerSavedLocationsUIResult.formValues;
             if (deleteToggle == true) {
                 const salt = world.getDynamicProperty("crypt");
-                // この保存されたホームロケーションを検索して削除する
+                // Find and delete this saved home location
                 let encryptedString: string = "";
                 const tags = member.getTags();
                 const tagsLength = tags.length;
                 for (let i = 0; i < tagsLength; i++) {
                     if (tags[i].startsWith("1337")) {
                         encryptedString = tags[i];
-                        // それを検証するためにデコードする
+                        // Decode it so we can verify it
                         tags[i] = (world as WorldExtended).decryptString(tags[i], salt as string);
                     }
                     if (tags[i].startsWith("LocationHome:" && Locations[selectedLocationvalue as number] + " X", 13)) {
                         member.removeTag(encryptedString);
-                        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 座標を消去しました！！ '§7${Locations[selectedLocationvalue as number]}§f'!`);
+                        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Successfully deleted home '§7${Locations[selectedLocationvalue as number]}§f'!`);
                         break;
                     }
                 }
@@ -111,7 +111,7 @@ async function handleUImanagePlayerSavedLocations(managePlayerSavedLocationsUIRe
         })
         .catch((error) => {
             console.error("Paradox Unhandled Rejection: ", error);
-            // スタックトレース情報の抽出
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {

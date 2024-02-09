@@ -6,7 +6,7 @@ import ConfigInterface from "../../interfaces/Config.js";
 function resetPrefix(player: Player, configuration: ConfigInterface) {
     const sanitize = player.getTags();
     for (const tag of sanitize) {
-        if (tag.startsWith("Prefix:")) {
+        if (tag.startsWith("接頭辞：")) {
             player.removeTag(tag);
             configuration.customcommands.prefix = "!";
         }
@@ -16,19 +16,19 @@ function resetPrefix(player: Player, configuration: ConfigInterface) {
 
 function prefixHelp(player: Player, prefix: string) {
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6コマンド§4]§f: 接頭辞`,
+        `\n§o§4[§6コマンド§4]§f: prefix`,
         `§4[§6使用§4]§f：接頭辞 [オプション］`,
-        `§4[§6オプション§4]§f：接頭辞、ヘルプ`,
+        `§4[§6Optional§4]§f: prefix, help`,
         `§4[§6説明§4]§f：コマンドの接頭辞を変更する。最大 2 文字。`,
         `§4[§6例§4]§f：`,
-        `    ${prefix}prefix !!`,
+        `    接頭辞}接頭辞 !`,
         `        §4- §6 コマンドの接頭辞を "!!" に変更 §f`,
-        `    ${prefix}prefix @!`,
+        `    プレフィックス}プレフィックス @！`,
         `        §4- §6 コマンドの接頭辞を "@!" に変更 §f`,
-        `    ${prefix}prefix $`,
+        `    接頭辞}接頭辞 $`,
         `        §4- §6コマンドの接頭辞を"$"に変更 §f`,
         `    ${prefix}prefix help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -40,7 +40,7 @@ function prefixHelp(player: Player, prefix: string) {
 export function prefix(message: ChatSendAfterEvent, args: string[]) {
     // 必要なパラメータが定義されていることを確認する
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/moderation/prefix.js:34)");
+        return console.warn(`新しい日付()}。|` + "エラー: ${message} が定義されていません。渡し忘れですか？(./commands/moderation/prefix.js:34)");
     }
 
     const player = message.sender;
@@ -50,7 +50,11 @@ export function prefix(message: ChatSendAfterEvent, args: string[]) {
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
@@ -86,7 +90,7 @@ export function prefix(message: ChatSendAfterEvent, args: string[]) {
     if (args[0].length <= 2 && args[0].length >= 1) {
         resetPrefix(player, configuration);
         configuration.customcommands.prefix = args[0];
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 接頭辞が'§7${args[0]}§f'に変更されました`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f接頭辞が'§7${args[0]}§f'に変更されました！`);
         return player.addTag("Prefix:" + args[0]);
     } else {
         sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f接頭辞の長さを2文字以上にすることはできない！`);

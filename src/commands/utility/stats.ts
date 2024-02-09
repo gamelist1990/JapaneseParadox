@@ -14,16 +14,16 @@ function statsHelp(player: Player, prefix: string, setting: boolean) {
         commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `§6コマンド§4]§f: スタッツ`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6使用§4]§f：統計 [オプション］`,
-        `§4[§6オプション§4]§f: ユーザー名、ヘルプ`,
-        `§4[§6説明§4]§f：指定されたユーザーのログを表示する。`,
-        `§4[§6例§4]§f：`,
+        `\n§o§4[§6コマンド§4]§f: stats`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
+        `§4[§6使用法§4]§f: stats [optional]`,
+        `§4[§6Optional§4]§f: username, help`,
+        `§4[§6説明§4]§f: Shows logs from the specified user.`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}stats ${player.name}`,
-        `        §指定されたユーザのログを表示する§f`,
+        `        §4- §6Show logs for the specified user§f`,
         `    ${prefix}stats help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -35,7 +35,7 @@ function statsHelp(player: Player, prefix: string, setting: boolean) {
 export function stats(message: ChatSendAfterEvent, args: string[]) {
     handleStats(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -47,42 +47,46 @@ export function stats(message: ChatSendAfterEvent, args: string[]) {
 }
 
 async function handleStats(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/utility/stats.js:29)");
+        return console.warn(`${new Date()} | ` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? (./commands/utility/stats.js:29)");
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 反論はあるか
+    // Are there arguements
     if (!args.length) {
         return statsHelp(player, prefix, configuration.customcommands.stats);
     }
 
-    // 助けを求められたか
+    // Was help requested
     const argCheck = args[0];
     if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.stats) {
         return statsHelp(player, prefix, configuration.customcommands.stats);
     }
 
     if (!player.hasTag("notify")) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fチート通知をBooleanにする必要があります。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to enable cheat notifications.`);
     }
 
-    // リクエストされた選手を探す
+    // try to find the player requested
     let member: Player;
     const players = world.getPlayers();
     for (const pl of players) {
@@ -93,7 +97,11 @@ async function handleStats(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f そのプレーヤーが見つかりませんでした!
+`
+        );
     }
 
     const reportBody = [

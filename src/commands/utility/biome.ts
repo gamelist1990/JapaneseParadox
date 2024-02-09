@@ -10,16 +10,16 @@ function biomeHelp(player: Player, prefix: string, setting: boolean) {
         commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `§6コマンド§4]§f：バイオーム`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6使用§4]§f：バイオーム[オプション］`,
-        `§4[§6オプション§4]§f: ヘルプ`,
-        `§4[§6解説§4]§f：現在のバイオームとプレイヤーが向いている方向を送信する。§6MolangをBooleanにする必要があることに注意。`,
-        `§4[§6例§4]§f：`,
+        `\n§o§4[§6コマンド§4]§f: biome`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
+        `§4[§6使用法§4]§f: biome [optional]`,
+        `§4[§6Optional§4]§f: help`,
+        `§4[§6説明§4]§f: Sends the current biome and direction the player is facing. §6Note you need to enable Molang. `,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}biome`,
-        `        §4- §6現在のバイオームと方向をプレイヤーに送る§f`,
+        `        §4- §6Send the current biome and direction to the player§f`,
         `    ${prefix}biome help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 /**
@@ -28,149 +28,154 @@ function biomeHelp(player: Player, prefix: string, setting: boolean) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function biome(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./utility/biome.js:26)");
+        return console.warn(`${new Date()} | ` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? (./utility/biome.js:26)");
     }
     const player = message.sender;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
-    // 助けを求められたか
+    // Was help requested
     const argCheck = args[0];
     if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.biome) {
         return biomeHelp(player, prefix, configuration.customcommands.biome);
     }
     const directionMap: Map<string, string> = new Map([
-        ["North", "向いている方角: 北"],
-        ["South", "向いている方角: 南"],
-        ["East", "向いている方角: 東"],
-        ["West", "向いている方角: 西"],
+        ["North", "Facing: North"],
+        ["South", "Facing: South"],
+        ["East", "Facing: East"],
+        ["West", "Facing: West"],
     ]);
-    const defaultDirection: string = "検知できません！！";
+    const defaultDirection: string = "Facing: Unknown!";
     let direction: string;
-    // 一致するタグを見つけるために、マップのエントリーを繰り返し処理する。
+    // Iterate over the map entries to find a matching tag
     for (const [tag, mappedDirection] of directionMap.entries()) {
         if (player.hasTag(tag)) {
             direction = mappedDirection;
             break;
         }
     }
-    // 一致するタグが見つからない場合は、デフォルトの方向を割り当てる。
+    // If no matching tag is found, assign the default direction
     if (!direction) {
         direction = defaultDirection;
     }
-    //バイオームマップ
+    //Biome Map
     const biomeMap: Map<string, string> = new Map([
-        ["basalt_deltas", "バイオーム: ネザーの玄武岩の三角州"],
-        ["bamboo_jungle", "バイオーム: まばらなジャングル "],
-        ["bamboo_jungle_hills", "バイオーム: 竹林"],
-        ["beach", "バイオーム: ビーチ"],
-        ["birch_forest", "バイオーム: 白樺の森"],
-        ["birch_forest_hills", "バイオーム: ちょい崖の白樺の森"],
-        ["birch_forest_hills_mutated", "バイオーム: 白樺の森の丘の突然変異!?"],
-        ["birch_forest_mutated", "バイオーム: 白樺の森の変異！？"],
-        ["cold_beach", "バイオーム: 雪のビーチ"],
-        ["cold_ocean", "バイオーム: 冷たい海洋"],
-        ["cold_taiga", "バイオーム: 雪のタイガ"],
-        ["cold_taiga_hills", "バイオーム: ちょい崖のタイガ"],
-        ["cold_taiga_mutated", "バイオーム: 崖タイガw"],
-        ["crimson_forest", "バイオーム: ネザー真紅の森"],
-        ["deep_cold_ocean", "バイオーム: 冷たい深海"],
-        ["deep_frozen_ocean", "バイオーム: 凍った深海"],
-        ["deep_lukewarm_ocean", "バイオーム: ぬるい深海"],
-        ["deep_ocean", "バイオーム: ただの深海"],
-        ["deep_warm_ocean", "バイオーム: 深海【海底神殿あるかも？】"],
-        ["desert", "バイオーム: 砂漠～"],
-        ["desert_hills", "バイオーム: 砂漠の崖～"],
-        ["desert_mutated", "バイオーム: 崖砂漠～"],
-        ["extreme_hills_edge", "バイオーム: 吹きさらしの谷～"],
-        ["extreme_hills_mutated", "バイオーム: エメラルドが取れそうな山"],
-        ["extreme_hills_plus_trees", "バイオーム: 山岳"],
-        ["extreme_hills_plus_trees_mutated", "バイオーム: 森のある山"],
-        ["flower_forest", "バイオーム: 花の森"],
-        ["forest", "バイオーム: ただの森"],
-        ["forest_hills", "バイオーム: ちょい崖の森"],
-        ["frozen_ocean", "バイオーム: 凍った海"],
-        ["frozen_river", "バイオーム: 凍った川"],
-        ["ice_mountains", "バイオーム: 氷の山【スキーできるね！】"],
-        ["ice_plains", "バイオーム: 氷原"],
-        ["ice_plains_spikes", "バイオーム: 氷原のトラップ"],
-        ["jungle", "バイオーム: ただのジャングル"],
-        ["jungle_edge", "バイオーム: ジャングルエッジ～"],
-        ["jungle_edge_mutated", "バイオーム: 変異したジャングル・エッジ～"],
-        ["jungle_hills", "バイオーム: ジャングル・ヒルズ"],
-        ["jungle_mutated", "バイオーム: ジャングルの突然変異！？"],
-        ["legacy_frozen_ocean", "バイオーム:シロクマさんがスポーンする凍った海"],
-        ["lofty_peaks", "バイオーム: 雪山岳"],
-        ["lukewarm_ocean", "バイオーム: ぬるい海"],
-        ["mega_spruce_taiga", "バイオーム: トウヒの原生林"],
-        ["mega_spruce_taiga_hills", "バイオーム: 寒いタイガの原生林"],
-        ["mega_taiga", "バイオーム: 巨大なタイガの原生林"],
-        ["mega_taiga_hills", "バイオーム: 巨大なトウヒの森！"],
-        ["mesa", "バイオーム: メサ"],
-        ["mesa_bryce", "バイオーム: メサブライス"],
-        ["mesa_plateau", "バイオーム: メサ高原"],
-        ["mesa_plateau_mutated", "バイオーム:メサ高原の突然変異"],
-        ["mesa_plateau_stone", "バイオーム: 石テーブルトップ"],
-        ["mesa_plateau_stone_mutated", "バイオーム: メサ・プラトー・ストーン"],
-        ["mountain_grove", "バイオーム: マウンテン・グローブ"],
-        ["mountain_meadow", "バイオーム: マウンテン・メドウ"],
-        ["mountain_peaks", "バイオーム: 山頂"],
-        ["mushroom_island", "バイオーム: マッシュルーム・アイランド"],
-        ["mushroom_island_shore", "バイオーム:マッシュルーム・アイランド・ショア"],
-        ["nether_wastes", "バイオーム: ネザーの荒地"],
-        ["ocean", "バイオーム: 海"],
-        ["plains", "バイオーム: 平野"],
-        ["river", "バイオーム: 川"],
-        ["roofed_forest_mutated", "バイオーム: 変異した屋根のある森"],
-        ["savanna", "バイオーム: サバンナ"],
-        ["savanna_mutated", "バイオーム:サバンナ"],
-        ["savanna_plateau", "バイオーム:サバンナ"],
-        ["savanna_plateau_mutated", "バイオーム:サバンナ"],
-        ["snow_capped_peaks", "バイオーム: 雪に覆われた山々"],
-        ["snowy_slopes", "バイオーム: 雪の坂道"],
-        ["soulsand_valley", "バイオーム:ネザーのソウルサンド地帯"],
-        ["stone_beach", "バイオーム: 石浜"],
-        ["sunflower_plains", "バイオーム:ひまわり平野"],
-        ["swamp", "バイオーム: 沼地"],
-        ["swamp_mutated", "バイオーム: 沼地"],
-        ["taiga", "バイオーム: タイガ"],
-        ["taiga_hills", "バイオーム: タイガ"],
-        ["taiga_mutated", "バイオーム: タイガ"],
-        ["the_end", "バイオーム: エンド！！"],
-        ["warm_ocean", "バイオーム: 暖かい海"],
-        ["warped_forest", "バイオーム: 歪んだ森"],
-        ["deep_dark", "バイオーム: 深い闇"],
-        ["lush_caves", "バイオーム: 豊かな洞窟"],
-        ["jagged_peaks", "バイオーム: 緑豊かな鍾乳洞"],
-        ["dripstone_caves", "バイオーム: ドリップストーン洞窟"],
-        ["meadow", "バイオーム: 草地"],
-        ["mangrove_swamp", "バイオーム: マングローブ湿地"],
-        ["cherry_grove", "バイオーム: チェリー・グローブ"],
-        ["roofed_forest", "バイオーム: 屋根の森"],
-        ["grove", "バイオーム: グローブ"],
-        ["stony_peaks", "バイオーム: ストーニー・ピークス"],
+        ["basalt_deltas", "Biome: Basalt Deltas"],
+        ["bamboo_jungle", "Biome: Bamboo Jungle"],
+        ["bamboo_jungle_hills", "Biome: Bamboo Jungle Hills"],
+        ["beach", "Biome: Beach"],
+        ["birch_forest", "Biome: Birch Forest"],
+        ["birch_forest_hills", "Biome: Birch Forest Hills"],
+        ["birch_forest_hills_mutated", "Biome: Birch Forest Hills Mutated"],
+        ["birch_forest_mutated", "Biome: Birch Forest Mutated"],
+        ["cold_beach", "Biome: Cold Beach"],
+        ["cold_ocean", "Biome: Cold Ocean"],
+        ["cold_taiga", "Biome: Cold Taiga"],
+        ["cold_taiga_hills", "Biome: Cold Taiga Hills"],
+        ["cold_taiga_mutated", "Biome: Cold Taiga Mutated"],
+        ["crimson_forest", "Biome: Crimson Forest"],
+        ["deep_cold_ocean", "Biome: Deep Cold Ocean"],
+        ["deep_frozen_ocean", "Biome: Deep Frozen Ocean"],
+        ["deep_lukewarm_ocean", "Biome: Deep Lukewarm Ocean"],
+        ["deep_ocean", "Biome: Deep Ocean"],
+        ["deep_warm_ocean", "Biome: Deep Warm Ocean"],
+        ["desert", "Biome: Desert"],
+        ["desert_hills", "Biome: Desert Hills"],
+        ["desert_mutated", "Biome: Desert Mutated"],
+        ["extreme_hills", "Biome: Extreme Hills"],
+        ["extreme_hills_edge", "Biome: Extreme Hills Edge"],
+        ["extreme_hills_mutated", "Biome: Extreme Hills Mutated"],
+        ["extreme_hills_plus_trees", "Biome: Extreme Hills Plus Trees"],
+        ["extreme_hills_plus_trees_mutated", "Biome: Extreme Hills Plus Trees Mutated"],
+        ["flower_forest", "Biome: Flower Forest"],
+        ["forest", "Biome: Forest"],
+        ["forest_hills", "Biome: Forest Hills"],
+        ["frozen_ocean", "Biome: Frozen Ocean"],
+        ["frozen_river", "Biome: Frozen River"],
+        ["ice_mountains", "Biome: Ice Mountains"],
+        ["ice_plains", "Biome: Ice plains"],
+        ["ice_plains_spikes", "Biome: Ice plains Spikes"],
+        ["jungle", "Biome: Jungle"],
+        ["jungle_edge", "Biome: Jungle Edge"],
+        ["jungle_edge_mutated", "Biome: Jungle Edge Mutated"],
+        ["jungle_hills", "Biome: Jungle Hills"],
+        ["jungle_mutated", "Biome: Jungle Mutated"],
+        ["legacy_frozen_ocean", "Biome: Legacy Frozen Ocean"],
+        ["lofty_peaks", "Biome: Lofty Peaks"],
+        ["lukewarm_ocean", "Biome: Lukewarm Ocean"],
+        ["mega_spruce_taiga", "Biome: Mega Spruce Taiga"],
+        ["mega_spruce_taiga_hills", "Biome: Mega Spruce Taiga Hills"],
+        ["mega_taiga", "Biome: Mega Taiga"],
+        ["mega_taiga_hills", "Biome: Mega Taiga Hills"],
+        ["mesa", "Biome: Mesa"],
+        ["mesa_bryce", "Biome: Mesa Bryce"],
+        ["mesa_plateau", "Biome: Mesa Plateau"],
+        ["mesa_plateau_mutated", "Biome: Mesa Plateau Mutated"],
+        ["mesa_plateau_stone", "Biome: Mesa Plateau Stone"],
+        ["mesa_plateau_stone_mutated", "Biome: Mesa Plateau Stone Mutated"],
+        ["mountain_grove", "Biome: Mountain Grove"],
+        ["mountain_meadow", "Biome: Mountain Meadow"],
+        ["mountain_peaks", "Biome: Mountain peaks"],
+        ["mushroom_island", "Biome: Mushroom Island"],
+        ["mushroom_island_shore", "Biome: Mushroom Island Shore"],
+        ["nether_wastes", "Biome: Nether Wastes"],
+        ["ocean", "Biome: Ocean"],
+        ["plains", "Biome: Plains"],
+        ["river", "Biome: River"],
+        ["roofed_forest_mutated", "Biome: Roofed Forest Mutated"],
+        ["savanna", "Biome: Savanna"],
+        ["savanna_mutated", "Biome: Savanna Mutated"],
+        ["savanna_plateau", "Biome: Savanna Plateau"],
+        ["savanna_plateau_mutated", "Biome: Savanna Plateau Mutated"],
+        ["snow_capped_peaks", "Biome: Snow Capped Peaks"],
+        ["snowy_slopes", "Biome: Snowy Slopes"],
+        ["soulsand_valley", "Biome: Soulsand Valley"],
+        ["stone_beach", "Biome: Stone Beach"],
+        ["sunflower_plains", "Biome: Sunflower Plains"],
+        ["swamp", "Biome: Swamp"],
+        ["swamp_mutated", "Biome: Swamp Mutated"],
+        ["taiga", "Biome: Taiga"],
+        ["taiga_hills", "Biome: Taiga Hills"],
+        ["taiga_mutated", "Biome: Taiga Mutated"],
+        ["the_end", "Biome: The End"],
+        ["warm_ocean", "Biome: Warm Ocean"],
+        ["warped_forest", "Biome: Warped Forest"],
+        ["deep_dark", "Biome: Deep Dark"],
+        ["lush_caves", "Biome: Lush Caves"],
+        ["jagged_peaks", "Biome: Lush Caves"],
+        ["dripstone_caves", "Biome: Dripstone Cave"],
+        ["meadow", "Biome: Meadow"],
+        ["mangrove_swamp", "Biome: Mangrove Swamp"],
+        ["cherry_grove", "Biome: Cherry Grove"],
+        ["roofed_forest", "Biome: Roofed Forest"],
+        ["grove", "Biome: Grove"],
+        ["stony_peaks", "Biome: Stony Peaks"],
     ]);
 
-    const defaultBiome: string = "Unknown Or §4Molang is not Boolean!§f";
+    const defaultBiome: string = "Unknown Or §4Molang is not enabled!§f";
     let currentBiome: string;
-    // 一致するタグを見つけるために、マップのエントリーを繰り返し処理する。
+    // Iterate over the map entries to find a matching tag
     for (const [tag, mappedBiome] of biomeMap.entries()) {
         if (player.hasTag(tag)) {
             currentBiome = mappedBiome;
             break;
         }
     }
-    // 一致するタグが見つからない場合は、デフォルトのバイオームを割り当てる。
+    // If no matching tag is found, assign the default biome
     if (!currentBiome) {
         currentBiome = defaultBiome;
     }

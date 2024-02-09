@@ -15,7 +15,7 @@ async function queueSleep(player: Player) {
     const configuration = getRegistry();
     const hotbarBoolean = configuration.modules.hotbar.enabled;
     if (hotbarBoolean === undefined || hotbarBoolean === false) {
-        player.runCommand(`title @a[tag=!vanish] actionbar おはよ！`);
+        player.runCommand(`title @a[tag=!vanish] actionbar Good Morning`);
     }
 }
 

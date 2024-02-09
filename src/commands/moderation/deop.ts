@@ -9,19 +9,19 @@ function deopHelp(player: Player, prefix: string, setting: boolean) {
     if (!setting) {
         commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§a有効§6]§f";
+        commandStatus = "§6[§a有効§6]§f。";
     }
     return sendMsgToPlayer(player, [
-        `§n§o§4[§6コマンド§4]§f: デオプ`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
+        `\n§o§4[§6コマンド§4]§f: deop`,
+        `§4[§6ステータス§4]§f: ${commandStatus}.`,
         `§4[§6使用§4]§f: デオプ [オプション］`,
-        `§4[§6オプション§4]§f: ユーザー名、ヘルプ`,
+        `§4[§6Optional§4]§f: username, help`,
         `§4[§6解説§4]§f：Paradox AntiCheat 機能の使用許可を取り消す。`,
         `§4[§6例§4]§f：`,
         `    ${prefix}deop ${player.name}`,
         `        §4-§6Paradox・オプの許可をプレイヤーから剥奪する§f`,
         `    ${prefix}deop help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6コマンドのヘルプを表示する§f`,
     ]);
 }
 
@@ -33,7 +33,7 @@ function deopHelp(player: Player, prefix: string, setting: boolean) {
 export function deop(message: ChatSendAfterEvent, args: string[]) {
     // 必要なパラメータが定義されていることを確認する
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/moderation/op.js:30)");
+        return console.warn(`新しい日付()}。|` + "エラー: ${message} が定義されていません。渡し忘れですか？(./commands/moderation/op.js:30)");
     }
 
     const player = message.sender;
@@ -43,7 +43,11 @@ export function deop(message: ChatSendAfterEvent, args: string[]) {
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
@@ -94,8 +98,8 @@ export function deop(message: ChatSendAfterEvent, args: string[]) {
         member.setDynamicProperty("salt");
         member.removeTag("paradoxOpped");
         dynamicPropertyRegistry.deleteProperty(member, member.id);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${member.name}§fはもうParadox-Oppedではありません。`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${member.name}§f は管理者権限を取り消されました。`);
         return sendMsgToPlayer(member, `§f§4[§6Paradox§4]§fあなたのOPステータスは取り消されました！`);
     }
-    return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f §7${member.name}§fはParadoxを使用する許可がありませんでした。`);
+    return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f §7${member.name}§f は Paradox を使用する許可を持っていませんでした。`);
 }

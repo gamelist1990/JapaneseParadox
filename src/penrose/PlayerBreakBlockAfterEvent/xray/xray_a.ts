@@ -104,9 +104,7 @@ function xraya(object: PlayerBreakBlockAfterEvent) {
         if (isXraySuspicious(playerId, brokenBlockPermutation.type.id)) {
             sendMsg(
                 `@a[tag=notify]`,
-                `§f§4[§6Paradox§4]§f §4[Xray]§f ${player.name}§f§6 が鉱石を見つけました §f${blocksBrokenCount.get(playerId)}x ${brokenBlockPermutation.type.id.replace("minecraft:", "")}§6 at X=§f${x.toFixed(0)}§6 Y=§f${y.toFixed(
-                    0
-                )}§6 Z=§f${z.toFixed(0)}.`
+                `§f§4[§6Paradox§4]§f §4[Xray]§f ${player.name}§f§6 has found §f${blocksBrokenCount.get(playerId)}x ${brokenBlockPermutation.type.id.replace("minecraft:", "")}§6 at X=§f${x.toFixed(0)}§6 Y=§f${y.toFixed(0)}§6 Z=§f${z.toFixed(0)}.`
             );
             // Reset the count after notifying
             blocksBrokenCount.set(playerId, 0);

@@ -1,5 +1,5 @@
 export default {
-    debug: true,
+    debug: false,
     customcommands: {
         prefix: "!",
         ban: true,
@@ -104,12 +104,12 @@ export default {
             enabled: true,
         },
         namespoofA: {
-            enabled: false,
+            enabled: true,
             minNameLength: 3,
             maxNameLength: 16,
         },
         namespoofB: {
-            enabled: false,
+            enabled: true,
             // eslint-disable-next-line no-control-regex
             banregex: /[^\x00-\x7F]|[/:\\*?"<>]|^\.$|\.$/gu,
             // Deny any invalid character not within the scope of this regex
@@ -159,7 +159,7 @@ export default {
             enabled: false,
         },
         antikbA: {
-            enabled: true,
+            enabled: false,
             velocityIntensity: -0.078,
         },
         antiscaffoldA: {
@@ -193,19 +193,19 @@ export default {
             enabled: false,
         },
         setHome: {
-            max: 10,
+            max: 5,
         },
         goHome: {
             seconds: 0,
-            minutes: 1,
+            minutes: 5,
             hours: 0,
             days: 0,
         },
         clearLag: {
-            enabled: true,
+            enabled: false,
             seconds: 0,
-            minutes: 0,
-            hours: 1,
+            minutes: 10,
+            hours: 0,
             days: 0,
         },
         illegalEnchantment: {
@@ -217,10 +217,10 @@ export default {
         },
         hotbar: {
             enabled: false,
-            message: "ホットバー通知", // Put Message inside the quotes
+            message: "Hotbar is enabled (Set your message to change this)", // Put Message inside the quotes
         },
         ops: {
-            enabled: true,
+            enabled: false,
         },
         salvage: {
             enabled: false,
@@ -231,25 +231,24 @@ export default {
         showrules: {
             enabled: true,
             kick: false,
-            rule1: "ルール1: チートはダメ！！",
-            rule2: "ルール2: 人の許可なく建築を破壊しない",
-            rule3: "ルール3: スパム行為などは禁止！！",
-            rule4: "ルール4: みんなで仲良くしてね",
-            rule5: "ルール5: !helpでコマンドが使えます確認してみてね",
+            rule1: "Rule1: No hacking allowed.",
+            rule2: "Rule2: Don't grief other players' builds.",
+            rule3: "Rule3: Be kind to everyone on the server.",
+            rule4: "Rule4: Follow the staff's instructions.",
+            rule5: "Rule5: No spamming or advertising.",
         },
         paradoxui: {
             enabled: true,
         },
         tprExpiration: {
-            seconds: 10,
-            minutes: 0,
+            seconds: 0,
+            minutes: 2,
             hours: 0,
             days: 0,
         },
         banAppeal: {
-            enabled: true,
-            //ここは個人に応じて変えてください
-            discordLink: "何か異論があればdiscordまで(@koukun_)",
+            enabled: false,
+            discordLink: "https://discord.gg",
         },
         autoBan: {
             enabled: false,
@@ -260,7 +259,7 @@ export default {
             enabled: true,
         },
         afk: {
-            enabled: false,
+            enabled: true,
             minutes: 10,
         },
         antiphaseA: {
@@ -275,7 +274,7 @@ export default {
             vector3: { x: 0, y: 0, z: 0 },
         },
         autoclicker: {
-            enabled: true,
+            enabled: false,
         },
     },
     /**
@@ -284,7 +283,7 @@ export default {
      * This is required for Realm users to gain Paradox-Op.
      *
      * Anyone else is welcome to use this if they like but
-     * レルムズの人はここにパスワードを入れてください！！
+     * are not obligated.
      */
     encryption: {
         password: "",

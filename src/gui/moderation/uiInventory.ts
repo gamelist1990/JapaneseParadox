@@ -15,7 +15,7 @@ import { uiInvEditorMenu } from "./uiInventory/uiInvEditorMainMenu.js";
 export function uiINVENTORY(inventoryUIResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUIInventory(inventoryUIResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -28,7 +28,7 @@ export function uiINVENTORY(inventoryUIResult: ModalFormResponse, onlineList: st
 
 async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!inventoryUIResult || inventoryUIResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [value] = inventoryUIResult.formValues;
@@ -40,16 +40,16 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
             break;
         }
     }
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped.`);
     }
 
-    // オンラインですか？
+    // Are they online?
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
     const inv = member.getComponent("inventory") as EntityInventoryComponent;
     const container = inv.container;
@@ -57,7 +57,7 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
 
     const maxSlots = 36; // Maximum number of slots in the player's inventory
 
-    // インベントリーをループし、アイテムをitemArrayに追加する。
+    // Loop through the inventory and add items to the itemArray
     for (let i = 0; i < maxSlots; i++) {
         const item = container.getItem(i);
         if (item?.typeId) {
@@ -67,11 +67,11 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         }
     }
 
-    // すべてのアイテム/ブロックとそのテクスチャパスのマップ
+    // Map of all items/blocks and their texture paths
     const textures = new Map([
-        //スロットが空であるか、マップにテクスチャがない場合、デフォルトのテクスチャが表示されます。
+        //default texture if the slot is empty or no texture is found in the map, this can happen as some blocks/items dont seem to have a
         ["empty", "ui/slots_bg"],
-        //ブロック
+        //blocks
         ["acacia_button", "blocks/planks_acacia"],
         ["acacia_door", "blocks/door_acacia_upper"],
         ["acacia_fence", "blocks/planks_acacia"],
@@ -654,7 +654,7 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         ["seagrass", "blocks/seagrass"],
         ["shroomlight", "blocks/shroomlight"],
         ["silver_glazed_terracotta", "blocks/glazed_terracotta_silver"],
-        //頭蓋骨のテクスチャはエンティティの下にあり、シェーダーが必要だ。
+        //Skull texture is under and entity and would need a shader.
         ["skull", ""],
         ["slime", "blocks/slime"],
         ["small_amethyst_bud", "blocks/small_amethyst_bud"],
@@ -823,7 +823,7 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         ["yellow_shulker_box", "blocks/shulker_top_yellow"],
         ["yellow_wool", "blocks/wool_coloured_yellow"],
 
-        //これらの項目はブロックが除外されている
+        //items these have had the blocks excluded
         ["acacia_boat", "items/boat_acacia"],
         ["acacia_chest_boat", "items/acacia_chest_boat"],
         ["acacia_sign", "items/sign_acacia"],
@@ -973,7 +973,7 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         ["flower_banner_pattern", "items/banner_pattern"],
         ["fox_spawn_egg", "items/egg_fox"],
         ["friend_pottery_sherd", "items/friend_pottery_sherd"],
-        //テクスチャが見つかりません。
+        //Unable to locate a texture.
         ["frog_spawn_egg", ""],
         ["ghast_spawn_egg", "items/egg_ghast"],
         ["ghast_tear", "items/ghast_tear"],
@@ -1248,7 +1248,7 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         ["zombie_villager_spawn_egg", "egg_zombievillager"],
     ]);
 
-    // itemArrayの4番目の値（texture）を更新する。
+    // Update the fourth value (texture) in the itemArray
     const itemArrayLength = itemArray.length;
     for (let i = 0; i < itemArrayLength; i += 4) {
         const type: string | number = itemArray[i + 3];
@@ -1256,50 +1256,49 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         itemArray[i + 3] = texture;
     }
 
-    // 更新されたitemArrayを出力する(Debugging)
-    // console.log(itemArray)；
+    // Output the updated itemArray(Debugging)
+    // console.log(itemArray);
 
-    //ループが終わったら、次のパートに移る。
+    //once the loop is done then move to the next part
 
     const playerInventory = new ActionFormData();
-    playerInventory.title("§4" + member.nameTag + "のインベントリ！！" + "§4");
-    playerInventory.body("UserID 【<" + member.id + ">】");
-    playerInventory.button(itemArray[1] + "を" + itemArray[2] + "個持っています", "textures/" + itemArray[3]); ////0
-    playerInventory.button(itemArray[5] + " を " + itemArray[6] + "個持っています", "textures/" + itemArray[7]); //1
-    playerInventory.button(itemArray[9] + " を " + itemArray[10] + "個持っています", "textures/" + itemArray[11]); //2
-    playerInventory.button(itemArray[13] + " を " + itemArray[14] + "個持っています", "textures/" + itemArray[15]); //3
-    playerInventory.button(itemArray[17] + " を " + itemArray[18] + "個持っています", "textures/" + itemArray[19]); //4
-    playerInventory.button(itemArray[21] + " を " + itemArray[22] + "個持っています", "textures/" + itemArray[23]); //5
-    playerInventory.button(itemArray[25] + " を " + itemArray[26] + "個持っています", "textures/" + itemArray[27]); //6
-    playerInventory.button(itemArray[29] + " を " + itemArray[30] + "個持っています", "textures/" + itemArray[31]); //7
-    playerInventory.button(itemArray[33] + " を " + itemArray[34] + "個持っています", "textures/" + itemArray[35]); //8
-    playerInventory.button(itemArray[37] + " を " + itemArray[38] + "個持っています", "textures/" + itemArray[39]); //9
-    playerInventory.button(itemArray[41] + " を " + itemArray[42] + "個持っています", "textures/" + itemArray[43]); //10
-    playerInventory.button(itemArray[45] + " を " + itemArray[46] + "個持っています", "textures/" + itemArray[47]); //11
-    playerInventory.button(itemArray[49] + " を " + itemArray[50] + "個持っています", "textures/" + itemArray[51]); //12
-    playerInventory.button(itemArray[53] + " を " + itemArray[54] + "個持っています", "textures/" + itemArray[55]); //13
-    playerInventory.button(itemArray[57] + " を " + itemArray[58] + "個持っています", "textures/" + itemArray[59]); //14
-    playerInventory.button(itemArray[61] + " を " + itemArray[62] + "個持っています", "textures/" + itemArray[63]); //15
-    playerInventory.button(itemArray[65] + " を " + itemArray[66] + "個持っています", "textures/" + itemArray[67]); //16
-    playerInventory.button(itemArray[69] + " を " + itemArray[70] + "個持っています", "textures/" + itemArray[71]); //17
-    playerInventory.button(itemArray[73] + " を " + itemArray[74] + "個持っています", "textures/" + itemArray[75]); //18
-    playerInventory.button(itemArray[77] + " を " + itemArray[78] + "個持っています", "textures/" + itemArray[79]); //19
-    playerInventory.button(itemArray[81] + " を " + itemArray[82] + "個持っています", "textures/" + itemArray[83]); //20
-    playerInventory.button(itemArray[85] + " を " + itemArray[86] + "個持っています", "textures/" + itemArray[87]); //21
-    playerInventory.button(itemArray[89] + " を " + itemArray[90] + "個持っています", "textures/" + itemArray[91]); //22
-    playerInventory.button(itemArray[93] + " を " + itemArray[94] + "個持っています", "textures/" + itemArray[95]); //23
-    playerInventory.button(itemArray[97] + " を " + itemArray[98] + "個持っています", "textures/" + itemArray[99]); //24
-    playerInventory.button(itemArray[101] + " を " + itemArray[102] + "個持っています", "textures/" + itemArray[103]); //25
-    playerInventory.button(itemArray[105] + " を " + itemArray[106] + "個持っています", "textures/" + itemArray[107]); //26
-    playerInventory.button(itemArray[109] + " を " + itemArray[110] + "個持っています", "textures/" + itemArray[111]); //27
-    playerInventory.button(itemArray[113] + " を " + itemArray[114] + "個持っています", "textures/" + itemArray[115]); //28
-    playerInventory.button(itemArray[117] + " を " + itemArray[118] + "個持っています", "textures/" + itemArray[119]); //29
-    playerInventory.button(itemArray[121] + " を " + itemArray[122] + "個持っています", "textures/" + itemArray[123]); //30
-    playerInventory.button(itemArray[125] + " を " + itemArray[126] + "個持っています", "textures/" + itemArray[127]); //31
-    playerInventory.button(itemArray[129] + " を " + itemArray[130] + "個持っています", "textures/" + itemArray[131]); //32
-    playerInventory.button(itemArray[133] + " を " + itemArray[134] + "個持っています", "textures/" + itemArray[135]); //33
-    playerInventory.button(itemArray[137] + " を " + itemArray[138] + "個持っています", "textures/" + itemArray[139]); //34
-    playerInventory.button(itemArray[141] + " を " + itemArray[142] + "個持っています", "textures/" + itemArray[143]); //35
+    playerInventory.title("§4" + member.nameTag + " Inventory" + "§4");
+    playerInventory.button(itemArray[1] + " Amount: " + itemArray[2], "textures/" + itemArray[3]);
+    playerInventory.button(itemArray[5] + " Amount: " + itemArray[6], "textures/" + itemArray[7]);
+    playerInventory.button(itemArray[9] + " Amount: " + itemArray[10], "textures/" + itemArray[11]);
+    playerInventory.button(itemArray[13] + " Amount: " + itemArray[14], "textures/" + itemArray[15]);
+    playerInventory.button(itemArray[17] + " Amount: " + itemArray[18], "textures/" + itemArray[19]);
+    playerInventory.button(itemArray[21] + " Amount: " + itemArray[22], "textures/" + itemArray[23]);
+    playerInventory.button(itemArray[25] + " Amount: " + itemArray[26], "textures/" + itemArray[27]);
+    playerInventory.button(itemArray[29] + " Amount: " + itemArray[30], "textures/" + itemArray[31]);
+    playerInventory.button(itemArray[33] + " Amount: " + itemArray[34], "textures/" + itemArray[35]);
+    playerInventory.button(itemArray[37] + " Amount: " + itemArray[38], "textures/" + itemArray[39]);
+    playerInventory.button(itemArray[41] + " Amount: " + itemArray[42], "textures/" + itemArray[43]);
+    playerInventory.button(itemArray[45] + " Amount: " + itemArray[46], "textures/" + itemArray[47]);
+    playerInventory.button(itemArray[49] + " Amount: " + itemArray[50], "textures/" + itemArray[51]);
+    playerInventory.button(itemArray[53] + " Amount: " + itemArray[54], "textures/" + itemArray[55]);
+    playerInventory.button(itemArray[57] + " Amount: " + itemArray[58], "textures/" + itemArray[59]);
+    playerInventory.button(itemArray[61] + " Amount: " + itemArray[62], "textures/" + itemArray[63]);
+    playerInventory.button(itemArray[65] + " Amount: " + itemArray[66], "textures/" + itemArray[67]);
+    playerInventory.button(itemArray[69] + " Amount: " + itemArray[70], "textures/" + itemArray[71]);
+    playerInventory.button(itemArray[73] + " Amount: " + itemArray[74], "textures/" + itemArray[75]);
+    playerInventory.button(itemArray[77] + " Amount: " + itemArray[78], "textures/" + itemArray[79]);
+    playerInventory.button(itemArray[81] + " Amount: " + itemArray[82], "textures/" + itemArray[83]);
+    playerInventory.button(itemArray[85] + " Amount: " + itemArray[86], "textures/" + itemArray[87]);
+    playerInventory.button(itemArray[89] + " Amount: " + itemArray[90], "textures/" + itemArray[91]);
+    playerInventory.button(itemArray[93] + " Amount: " + itemArray[94], "textures/" + itemArray[95]);
+    playerInventory.button(itemArray[97] + " Amount: " + itemArray[98], "textures/" + itemArray[99]);
+    playerInventory.button(itemArray[101] + " Amount: " + itemArray[102], "textures/" + itemArray[103]);
+    playerInventory.button(itemArray[105] + " Amount: " + itemArray[106], "textures/" + itemArray[107]);
+    playerInventory.button(itemArray[109] + " Amount: " + itemArray[110], "textures/" + itemArray[111]);
+    playerInventory.button(itemArray[113] + " Amount: " + itemArray[114], "textures/" + itemArray[115]);
+    playerInventory.button(itemArray[117] + " Amount: " + itemArray[118], "textures/" + itemArray[119]);
+    playerInventory.button(itemArray[121] + " Amount: " + itemArray[122], "textures/" + itemArray[123]);
+    playerInventory.button(itemArray[125] + " Amount: " + itemArray[126], "textures/" + itemArray[127]);
+    playerInventory.button(itemArray[129] + " Amount: " + itemArray[130], "textures/" + itemArray[131]);
+    playerInventory.button(itemArray[133] + " Amount: " + itemArray[134], "textures/" + itemArray[135]);
+    playerInventory.button(itemArray[137] + " Amount: " + itemArray[138], "textures/" + itemArray[139]);
+    playerInventory.button(itemArray[141] + " Amount: " + itemArray[142], "textures/" + itemArray[143]);
     playerInventory
         .show(player)
         .then((playerInventoryResult) => {
@@ -1411,7 +1410,7 @@ async function handleUIInventory(inventoryUIResult: ModalFormResponse, onlineLis
         })
         .catch((error) => {
             console.error("Paradox Unhandled Rejection: ", error);
-            // スタックトレース情報の抽出
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {

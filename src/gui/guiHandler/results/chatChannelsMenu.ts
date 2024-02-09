@@ -7,12 +7,12 @@ import { chatChannelsLeaveMenuUI } from "../../playerui/chatChannels/uiChatChann
 import { ChatChannelsDeleteMenuUI } from "../../playerui/chatChannels/uiChatChannelsDeleteMenu";
 export function chatChannelMainMenu(player: Player) {
     const menu = new ActionFormData();
-    menu.title("§4チャンネルメニュー！§4");
-    menu.button("チャンネルを作る");
-    menu.button("チャンネルに参加！");
-    menu.button("プレイヤーを招待");
-    menu.button("チャンネルから抜ける");
-    menu.button("チャンネルを削除");
+    menu.title("§4Paradox - Chat Channels Menu§4");
+    menu.button("Create A Channel");
+    menu.button("Join A Channel");
+    menu.button("Invite A Player");
+    menu.button("Leave A Channel");
+    menu.button("Delete A Channel");
     menu.show(player)
         .then((chatChannelsMenuUIResult) => {
             switch (chatChannelsMenuUIResult.selection) {

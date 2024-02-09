@@ -8,38 +8,38 @@ import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiSpawnProtection(spawnProtectionResult: ModalFormResponse, player: Player) {
     if (!spawnProtectionResult || spawnProtectionResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [spawnProtectionToggle, spawnProtection_X, spawnProtection_Y, spawnProtection_Z, spawnProtection_Radius] = spawnProtectionResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fスポーンプロテクションを設定するには、Paradoxオプする必要があります。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to configure Spawn Protection`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
     if (spawnProtectionToggle === true) {
-        // 許可する
+        // Allow
         configuration.modules.spawnprotection.enabled = true;
         const vector3 = new Vector(Number(spawnProtection_X), Number(spawnProtection_Y), Number(spawnProtection_Z));
         configuration.modules.spawnprotection.enabled = true;
         configuration.modules.spawnprotection.vector3 = vector3;
         configuration.modules.spawnprotection.radius = Math.abs(Number(spawnProtection_Radius));
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6Spawn Protection§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6Spawn Protection§f!`);
         SpawnProtection();
     }
     if (spawnProtectionToggle === false) {
-        // 拒否する
+        // Deny
         configuration.modules.spawnprotection.enabled = false;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4Spawn Protection§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4Spawn Protection§f!`);
     }
 
-    //完了したら、プレイヤーにメインUIを表示する。
+    //show the main ui to the player once complete.
     return paradoxui(player);
 }

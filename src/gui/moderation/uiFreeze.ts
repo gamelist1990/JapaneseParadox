@@ -16,7 +16,7 @@ import { ModalFormResponse } from "@minecraft/server-ui";
 export function uiFREEZE(freezeResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUIFreeze(freezeResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -29,7 +29,7 @@ export function uiFREEZE(freezeResult: ModalFormResponse, onlineList: string[], 
 
 async function handleUIFreeze(freezeResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!freezeResult || freezeResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [value] = freezeResult.formValues;
@@ -41,11 +41,11 @@ async function handleUIFreeze(freezeResult: ModalFormResponse, onlineList: strin
             break;
         }
     }
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped.`);
     }
 
     const boolean = member.hasTag("paradoxFreeze");
@@ -57,8 +57,8 @@ async function handleUIFreeze(freezeResult: ModalFormResponse, onlineList: strin
         for (const effectType of effectsToRemove) {
             member.removeEffect(effectType);
         }
-        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§fあなたはもはや凍っていない。`);
-        sendMsg(`a[tag=paradoxOpped]`, `§7${member.name}§f フリーズが解かれました`);
+        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You are no longer frozen.`);
+        sendMsg(`@a[tag=paradoxOpped]`, `§7${member.name}§f is no longer frozen.`);
         return;
     }
 
@@ -69,8 +69,8 @@ async function handleUIFreeze(freezeResult: ModalFormResponse, onlineList: strin
             member.addEffect(effectType, 1000000, { amplifier: 255, showParticles: true });
         }
         member.addTag("paradoxFreeze");
-        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f あなたは今凍っている。`);
-        sendMsg(`a[tag=paradoxOpped]`, `§7${member.name}§f 今あなたはフリーズしています.`);
+        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You are now frozen.`);
+        sendMsg(`@a[tag=paradoxOpped]`, `§7${member.name}§f is now frozen.`);
         return;
     }
 

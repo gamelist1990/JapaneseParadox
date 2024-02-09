@@ -44,13 +44,13 @@ export function locationHandler(player: Player) {
         So if there is no data we push a line to keep the array with at least 1 value.
         If there are saved locations then it will continue as normal.
         */
-        Locations.push("保存されている座標はありません");
+        Locations.push("You have no saved Locations");
     }
-    savedlocationsui.title("§4座標保存§4");
-    savedlocationsui.dropdown(`\n§r座標を選択してください新しく座標を作る際日本語では無く英語またはローマ字で保存してください例:home,ie,kouenn,niwa,等§r\n\n以下の座標が保存されています\n`, Locations);
-    savedlocationsui.toggle("選択した座標にTP【使う時オン】", false);
-    savedlocationsui.toggle("選択した座標を削除します【消すときだけオンにしてね】", false);
-    savedlocationsui.textField("ここの下に名前を入れると今いる座標が保存されます【例:home】", "");
+    savedlocationsui.title("§4Paradox - Saved Locations§4");
+    savedlocationsui.dropdown(`\n§fSelect a Location:§f\n\nSaved Location's\n`, Locations);
+    savedlocationsui.toggle("Teleport to the selected location:", false);
+    savedlocationsui.toggle("Deletes the selected Location:", false);
+    savedlocationsui.textField("Enter a name to save your current Location:", "");
     if (configuration.customcommands.sethome === true && configuration.customcommands.delhome === true && configuration.customcommands.listhome === true && configuration.customcommands.gohome === true) {
         savedlocationsui
             .show(player)
@@ -69,7 +69,7 @@ export function locationHandler(player: Player) {
                 }
             });
     } else {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f セーブした座標が削除されました!`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Saved Locations have been disabled by the Admins.`);
         return;
     }
 }

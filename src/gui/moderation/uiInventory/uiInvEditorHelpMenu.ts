@@ -3,22 +3,22 @@ import { Player } from "@minecraft/server";
 import { uiInvEditorMenu } from "./uiInvEditorMainMenu";
 export function uiInvEditorHelpMenu(player: Player, targetPlayer: Player, itemSlot: number) {
     const helpMenu = new ActionFormData();
-    helpMenu.title("§4ヘルプメニュー§4");
+    helpMenu.title("§4Paradox - Inventory Item Editor Help§4");
     helpMenu.body(
-        "§6エンチャントメニュー§このメニューではエンチャントの追加と削除ができます。このメニューでは、アイテム名を入力することで、アイテムを入れ替えることができます。また、アイテム名を入力することで、空のインベントリスロットを選択しているプレイヤーにアイテムを渡すこともできます。 アイテムを他のプレイヤーに転送したい場合は、ドロップダウンから自分の名前を選択してください。あなたのインベントリで次に空いているアイテムスロットを調べます。"
+        "§6Enchantments Menu§r\nIn this menu you can add and remove enchantments.\n§6Naming And Lore\n§rThis menu allows you to change the name of the item that is currently selected. The lore can be edited as well you can use colour codes each line is separated via a comma. to clear a lore leave the textbox blank and enable the edit lore toggle.\n§6Replace Or Delete\n§rIn this menu you can replace an item by entering the item name alternatively you can delete it, another option is that providing you have selected an empty inventory slot you can give the player an item by entering the item name.\n§6Transfer Item§r\nThis menu allows you to transfer the selected item to another player, if you want to transfer an item from the target player to your inventory select you name in the drop down. It will check for the next free item slot in your inventory."
     );
-    helpMenu.button("戻る");
+    helpMenu.button("Back");
     helpMenu
         .show(player)
         .then((InvEditorMenuUIResult) => {
             if (InvEditorMenuUIResult.selection == 0) {
-                //メインメニューに戻る
+                //Return to the main menu
                 uiInvEditorMenu(player, targetPlayer, itemSlot);
             }
         })
         .catch((error) => {
             console.error("Paradox Unhandled Rejection: ", error);
-            // スタックトレース情報の抽出
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {

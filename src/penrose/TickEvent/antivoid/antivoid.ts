@@ -37,7 +37,7 @@ function antiVoid(_id: number) {
             lastSavedCord = saveOrGetValue("get");
             if (player.location.y - lastSavedCord >= 3 && isFlying == false) {
                 if (flagPlayer == false) {
-                    console.log("プレイヤーにAntiVoid Expliotのフラグが付けられました");
+                    console.log("Player has been flagged for AntiVoid Expliot");
                     flagPlayer = true;
                 }
             }

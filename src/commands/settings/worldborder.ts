@@ -8,34 +8,34 @@ import ConfigInterface from "../../interfaces/Config.js";
  * Provides help information for the worldborders command.
  * @param {Player} player - The player requesting help.
  * @param {string} prefix - The custom prefix for the player.
- * @param {boolean} worldBorder.enabled - The status of the worldBorder module.
+ * @param {boolean} worldBorderBoolean - The status of the worldBorder module.
  * @param {boolean} setting - The status of the worldBorder custom command setting.
  */
 function worldBorderHelp(player: Player, prefix: string, worldBorderBoolean: boolean, setting: boolean): void {
-    // コマンドとモジュールのステータスを決定する
-    const commandStatus: string = setting ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
-    const moduleStatus: string = worldBorderBoolean ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
+    // Determine the status of the command and module
+    const commandStatus: string = setting ? "§6[§aENABLED§6]§f" : "§6[§4DISABLED§6]§f";
+    const moduleStatus: string = worldBorderBoolean ? "§6[§aENABLED§6]§f" : "§6[§4DISABLED§6]§f";
 
-    // 選手にヘルプ情報を表示する
+    // Display help information to the player
     sendMsgToPlayer(player, [
-        `\n[§6コマンド§4]§f: ワールドボーダー`,
+        `\n§o§4[§6Command§4]§f: worldborder`,
         `§4[§6Status§4]§f: ${commandStatus}`,
         `§4[§6Module§4]§f: ${moduleStatus}`,
         `§4[§6Usage§4]§f: ${prefix}worldborder [options]`,
-        `§4[§6解説§4]§f：ワールドの境界線を設定し、プレイヤーをその境界線に制限します。`,
-        `§4[§6オプション§4]§f：`,
-        `    -オーバーワールド`,
-        `       §4[§7オーバーワールドの境界線の大きさを設定する§4]§f`,
+        `§4[§6Description§4]§f: Sets the world border and restricts players to that border.`,
+        `§4[§6Options§4]§f:`,
+        `    -o, --overworld`,
+        `       §4[§7Set the size of the overworld border§4]§f`,
         `    -n, --nether`,
-        `       §4[§7境界線の大きさを設定する§4]§f`,
+        `       §4[§7Set the size of the nether border§4]§f`,
         `    -e, --end`,
-        `       §4[§7エンドボーダーのサイズを設定する§4]§f`,
+        `       §4[§7Set the size of the end border§4]§f`,
         `    -d, --disable`,
-        `       §4[§7ワールド・ボーダーを無効にする§4]§f`,
+        `       §4[§7Disable the World Border§4]§f`,
         `    -e, --enable`,
-        `       §4[§7ワールド・ボーダーをBooleanにする§4]§f`,
+        `       §4[§7Enable the World Border§4]§f`,
         `    -h, --help`,
-        `       §4[§7このヘルプメッセージを表示する§4]§f`,
+        `       §4[§7Display this help message§4]§f`,
     ]);
 }
 
@@ -63,15 +63,15 @@ function setWorldBorder(player: Player, overworldSize: number, netherSize: numbe
  * @returns {number | undefined} - The parsed positive number.
  */
 function parseSize(value: string | undefined): number | undefined {
-    // 文字列値を数値に変換しようとする。
+    // Attempt to convert the string value to a number
     const parsedValue = Number(value);
 
-    // 変換結果がBooleanな数値かどうかをチェックする
+    // Check if the conversion resulted in a valid number
     if (isNaN(parsedValue)) {
         return undefined;
     }
 
-    // 解析された正の数を返す
+    // Return the parsed positive number
     return Math.abs(parsedValue);
 }
 
@@ -83,7 +83,7 @@ function parseSize(value: string | undefined): number | undefined {
 export function worldborders(message: ChatSendAfterEvent, args: string[]): void {
     handleWorldBorders(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -100,7 +100,7 @@ export function worldborders(message: ChatSendAfterEvent, args: string[]): void 
  * @param {string[]} args - Additional arguments provided (optional).
  */
 async function handleWorldBorders(message: ChatSendAfterEvent, args: string[]): Promise<void> {
-    // 必要なパラメータが定義されていることを検証する
+    // Validate that required params are defined
     if (!message) {
         return console.warn(`${new Date()} | Error: ${message} isn't defined. Did you forget to pass it? (./commands/settings/worldborder.js:38)`);
     }
@@ -108,25 +108,25 @@ async function handleWorldBorders(message: ChatSendAfterEvent, args: string[]): 
     const player: Player = message.sender;
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     const prefix: string = getPrefix(player);
     const configuration: ConfigInterface = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // キャッシュ
+    // Cache
     const length = args.length;
 
     if (length <= 0 || ["--help", "-h"].includes(args[0].toLowerCase()) || !configuration.customcommands.worldborder) {
         return worldBorderHelp(player, prefix, configuration.modules.worldBorder.enabled, configuration.customcommands.worldborder);
     }
 
-    // ワールドボーダーを閉鎖
+    // Shutdown worldborder
     if (length <= 0 || ["--disable", "-d"].includes(args[0].toLowerCase())) {
-        // ワールドボーダーを無効にする
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f は無効 the §6World Border§f!`);
+        // Disable Worldborder
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled the §6World Border§f!`);
         configuration.modules.worldBorder.overworld = 0;
         configuration.modules.worldBorder.nether = 0;
         configuration.modules.worldBorder.end = 0;
@@ -134,16 +134,16 @@ async function handleWorldBorders(message: ChatSendAfterEvent, args: string[]): 
         return;
     }
 
-    // ワールドボーダーをBooleanにする
+    // Enable worldborder
     if (length <= 0 || ["--enable", "-e"].includes(args[0].toLowerCase())) {
         const o = configuration.modules.worldBorder.overworld;
         const n = configuration.modules.worldBorder.nether;
         const e = configuration.modules.worldBorder.end;
         if (!configuration.modules.worldBorder.enabled && (o !== 0 || n !== 0 || e !== 0)) {
-            // ワールドボーダーをBooleanにする
+            // Enable Worldborder
             configuration.modules.worldBorder.enabled = true;
             dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 以下の機能が有効です=> the §6World Border§f!`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled the §6World Border§f!`);
             WorldBorder();
             return;
         } else {
@@ -151,7 +151,7 @@ async function handleWorldBorders(message: ChatSendAfterEvent, args: string[]): 
             if (noBorders) {
                 return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Set the border size please. Use ${prefix}worldborder --help for command usage.`);
             }
-            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fワールド・ボーダーは既にBooleanになっている。`);
+            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f World Border is already enabled.`);
         }
     }
 

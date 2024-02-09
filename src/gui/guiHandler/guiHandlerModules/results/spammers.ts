@@ -10,23 +10,23 @@ export function spammersHandler(player: Player) {
     const spammerABoolean = configuration.modules.spammerA.enabled;
     const spammerBBoolean = configuration.modules.spammerB.enabled;
     const spammerCBoolean = configuration.modules.spammerC.enabled;
-    modulesspamui.title("§4Spam Modulesメニュー§4");
-    modulesspamui.toggle("Spammer A - 移動中に送信されたメッセージをチェックする：", spammerABoolean);
-    modulesspamui.toggle("Spammer B - スイング中に送信されたメッセージをチェックする：", spammerBBoolean);
-    modulesspamui.toggle("Spammer C - アイテム使用中に送信されたメッセージをチェックする：", spammerCBoolean);
+    modulesspamui.title("§4Paradox Modules - Spam Modules§4");
+    modulesspamui.toggle("Spammer A - Checks for messages sent while moving:", spammerABoolean);
+    modulesspamui.toggle("Spammer B - Checks for messages sent while swinging:", spammerBBoolean);
+    modulesspamui.toggle("Spammer C - Checks for messages sent while using items:", spammerCBoolean);
     modulesspamui
         .show(player)
         .then((spamResult) => {
             uiSPAMMER(spamResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

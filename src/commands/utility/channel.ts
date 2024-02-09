@@ -13,56 +13,56 @@ function chatChannelHelp(player: Player, prefix: string, setting: boolean) {
         commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6チャットチャネルコマンド§4]§f：`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
+        `\n§o§4[§6Chat Channel Commands§4]§f:`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
         ``,
-        `§4[§6Command§4]§f: ${prefix}channel create <channelName> <password?>`,
-        `§4[§6説明§4]§f：新しいチャットチャンネルを作成する(オプションのパスワード付き)。`,
-        `§4[§6例§4]§f：`,
+        `§4[§6コマンド§4]§f: ${prefix}channel create <channelName> <password?>`,
+        `§4[§6説明§4]§f: Create a new chat channel (with optional password).`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}channel create test`,
-        `        §パスワードなしで 'test' という名前のチャットチャンネルを作る§f`,
+        `        §4- §6Create a chat channel named 'test' without a password§f`,
         `    ${prefix}channel create test password123`,
-        `        §パスワード 'password123' で 'test' という名前のチャットチャンネルを作成する。`,
+        `        §4- §6Create a chat channel named 'test' with password 'password123'§f`,
         ``,
-        `§4[§6Command§4]§f: ${prefix}channel delete <channelName> <password?>`,
-        `§4[§6説明§4]§f：既存のチャットチャンネルを削除する(オプションのパスワード付き)。`,
-        `§4[§6例§4]§f：`,
+        `§4[§6コマンド§4]§f: ${prefix}channel delete <channelName> <password?>`,
+        `§4[§6説明§4]§f: Delete an existing chat channel (with optional password).`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}channel delete test`,
-        `        §4- §6「test」という名前のチャットチャンネルを削除する§f`,
+        `        §4- §6Delete the chat channel named 'test'§f`,
         `    ${prefix}channel delete test password123`,
-        `        §4- §6パスワード'password123'で'test'という名前のチャットチャンネルを削除する§f`,
+        `        §4- §6Delete the chat channel named 'test' with password 'password123'§f`,
         ``,
-        `§4[§6Command§4]§f: ${prefix}channel invite <channelName> <playerName>`,
-        `§4[§6説明§4]§f：チャットチャンネルにプレイヤーを招待する。`,
-        `§4[§6例§4]§f：`,
+        `§4[§6コマンド§4]§f: ${prefix}channel invite <channelName> <playerName>`,
+        `§4[§6説明§4]§f: Invite a player to join your chat channel.`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}channel invite test player123`,
-        `        §4- §6チャットチャンネル「test」に「player123」を招待する§f`,
+        `        §4- §6Invite 'player123' to join the chat channel 'test'§f`,
         ``,
-        `§4[§6Command§4]§f: ${prefix}channel join <channelName> <password?>`,
-        `§4[§6説明§4]§f：チャットチャンネルに参加する(パスワードは任意)。`,
-        `§4[§6例§4]§f：`,
+        `§4[§6コマンド§4]§f: ${prefix}channel join <channelName> <password?>`,
+        `§4[§6説明§4]§f: Join a chat channel (with optional password).`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}channel join test`,
-        `        §4- §6チャットチャンネル「test」に参加する§f`,
+        `        §4- §6Join the chat channel 'test'§f`,
         `    ${prefix}channel join test password123`,
-        `        §4- §6パスワード'password123'でチャットチャンネル'test'に参加する§f`,
+        `        §4- §6Join the chat channel 'test' with password 'password123'§f`,
         ``,
-        `§4[§6Command§4]§f: ${prefix}channel handover <channelName> <playerName>`,
-        `§4[§6解説§4]§f：チャットチャンネルの所有権を譲渡する。`,
-        `§4[§6例§4]§f：`,
+        `§4[§6コマンド§4]§f: ${prefix}channel handover <channelName> <playerName>`,
+        `§4[§6説明§4]§f: Transfer ownership of a chat channel.`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}channel handover test newOwner123`,
-        `        §4- §6 チャットチャンネル 'test' の所有権を 'newOwner123' に移す§f`,
+        `        §4- §6Transfer ownership of the chat channel 'test' to 'newOwner123'§f`,
         ``,
-        `§4[§6Command§4]§f: ${prefix}channel members`,
-        `§4[§6説明§4]§f：同じチャットチャンネルにいるメンバー全員をリストアップする。`,
-        `§4[§6例§4]§f：`,
+        `§4[§6コマンド§4]§f: ${prefix}channel members`,
+        `§4[§6説明§4]§f: List all members in the same chat channel.`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}channel members`,
-        `        §4- §6同じチャットチャンネルにいるメンバーを一覧表示する§f`,
+        `        §4- §6List all members in the same chat channel§f`,
         ``,
-        `§4[§6Command§4]§f: ${prefix}channel leave`,
-        `§4[§6説明§4]§f：現在のチャットチャンネルから抜ける。`,
-        `§4[§6例§4]§f：`,
+        `§4[§6コマンド§4]§f: ${prefix}channel leave`,
+        `§4[§6説明§4]§f: Leave the current chat channel.`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}channel leave`,
-        `        §4- §6現在のチャットチャンネルから抜ける§f`,
+        `        §4- §6Leave the current chat channel§f`,
     ]);
 }
 
@@ -92,7 +92,7 @@ export function chatChannel(message: ChatSendAfterEvent, args: string[]) {
             const channelNameForMembers = ChatChannelManager.getPlayerChannel(player.id);
 
             if (!channelNameForMembers) {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはどのチャットチャンネルにも入っていません。`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You are not in any chat channel.`);
                 return;
             }
 
@@ -191,7 +191,7 @@ export function chatChannel(message: ChatSendAfterEvent, args: string[]) {
             if (newChannel === "wrong_password") {
                 sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Wrong password for chat channel '§7${channelNameToJoin}§f'.`);
             } else if (newChannel === "already_in_channel") {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたは既にチャットチャンネルに入っています。まず現在のチャンネルから退出してください。`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You are already in a chat channel. Please leave your current channel first.`);
             } else if (newChannel !== false) {
                 const joinedPlayer = (world as WorldExtended).getPlayerById(player.id);
                 const joinedPlayerName = joinedPlayer ? joinedPlayer.name : "Unknown Player";
@@ -208,7 +208,7 @@ export function chatChannel(message: ChatSendAfterEvent, args: string[]) {
 
                 sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You joined chat channel '§7${channelNameToJoin}§f'.`);
             } else {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fチャットチャンネルに参加できません。`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Unable to join chat channel.`);
             }
             break;
         }
@@ -226,7 +226,7 @@ export function chatChannel(message: ChatSendAfterEvent, args: string[]) {
             } else if (handOverResult) {
                 sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Ownership of chat channel '§7${channelNameToHandOver}§f' transferred to '§7${newOwnerName}§f'.`);
             } else {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fチャットの所有権を移転できない。`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Unable to transfer ownership of chat channel.`);
             }
             break;
         }
@@ -235,18 +235,18 @@ export function chatChannel(message: ChatSendAfterEvent, args: string[]) {
             const channelNameToLeave = ChatChannelManager.getPlayerChannel(player.id);
 
             if (!channelNameToLeave) {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはどのチャットチャンネルにも入っていません。`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You are not in any chat channel.`);
                 return;
             }
 
             const channelToLeave = ChatChannelManager.getChatChannelByName(channelNameToLeave);
             const isOwner = channelToLeave.owner === player.id;
 
-            // チャンネルからプレーヤーを外す
+            // Remove the player from the channel
             channelToLeave.members.delete(player.id);
             ChatChannelManager.clearPlayerFromChannelMap(player.id);
 
-            // チャンネルに残っているすべてのメンバーに、プレーヤーが退席したことを知らせる。
+            // Inform all remaining members in the channel that the player left
             const leavingPlayer = (world as WorldExtended).getPlayerById(player.id);
             const leavingPlayerName = leavingPlayer ? leavingPlayer.name : "Unknown Player";
             const leaveMessage = `§f§4[§6Paradox§4]§f §6${leavingPlayerName}§f left the chat channel.`;
@@ -259,7 +259,7 @@ export function chatChannel(message: ChatSendAfterEvent, args: string[]) {
             });
 
             if (isOwner) {
-                // 退団する選手がオーナーである場合、所有権を他の会員に譲渡する。
+                // If the leaving player is the owner, transfer ownership to another member
                 const newOwnerId = Array.from(channelToLeave.members)[0]; // Get the first member as new owner
 
                 if (newOwnerId) {
@@ -267,7 +267,7 @@ export function chatChannel(message: ChatSendAfterEvent, args: string[]) {
                     const newOwnerObject = (world as WorldExtended).getPlayerById(newOwnerId);
                     sendMsgToPlayer(newOwnerObject, `§f§4[§6Paradox§4]§f Ownership of chat channel '§7${channelNameToLeave}§f' transferred to '§7${newOwnerObject.name}§f'.`);
                 } else {
-                    // 他にメンバーがいない場合、チャンネルを削除する。
+                    // If no other members, delete the channel
                     ChatChannelManager.deleteChatChannel(channelNameToLeave, channelToLeave.password);
                 }
             }
@@ -282,7 +282,7 @@ export function chatChannel(message: ChatSendAfterEvent, args: string[]) {
     }
 }
 
-// playerLeaveイベントを処理するコールバック関数を定義する。
+// Define a callback function to handle the playerLeave event
 function onPlayerLeave(event: PlayerLeaveAfterEvent) {
     const playerId = event.playerId;
     const channelName = ChatChannelManager.getPlayerChannel(playerId);
@@ -294,7 +294,7 @@ function onPlayerLeave(event: PlayerLeaveAfterEvent) {
     const channel = ChatChannelManager.getChatChannelByName(channelName);
 
     if (channel.owner === playerId) {
-        // 退団する選手がオーナーである場合、所有権を他の会員に譲渡する。
+        // If the leaving player is the owner, transfer ownership to another member
         const newOwnerId = Array.from(channel.members).find((memberId) => memberId !== playerId);
 
         if (newOwnerId) {
@@ -302,17 +302,17 @@ function onPlayerLeave(event: PlayerLeaveAfterEvent) {
             const newOwnerObject = (world as WorldExtended).getPlayerById(newOwnerId);
             sendMsgToPlayer(newOwnerObject, `§f§4[§6Paradox§4]§f Ownership of chat channel '§7${channelName}§f' transferred to '§7${newOwnerObject.name}§f'.`);
         } else {
-            // 他にメンバーがいない場合、チャンネルを削除する。
+            // If no other members, delete the channel
             ChatChannelManager.deleteChatChannel(channelName, channel.password);
             return;
         }
     }
 
-    // チャンネルからプレーヤーを外す
+    // Remove the player from the channel
     channel.members.delete(playerId);
     ChatChannelManager.clearPlayerFromChannelMap(playerId);
 
-    // チャンネルに残っているすべてのメンバーに、プレーヤーが退席したことを知らせる。
+    // Inform all remaining members in the channel that the player left
     const leavingPlayer = (world as WorldExtended).getPlayerById(playerId);
     const leavingPlayerName = leavingPlayer ? leavingPlayer.name : "Unknown Player";
 
@@ -326,7 +326,7 @@ function onPlayerLeave(event: PlayerLeaveAfterEvent) {
 }
 
 const onChannelLeave = () => {
-    // コールバック関数をplayerLeaveイベントにサブスクライブする。
+    // Subscribe the callback function to the playerLeave event
     world.afterEvents.playerLeave.subscribe(onPlayerLeave);
 };
 

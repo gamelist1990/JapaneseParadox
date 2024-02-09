@@ -10,14 +10,14 @@ import { antiJesusAHandler } from "./results/antijesusa";
 
 export function movementui(player: Player) {
     const modulesmovementui = new ActionFormData();
-    modulesmovementui.title("§4メニュー：移動系§4");
-    modulesmovementui.button("ノックバック検知", "textures/items/diamond_chestplate");
-    modulesmovementui.button("落下ダメ検知", "textures/items/diamond_boots");
-    modulesmovementui.button("飛行検知", "textures/items/elytra");
-    modulesmovementui.button("Sprint検知", "textures/items/diamond_boots");
-    modulesmovementui.button("速さ検知", "textures/items/diamond_boots");
-    modulesmovementui.button("Scaffold検知", "textures/blocks/scaffolding_top");
-    modulesmovementui.button("水の上走ってるやつ検知", "textures/blocks/lava_placeholder");
+    modulesmovementui.title("§4Paradox Modules - Movement§4");
+    modulesmovementui.button("Anti Knockback", "textures/items/diamond_chestplate");
+    modulesmovementui.button("Anti Fall", "textures/items/diamond_boots");
+    modulesmovementui.button("Anti Fly", "textures/items/elytra");
+    modulesmovementui.button("Invalid Sprint", "textures/items/diamond_boots");
+    modulesmovementui.button("Anti Speed", "textures/items/diamond_boots");
+    modulesmovementui.button("Anti Scaffold", "textures/blocks/scaffolding_top");
+    modulesmovementui.button("Anti Jesusa", "textures/blocks/lava_placeholder");
     modulesmovementui
         .show(player)
         .then((movementResult) => {

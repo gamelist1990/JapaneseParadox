@@ -8,21 +8,21 @@ export function antiSpamHandler(player: Player) {
     const modulesantispamui = new ModalFormData();
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const antiSpamBoolean = configuration.modules.antispam.enabled;
-    modulesantispamui.title("§4 Anti Spamメニュー§4");
-    modulesantispamui.toggle("アンチスパム - 2秒のクールダウンでチャットのスパムをチェックする：", antiSpamBoolean);
+    modulesantispamui.title("§4Paradox Modules - Anti Spam§4");
+    modulesantispamui.toggle("Anti Spam - Checks for spamming in chat with 2 second cooldown:", antiSpamBoolean);
     modulesantispamui
         .show(player)
         .then((antispamResult) => {
             uiANTISPAM(antispamResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

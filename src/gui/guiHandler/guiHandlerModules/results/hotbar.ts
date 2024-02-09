@@ -9,23 +9,23 @@ export function hotbarHandler(player: Player) {
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const hotbarBoolean = configuration.modules.hotbar.enabled;
     const CurrentHotbarConfig = configuration.modules.hotbar.message;
-    moduleshotbarui.title("§4 Hotbarメニュー§4");
-    moduleshotbarui.textField("ホットバーのメッセージ", "", CurrentHotbarConfig);
-    moduleshotbarui.toggle("Enable Hotbar - ホットバーメッセージを表示します：", hotbarBoolean);
-    moduleshotbarui.toggle("config.jsに保存されているメッセージに戻す：", false);
+    moduleshotbarui.title("§4Paradox Modules - Hotbar§4");
+    moduleshotbarui.textField("Hotbar Message: ", "", CurrentHotbarConfig);
+    moduleshotbarui.toggle("Enable Hotbar - Displays a hotbar message for all player's currently online:", hotbarBoolean);
+    moduleshotbarui.toggle("Restore to message stored in config.js:", false);
     moduleshotbarui
         .show(player)
         .then((hotbarResult) => {
             uiHOTBAR(hotbarResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

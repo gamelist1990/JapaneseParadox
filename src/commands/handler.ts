@@ -1,7 +1,7 @@
 import { ChatSendAfterEvent, ChatSendBeforeEvent, Player } from "@minecraft/server";
 import { sendMsgToPlayer } from "../util.js";
 
-// すべてのコマンドをインポートする
+// import all our commands
 import { kick } from "./moderation/kick.js";
 import { help } from "./moderation/help.js";
 import { notify } from "./moderation/notify.js";
@@ -175,18 +175,6 @@ const commandDefinitions: Record<string, (data: Player | ChatSendAfterEvent, arg
         channel: chatChannel,
         pvp: pvp,
         spawnprotection: spawnprotection,
-        //custom
-        map: biome,
-        tp: TeleportRequestHandler,
-        ui: paradoxUI,
-        tpl: listhome,
-        tpg: gohome,
-        tps: sethome,
-        tpd: delhome,
-        list: fullreport,
-        van: vanish,
-        ch: chatChannel,
-        clear: clearlag,
     },
     null
 );
@@ -201,38 +189,38 @@ export function commandHandler(player: Player, message: ChatSendBeforeEvent): vo
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
     if (configuration.debug) {
-        console.warn(`${new Date()} | ${player.name}がコマンドを実行`);
+        console.warn(`${new Date()} | did run command handler`);
     }
 
-    // メッセージがプレフィックスで始まっているかチェックし、始まっていない場合は終了する。
+    // checks if the message starts with our prefix, if not exit
     if (!message.message.startsWith(configuration.customcommands.prefix)) return void 0;
 
     const args = message.message.slice(configuration.customcommands.prefix.length).split(/ +/);
 
     const commandName = args.shift().toLowerCase();
 
-    if (configuration.debug) console.warn(`${new Date()} | "${player.name}" が以下のコマンドを実行しました: ${configuration.customcommands.prefix}${commandName} ${args.join(" ")}`);
+    if (configuration.debug) console.warn(`${new Date()} | "${player.name}" used the command: ${configuration.customcommands.prefix}${commandName} ${args.join(" ")}`);
 
     if (!(commandName in commandDefinitions)) {
         message.cancel = true;
         message.sendToTargets = true;
         message.setTargets([]);
         message.message = "";
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  §7${configuration.customcommands.prefix}${commandName}§f そのコマンドは存在しません！！`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f The command §7${configuration.customcommands.prefix}${commandName}§f does not exist. Try again!`);
         return;
     }
 
-    // いかなるターゲットにもメッセージを流さない
+    // Do not broadcast any message to any targets
     message.sendToTargets = true;
 }
 
 export function handleCommandAfterSend(chatSendAfterEvent: ChatSendAfterEvent): void {
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // メッセージ送信後のコマンド処理ロジック
+    // Logic for handling the command after the message is sent
     if (!chatSendAfterEvent.message.startsWith(configuration.customcommands.prefix)) return;
 
-    // いかなるターゲットにもメッセージを流さない
+    // Do not broadcast any message to any targets
     chatSendAfterEvent.sendToTargets = true;
 
     const args = chatSendAfterEvent.message.slice(configuration.customcommands.prefix.length).split(/ +/);

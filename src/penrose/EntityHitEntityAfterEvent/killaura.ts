@@ -120,8 +120,8 @@ function freeze(id: number) {
             player.removeTag("freezeAura");
             return;
         }
-        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f 凍結！", {
-            subtitle: "§fスタッフに連絡 §4[§6AntiKillAura§4]§f",
+        player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f Frozen!", {
+            subtitle: "§fContact Staff §4[§6AntiKillAura§4]§f",
             fadeInDuration: 0,
             fadeOutDuration: 0,
             stayDuration: 60,

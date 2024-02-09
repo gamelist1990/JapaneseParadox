@@ -40,23 +40,23 @@ export function uiItemEditorStats(player: Player, targetPlayer: Player, itemSlot
         const maxDurability = durability.maxDurability;
         let currentDamage = durability.damage;
         //Show the stats for the item.
-        statsMenu.title("§4アイテムステータス§4");
+        statsMenu.title("§4Paradox - Item Editor Stats§4");
         statsMenu.body(
-            "現在のプレイヤーのインベントリ: §6" +
+            "Current Players Inventory: §6" +
                 targetPlayer.name +
                 "\n" +
-                "§r指定したアイテム: §6" +
+                "§rSelected Item: §6" +
                 item.typeId.replace("minecraft:", "") +
-                "§r\n\nエンチャ: \n" +
+                "§r\n\nCurrent Enchantments: \n" +
                 formattedEnchantments +
-                "\n\n§r追加: \n" +
+                "\n\n§rLore: \n" +
                 formattedLore +
-                "\n\n耐久性: §6" +
+                "\n\nDurability: §6" +
                 (currentDamage = maxDurability - currentDamage) +
                 "/" +
                 maxDurability
         );
-        statsMenu.button("戻る");
+        statsMenu.button("Back");
         statsMenu.show(player).then((InvEditorMenuUIResult) => {
             if (InvEditorMenuUIResult.selection == 0) {
                 //Return to the main menu

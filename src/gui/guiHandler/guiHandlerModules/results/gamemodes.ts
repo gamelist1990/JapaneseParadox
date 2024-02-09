@@ -5,29 +5,29 @@ import { uiGAMEMODES } from "../../../modules/uiGamemodes";
 import ConfigInterface from "../../../../interfaces/Config";
 
 export function gamemodesHandler(player: Player) {
-    //ゲームモードUI
+    //GameModes UI
     const gamemodesui = new ModalFormData();
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const adventureGMBoolean = configuration.modules.adventureGM.enabled;
     const creativeGMBoolean = configuration.modules.creativeGM.enabled;
     const survivalGMBoolean = configuration.modules.survivalGM.enabled;
-    gamemodesui.title("§4Gamemodeメニュー§4");
-    gamemodesui.toggle("アドベンチャーを無効にする：", adventureGMBoolean);
-    gamemodesui.toggle("クリエイティブを無効にする：", creativeGMBoolean);
-    gamemodesui.toggle("サバイバルを無効にする：", survivalGMBoolean);
+    gamemodesui.title("§4Paradox - Configure Gamemodes§4");
+    gamemodesui.toggle("Disable Adventure:", adventureGMBoolean);
+    gamemodesui.toggle("Disable Creative:", creativeGMBoolean);
+    gamemodesui.toggle("Disable Survival:", survivalGMBoolean);
     gamemodesui
         .show(player)
         .then((gamemodeResult) => {
             uiGAMEMODES(gamemodeResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

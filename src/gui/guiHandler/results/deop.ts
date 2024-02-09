@@ -6,9 +6,9 @@ export function deopHandler(player: Player) {
     // New window for deop
     const deopgui = new ModalFormData();
     let onlineList: string[] = [];
-    deopgui.title("§4管理者権限剝奪§4");
+    deopgui.title("§4DEOP§4");
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    deopgui.dropdown(`\n§fユーザーを選択:§f\n\n以下のプレイヤーがオンラインです\n`, onlineList);
+    deopgui.dropdown(`\n§fSelect a player to remove access to Paradox:§f\n\nPlayer's Online\n`, onlineList);
     deopgui
         .show(player)
         .then((opResult) => {

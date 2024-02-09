@@ -5,7 +5,7 @@ import { uiILLEGALITEMS } from "../../../modules/uiIllegaItems";
 import ConfigInterface from "../../../../interfaces/Config";
 
 export function illegalItemsHandler(player: Player) {
-    //違法な項目 これはいくつかのモジュールをカバーするので、1つのUIにまとめます。
+    //Illegal items this will cover a few modules so will group these into one UI.
     const modulesillegalitemsui = new ModalFormData();
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const illegalItemsABoolean = configuration.modules.illegalitemsA.enabled;
@@ -14,26 +14,26 @@ export function illegalItemsHandler(player: Player) {
     const illegalEnchantmentBoolean = configuration.modules.illegalEnchantment.enabled;
     const illegalLoresBoolean = configuration.modules.illegalLores.enabled;
     const stackBanBoolean = configuration.modules.stackBan.enabled;
-    modulesillegalitemsui.title("§4Illegal Itemsメニュー§4");
-    modulesillegalitemsui.toggle("不正アイテムA - 不正なアイテムをインベントリに入れているプレイヤーをチェックする：", illegalItemsABoolean);
-    modulesillegalitemsui.toggle("不正アイテムB - 不正なアイテムを置いたプレーヤーをチェックする：", illegalItemsBBoolean);
-    modulesillegalitemsui.toggle("Illegal Items C - 不正な落下物がないかチェックする：", illegalItemsCBoolean);
-    modulesillegalitemsui.toggle("違法エンチャント - 違法なエンチャントが施されたアイテムをチェックする：", illegalEnchantmentBoolean);
-    modulesillegalitemsui.toggle("不正な伝承 - アイテムに不正な伝承がないかチェックします：", illegalLoresBoolean);
-    modulesillegalitemsui.toggle("スタック禁止 - 不正なスタックを持つプレイヤーをチェックする：", stackBanBoolean);
+    modulesillegalitemsui.title("§4Paradox Modules - Illegal Items§4");
+    modulesillegalitemsui.toggle("Illegal Items A - Checks for player's that have illegal items in inventory:", illegalItemsABoolean);
+    modulesillegalitemsui.toggle("Illegal Items B - Checks for player's that place illegal items:", illegalItemsBBoolean);
+    modulesillegalitemsui.toggle("Illegal Items C - Checks for illegal dropped items:", illegalItemsCBoolean);
+    modulesillegalitemsui.toggle("Illegal Enchants - Checks for items with illegal enchantments:", illegalEnchantmentBoolean);
+    modulesillegalitemsui.toggle("Illegal Lores - Checks for illegal Lores on items:", illegalLoresBoolean);
+    modulesillegalitemsui.toggle("Stack Ban - Checks for player's with illegal stacks:", stackBanBoolean);
     modulesillegalitemsui
         .show(player)
         .then((illegalitemsResult) => {
             uiILLEGALITEMS(illegalitemsResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

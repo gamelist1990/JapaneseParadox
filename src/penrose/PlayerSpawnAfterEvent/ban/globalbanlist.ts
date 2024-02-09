@@ -21,8 +21,8 @@ function banHammerTime(object: PlayerSpawnAfterEvent) {
         if (!playerTags.includes("By:Paradox Anticheat")) {
             player.addTag("By:Paradox Anticheat");
         }
-        if (!playerTags.includes("Reason:あなたはParadoxからグローバルに追放されています!")) {
-            player.addTag("Reason:あなたはParadoxからグローバルに禁止されています!");
+        if (!playerTags.includes("Reason:You are globally banned from Paradox!")) {
+            player.addTag("Reason:You are globally banned from Paradox!");
         }
         banMessage(player);
     }

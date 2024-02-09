@@ -15,7 +15,7 @@ import { paradoxui } from "../paradoxui.js";
 export function uiMUTE(muteResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUIMute(muteResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -28,7 +28,7 @@ export function uiMUTE(muteResult: ModalFormResponse, onlineList: string[], play
 
 async function handleUIMute(muteResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!muteResult || muteResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [value, reason] = muteResult.formValues;
@@ -40,31 +40,31 @@ async function handleUIMute(muteResult: ModalFormResponse, onlineList: string[],
             break;
         }
     }
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fプレイヤーをミュートするには、Paradox-Opped が必要です。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to mute players!.`);
     }
 
-    // 自分たちがミュートにならないようにする
+    // Make sure they dont mute themselves
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 自分自身を無言にすることはできない。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot mute yourself.`);
     }
 
-    // スタッフがミュートしないようにする
+    // Make sure staff dont mute staff
     if (member.hasTag("paradoxOpped")) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fスタッフプレイヤーをミュートすることはできません。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot mute staff players.`);
     }
 
-    // まだミュートされていなければ、タグを付ける
+    // If not already muted then tag
     if (!member.hasTag("isMuted")) {
         member.addTag("isMuted");
     } else {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのプレイヤーは既にミュートされている。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f This player is already muted.`);
     }
-    // エデュケーション・エディションがBooleanであれば、合法的にミュートする。
+    // If Education Edition is enabled then legitimately mute them
     member.runCommandAsync(`ability @s mute true`);
     sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You have been muted. Reason: §7${reason}§f`);
     sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has muted §7${member.name}§f. Reason: §7${reason}§f`);

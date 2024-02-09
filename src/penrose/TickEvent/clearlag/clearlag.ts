@@ -72,16 +72,16 @@ function clearLag(id: number) {
         clearEntityItems();
         clearEntities();
         cooldownTimer.delete(object);
-        sendMsg("@a", `§f§4[§6Paradox§4]§f サーバーラグが解消されました!`);
+        sendMsg("@a", `§f§4[§6Paradox§4]§f Server lag has been cleared!`);
     } else if (timeLeftSeconds <= 60) {
         if (timeLeftSeconds === 60) {
-            sendMsg("@a", `§f§4[§6Paradox§4]§f サーバーのラグは1分で解消されます!`);
+            sendMsg("@a", `§f§4[§6Paradox§4]§f Server lag will be cleared in 1 minute!`);
         } else if (timeLeftSeconds === 5) {
-            sendMsg("@a", `§f§4[§6Paradox§4]§f サーバーのラグは${timeLeftSeconds}秒でクリアされます!`);
+            sendMsg("@a", `§f§4[§6Paradox§4]§f Server lag will be cleared in ${timeLeftSeconds} seconds!`);
         } else if (timeLeftSeconds <= 5 && timeLeftSeconds > 1) {
-            sendMsg("@a", `§f§4[§6Paradox§4]§f ${timeLeftSeconds} 秒...`);
+            sendMsg("@a", `§f§4[§6Paradox§4]§f ${timeLeftSeconds} seconds...`);
         } else if (timeLeftSeconds === 1) {
-            sendMsg("@a", `§f§4[§6Paradox§4]§f ${timeLeftSeconds} 秒...`);
+            sendMsg("@a", `§f§4[§6Paradox§4]§f ${timeLeftSeconds} second...`);
         }
     }
 }

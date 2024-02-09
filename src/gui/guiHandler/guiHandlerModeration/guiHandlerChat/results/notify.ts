@@ -3,27 +3,27 @@ import { ModalFormData } from "@minecraft/server-ui";
 import { uiNOTIFY } from "../../../../moderation/uiNotify";
 
 export function notifyHandler(player: Player) {
-    //ui を通知する
+    //notify ui
     const notifyui = new ModalFormData();
     let onlineList: string[] = [];
-    notifyui.title("§4Enable or Disable Notificationsメニュー§4");
+    notifyui.title("§4Enable or Disable Notifications§4");
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    notifyui.dropdown(`\n§f通知を許可する§f\n\n以下のユーザーがオンラインです！\n`, onlineList);
-    //デフォルトでは、現在の値をdisabledに設定する。
-    notifyui.toggle("通知", false);
+    notifyui.dropdown(`\n§fSelect a player to Enable or Disable Notifications:§f\n\nPlayer's Online\n`, onlineList);
+    //by default set the current value to disabled.
+    notifyui.toggle("Notifications:", false);
     notifyui
         .show(player)
         .then((notifyResult) => {
             uiNOTIFY(notifyResult, onlineList, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

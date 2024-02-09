@@ -5,28 +5,28 @@ import { Player } from "@minecraft/server";
 import ConfigInterface from "../../../../interfaces/Config";
 
 export function rulesHandler(player: Player) {
-    //ルール表示
+    //show rules ui
     const rulesui = new ModalFormData();
-    rulesui.title("§4Configure Rulesメニュー§4");
+    rulesui.title("§4Paradox - Configure Rules§4");
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const showrulesBoolean = configuration.modules.showrules.enabled;
     const KickOnDeclineBoolean = configuration.modules.showrules.kick;
-    rulesui.toggle("ルールをBooleanにする：", showrulesBoolean);
-    rulesui.toggle("キック・オン・デクライン", KickOnDeclineBoolean);
+    rulesui.toggle("Enable Rules:", showrulesBoolean);
+    rulesui.toggle("Kick On Decline:", KickOnDeclineBoolean);
     rulesui
         .show(player)
         .then((rulesResult) => {
-            // 制限のため、ゲーム内でルールを編集することはできません。
+            // due to limitations we can't edit the rules in game.
             uiRULES(rulesResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

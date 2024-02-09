@@ -119,17 +119,17 @@ const freezePlayers = () => {
             }
 
             const combinations: Record<string, string> = {
-                "111": "§fスタッフに連絡 §4[§6NA§4]§f§4[§6KA§4]§f§4[§6AS§4]§f", // Aura + Nuker + Scaffold
-                "110": "§fスタッフに連絡 §4[§6NA§4]§f§4[§6KA§4]§f", // Aura + Nuker
-                "101": "§fスタッフに連絡 §4[§6NA§4]§f§4[§6AS§4]§f", // Aura + Scaffold
-                "011": "§fスタッフに連絡 §4[§6KA§4]§f§4[§6AS§4]§f", // Nuker + Scaffold
-                "000": "§fスタッフに連絡§4[§6Command§4]§f", // Other cases
+                "111": "§fContact Staff §4[§6NA§4]§f§4[§6KA§4]§f§4[§6AS§4]§f", // Aura + Nuker + Scaffold
+                "110": "§fContact Staff §4[§6NA§4]§f§4[§6KA§4]§f", // Aura + Nuker
+                "101": "§fContact Staff §4[§6NA§4]§f§4[§6AS§4]§f", // Aura + Scaffold
+                "011": "§fContact Staff §4[§6KA§4]§f§4[§6AS§4]§f", // Nuker + Scaffold
+                "000": "§fContact Staff §4[§6Command§4]§f", // Other cases
             };
 
             const combinationKey = (hasAuraTag ? "1" : "0") + (hasNukerTag ? "1" : "0") + (hasScaffoldTag ? "1" : "0");
             const title = { subtitle: combinations[combinationKey] || combinations["000"] };
 
-            player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f 凍結!", {
+            player.onScreenDisplay.setTitle("§f§4[§6Paradox§4]§f Frozen!", {
                 ...title,
                 fadeInDuration: 0,
                 fadeOutDuration: 0,
@@ -160,7 +160,7 @@ export const freezeLeave = (): void => {
             ?.hasTag("paradoxFreeze");
 
         if (hasFreezeTag) {
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f§7${event.playerName}§f がフリーズし、サーバーを離れました。`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${event.playerName}§f was frozen and left the server.`);
         }
     });
 };
@@ -175,7 +175,7 @@ export const freezeJoin = (): void => {
             ?.hasTag("paradoxFreeze");
 
         if (hasFreezeTag) {
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${event.playerName}§f がフリーズし、サーバーに返されました.`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${event.playerName}§f was frozen and returned to the server.`);
         }
     });
 };

@@ -22,22 +22,22 @@ export function commandBlocksHandler(player: Player) {
     if (commandblocksscore >= 1) {
         removecmdblocksBoolean = true;
     }
-    modulescommandblocksui.title("§4メニュー：Command Blocks§4");
-    modulescommandblocksui.toggle("Override Command Blocks - commandblocksenabled gameruleを常にBooleanまたは無効にします：", cmdoBoolean);
-    modulescommandblocksui.toggle("アンチコマンドブロック（Anti Command Blocks） - Booleanにすると、すべてのコマンドブロックをクリアする：", removecmdblocksBoolean);
+    modulescommandblocksui.title("§4Paradox Modules - Command Blocks§4");
+    modulescommandblocksui.toggle("Override Command Blocks - Forces the commandblocksenabled gamerule to be enabled or disabled at all times:", cmdoBoolean);
+    modulescommandblocksui.toggle("Anti Command Blocks - Clears all Command Blocks when enabled:", removecmdblocksBoolean);
     modulescommandblocksui
         .show(player)
         .then((commandblockResult) => {
             uiCOMMANDBLOCKS(commandblockResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

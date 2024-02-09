@@ -7,7 +7,7 @@ import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiCHATRANKS(notifyResult: ModalFormResponse, onlineList: string[], predefinedrank: string[], player: Player) {
     if (!notifyResult || notifyResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [value, predefinedrankvalue, customrank, ChatRanksToggle] = notifyResult.formValues;
@@ -20,12 +20,12 @@ export function uiCHATRANKS(notifyResult: ModalFormResponse, onlineList: string[
         }
     }
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f通知をBooleanにするには、Paradox-Oppedにする必要があります。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to enable Notifications.`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
@@ -45,11 +45,11 @@ export function uiCHATRANKS(notifyResult: ModalFormResponse, onlineList: string[
                 member.removeTag(custom);
             }
         } catch (error) {
-            //プレーヤーがタグを持っていない場合にスローされます。
-            //sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 何かおかしい！ エラー: ${error}`)；
+            //This will throw if the player has no tags
+            //sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Something went wrong! Error: ${error}`);
         }
         member.addTag("Rank:" + predefinedrank[predefinedrankvalue as number]);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f が §7${member.name}のランクを更新しました§f `);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has updated §7${member.name}'s§f Rank.`);
         return paradoxui(player);
     }
     if (customrank) {
@@ -65,22 +65,22 @@ export function uiCHATRANKS(notifyResult: ModalFormResponse, onlineList: string[
                 member.removeTag(custom);
             }
         } catch (error) {
-            // これは、プレーヤーにマッチするタグがない場合にスローされる。
-            //sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 何かおかしい！ エラー: ${error}`)；
+            // This will throw if the player has no tags that match.
+            //sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Something went wrong! Error: ${error}`);
         }
         member.addTag("Rank:" + customrank);
         sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has updated §7${member.name}'s§f Rank.`);
         if (ChatRanksToggle === true && chatRanksBoolean === false) {
-            // 許可する
+            // Allow
             configuration.modules.chatranks.enabled = true;
             dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6ChatRanks§f!`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6ChatRanks§f!`);
         }
         if (ChatRanksToggle === false && chatRanksBoolean === true) {
-            // 拒否する
+            // Deny
             configuration.modules.chatranks.enabled = false;
             dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4ChatRanks§f!`);
+            sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4ChatRanks§f!`);
         }
         return paradoxui(player);
     }

@@ -12,12 +12,12 @@ function resetPrefix(player: Player, configuration: ConfigInterface) {
             configuration.customcommands.prefix = "!";
         }
     }
-    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f接頭辞がリセットされた！`);
+    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Prefix has been reset!`);
 }
 
 export function uiPREFIX(prefixResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!prefixResult || prefixResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [value, textField, toggle] = prefixResult.formValues;
@@ -29,12 +29,12 @@ export function uiPREFIX(prefixResult: ModalFormResponse, onlineList: string[], 
             break;
         }
     }
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
@@ -44,25 +44,25 @@ export function uiPREFIX(prefixResult: ModalFormResponse, onlineList: string[], 
          * Make sure we are not attempting to set a prefix that can break commands
          */
         if (textField === "/") {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 接頭辞 '§7/§f' の使用は許されない！`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Using prefix '§7/§f' is not allowed!`);
             return paradoxui;
         }
 
-        // 条件下での接頭辞変更コマンド
+        // Change Prefix command under conditions
         if ((textField as string).length <= 1 && (textField as string).length >= 1) {
             resetPrefix(member, configuration);
             configuration.customcommands.prefix = textField as string;
             sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Prefix has been changed to '§7${textField}§f'! for §7${member.name}§f`);
             member.addTag("Prefix:" + textField);
         } else {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f接頭辞の長さを2文字以上にすることはできない！`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Prefix length cannot be more than 2 characters!`);
         }
     }
 
-    // リセットが切り替えられた
+    // Reset has been toggled
     if (toggle) {
         resetPrefix(player, configuration);
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f プレフィックスがリセットされました §7${member.name}§f!`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Prefix has been reset for §7${member.name}§f!`);
     }
     return paradoxui(player);
 }

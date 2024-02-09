@@ -4,11 +4,11 @@ import { uiKICK } from "../../../moderation/uiKick";
 
 export function kickHandler(player: Player) {
     const kickui = new ModalFormData();
-    kickui.title("§4Kick A Playerメニュー§4");
+    kickui.title("§4Paradox - Kick A Player§4");
     let onlineList: string[] = [];
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    kickui.dropdown(`\n§f指定したユーザーをキック:§f\n\n以下のユーザーがオンラインです！\n`, onlineList);
-    kickui.textField("理由", "ハッキングだ！");
+    kickui.dropdown(`\n§fSelect a player to Kick:§f\n\nPlayer's Online\n`, onlineList);
+    kickui.textField("Reason:", "Hacking!");
 
     kickui
         .show(player)
@@ -16,13 +16,13 @@ export function kickHandler(player: Player) {
             uiKICK(kickResult, onlineList, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

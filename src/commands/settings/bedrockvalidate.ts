@@ -12,26 +12,26 @@ import ConfigInterface from "../../interfaces/Config.js";
  * @param {boolean} setting - The status of the BedrockValidate custom command setting.
  */
 function bedrockValidateHelp(player: Player, prefix: string, bedrockValidateBoolean: boolean, setting: boolean): void {
-    // コマンドとモジュールのステータスを決定する
-    const commandStatus: string = setting ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
-    const moduleStatus: string = bedrockValidateBoolean ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
+    // Determine the status of the command and module
+    const commandStatus: string = setting ? "§6[§aENABLED§6]§f" : "§6[§4DISABLED§6]§f";
+    const moduleStatus: string = bedrockValidateBoolean ? "§6[§aENABLED§6]§f" : "§6[§4DISABLED§6]§f";
 
-    // 選手にヘルプ情報を表示する
+    // Display help information to the player
     sendMsgToPlayer(player, [
-        `§6コマンド§4]§f: 岩盤バリデーション`,
+        `\n§o§4[§6Command§4]§f: bedrockvalidate`,
         `§4[§6Status§4]§f: ${commandStatus}`,
         `§4[§6Module§4]§f: ${moduleStatus}`,
         `§4[§6Usage§4]§f: ${prefix}bedrockvalidate [options]`,
-        `§4[§6Description§4]§f：岩盤検証のチェックを切り替える。`,
-        `§4[§6オプション§4]§f：`,
+        `§4[§6Description§4]§f: Toggles checks for bedrock validations.`,
+        `§4[§6Options§4]§f:`,
         `    -h, --help`,
-        `       §4[§7このヘルプメッセージを表示する§4]§f`,
+        `       §4[§7Display this help message§4]§f`,
         `    -s, --status`,
-        `       §4[§7BedrockValidateモジュールの現在の状態を表示する§4]§f`,
+        `       §4[§7Display the current status of BedrockValidate module§4]§f`,
         `    -e, --enable`,
-        `       §4[§7BedrockValidateモジュールをBooleanにする§4]§f`,
+        `       §4[§7Enable BedrockValidate module§4]§f`,
         `    -d, --disable`,
-        `       §4[§7BedrockValidateモジュールを無効にする§4]§f`,
+        `       §4[§7Disable BedrockValidate module§4]§f`,
     ]);
 }
 
@@ -44,7 +44,7 @@ function bedrockValidateHelp(player: Player, prefix: string, bedrockValidateBool
 export function bedrockvalidate(message: ChatSendAfterEvent, args: string[]) {
     handleBedrockValidate(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -61,34 +61,34 @@ export function bedrockvalidate(message: ChatSendAfterEvent, args: string[]) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 async function handleBedrockValidate(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
         return console.warn(`${new Date()} | ` + `Error: ${message} isnt defined. Did you forget to pass it? (./commands/settings/bedrockValidate.js:36)`);
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
-    // ダイナミック・プロパティ・ブール値の取得
+    // Get Dynamic Property Boolean
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 位置以外の引数をチェックする
+    // Check for additional non-positional arguments
     const length = args.length;
     let validFlagFound = false; // Flag to track if any valid flag is encountered
     for (let i = 0; i < length; i++) {
         const additionalArg: string = args[i].toLowerCase();
 
-        // 追加引数の処理
+        // Handle additional arguments
         switch (additionalArg) {
             case "-h":
             case "--help":
@@ -96,40 +96,40 @@ async function handleBedrockValidate(message: ChatSendAfterEvent, args: string[]
                 return bedrockValidateHelp(player, prefix, configuration.modules.bedrockValidate.enabled, configuration.customcommands.bedrockvalidate);
             case "-s":
             case "--status":
-                // ハンドル状態フラグ
+                // Handle status flag
                 validFlagFound = true;
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f BedrockValidate module is currently ${configuration.modules.bedrockValidate.enabled ? "有効" : "無効"}`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f BedrockValidate module is currently ${configuration.modules.bedrockValidate.enabled ? "enabled" : "disabled"}`);
                 break;
             case "-e":
             case "--enable":
-                // ハンドルイネーブルフラグ
+                // Handle enable flag
                 validFlagFound = true;
                 if (configuration.modules.bedrockValidate.enabled) {
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fBedrockValidateモジュールは既にBooleanになっています。`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f BedrockValidate module is already enabled.`);
                 } else {
                     configuration.modules.bedrockValidate.enabled = true;
                     dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 以下の機能が有効です=> §6BedrockValidate§f!`);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6BedrockValidate§f!`);
                     BedrockValidate();
                 }
                 break;
             case "-d":
             case "--disable":
-                // ハンドル無効フラグ
+                // Handle disable flag
                 validFlagFound = true;
                 if (!configuration.modules.bedrockValidate.enabled) {
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f BedrockValidate モジュールは既に無効になっています。`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f BedrockValidate module is already disabled.`);
                 } else {
                     configuration.modules.bedrockValidate.enabled = false;
                     dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f は無効 §4BedrockValidate§f!`);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4BedrockValidate§f!`);
                 }
                 break;
         }
     }
 
     if (!validFlagFound) {
-        // 追加の引数はありません。
+        // No additional arguments provided, display help
         sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Invalid command. Use ${prefix}bedrockvalidate --help for more information.`);
     }
 }

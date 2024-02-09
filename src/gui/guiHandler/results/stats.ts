@@ -7,8 +7,8 @@ export function statsHandler(player: Player) {
     const statsui = new ModalFormData();
     let onlineList: string[] = [];
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    statsui.title("§4ユーザーログ§4");
-    statsui.dropdown(`\n§fユーザーを指定§f\n\n以下のプレイヤーがオンラインです\n`, onlineList);
+    statsui.title("§4Paradox - Player Stats§4");
+    statsui.dropdown(`\n§fSelect a Location:§f\n\nSaved Location's\n`, onlineList);
     statsui
         .show(player)
         .then((statsResult) => {

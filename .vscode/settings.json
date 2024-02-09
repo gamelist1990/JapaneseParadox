@@ -30,5 +30,6 @@
     "**/.git": true,
     "**/node_modules": true
   },
-  "commentTranslate.source": "Bing"
+  "commentTranslate.source": "Bing",
+  "commentTranslate.hover.enabled": true
 }

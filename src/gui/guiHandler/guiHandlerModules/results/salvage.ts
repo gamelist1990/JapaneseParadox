@@ -5,25 +5,25 @@ import { uiEXPSALVAGESYSTEM } from "../../../modules/uiExpSalvageSystem";
 import ConfigInterface from "../../../../interfaces/Config";
 
 export function salvageHandler(player: Player) {
-    //新スラベージ・システム
+    //New Slavage System
     const modulesexpsavlagesystem = new ModalFormData();
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const salvageBoolean = configuration.modules.salvage.enabled;
-    modulesexpsavlagesystem.title("§4Salvage Systemメニュー§4");
-    modulesexpsavlagesystem.toggle("サルベージシステム - すべてのアイテムをサルベージする：", salvageBoolean);
+    modulesexpsavlagesystem.title("§4Paradox Modules - Salvage System§4");
+    modulesexpsavlagesystem.toggle("Salvage System - Salvage all item's:", salvageBoolean);
     modulesexpsavlagesystem
         .show(player)
         .then((salvagesystemResult) => {
             uiEXPSALVAGESYSTEM(salvagesystemResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

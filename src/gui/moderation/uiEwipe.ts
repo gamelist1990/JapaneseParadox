@@ -15,7 +15,7 @@ import { ModalFormResponse } from "@minecraft/server-ui";
 export function uiEWIPE(ewipeResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUIEWipe(ewipeResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -28,7 +28,7 @@ export function uiEWIPE(ewipeResult: ModalFormResponse, onlineList: string[], pl
 
 async function handleUIEWipe(ewipeResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!ewipeResult || ewipeResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [value] = ewipeResult.formValues;
@@ -40,34 +40,34 @@ async function handleUIEWipe(ewipeResult: ModalFormResponse, onlineList: string[
             break;
         }
     }
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped.`);
     }
 
-    // オンラインですか？
+    // Are they online?
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
 
-    // 自分自身を罰することがないようにする
+    // Make sure they don't punish themselves
     if (member === player) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 自分自身を拭くことはできない。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot wipe yourself.`);
     }
-    //スタッフに罰を与えないようにする！
+    //Make sure they don't punish staff!
     if (member.hasTag("paradoxOpped")) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f スタッフを消すことはできない。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot wipe Staff.`);
     }
-    // 0から29までの30個のスロットがある。
-    // エンダーの胸を一掃しよう
+    // There are 30 slots ranging from 0 to 29
+    // Let's clear out that ender chest
     for (let slot = 0; slot < 30; slot++) {
         member.runCommand(`replaceitem entity @s slot.enderchest ${slot} air`);
     }
-    // 罰が行われたことをスタッフと選手に通知する。
-    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f あなたのエンダーチェストは拭かれた！`);
-    // タグ「通知」を誰も持っていない場合は、try/catchを使用する。
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f が §7${member.name}'s§f のエンダーチェストを消した!`);
+    // Notify staff and player that punishment has taken place
+    sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f Your Enderchest has been wiped!`);
+    // Use try/catch in case nobody has tag 'notify' as this will report 'no target selector'
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f wiped §7${member.name}'s§f enderchest!`);
     return paradoxui(player);
 }

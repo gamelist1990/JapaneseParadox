@@ -3,12 +3,12 @@ import { ModalFormData } from "@minecraft/server-ui";
 import { uiItemEditorTransfer } from "./uiItemEditor";
 export function uiItemEditorTransferMenu(player: Player, targetPlayer: Player, itemSlot: number) {
     const itemEditor = new ModalFormData();
-    itemEditor.title("§4アイテムエディター アイテムの置換§4");
-    itemEditor.toggle("アイテムの置換");
+    itemEditor.title("§4Paradox - Item Editor Transfer§4");
+    itemEditor.toggle("Transfer Item");
     let onlineList: string[] = [];
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    itemEditor.dropdown(`\n§fプレーヤーを選択してください:§f\n\nプレイヤーがオンライン\n`, onlineList);
-    itemEditor.toggle("重複したアイテム", false);
+    itemEditor.dropdown(`\n§fSelect a player:§f\n\nPlayer's Online\n`, onlineList);
+    itemEditor.toggle("Duplicate Item", false);
     itemEditor
         .show(player)
         .then((InvEditorUIResult) => {

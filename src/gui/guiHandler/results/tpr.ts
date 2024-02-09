@@ -9,9 +9,9 @@ export function tprHandler(player: Player) {
     const tprui = new ActionFormData();
     //let onlineList: string[] = [];
     // onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    tprui.title("§4TPリクエスト§4");
-    tprui.button("私宛のリクエスト", "textures/ui/mail_icon");
-    tprui.button("TPリクエストを送る", "textures/ui/send_icon");
+    tprui.title("§4Paradox - TPR Menu§4");
+    tprui.button("My Requests", "textures/ui/mail_icon");
+    tprui.button("Send A Request", "textures/ui/send_icon");
     tprui
         .show(player)
         .then((tprmenuResult) => {
@@ -29,10 +29,10 @@ export function tprHandler(player: Player) {
                 let respons: string;
                 const toMinutes: Date = new Date(request.expiresAt);
                 const tprinboxui = new MessageFormData();
-                tprinboxui.title("私宛のリクエストを");
-                tprinboxui.body(request.requester.name + " 下のボタンを使って、このリクエストを承認または拒否してください。 \n リクエスト一覧: " + toMinutes.getMinutes());
-                tprinboxui.button1("TPを許可します");
-                tprinboxui.button2("Tpを拒否します");
+                tprinboxui.title("Paradox - Your TP Request.");
+                tprinboxui.body(request.requester.name + " Has sent you a request to be teleported to your location, use the buttons below to approve or decline this request. \n This request expires in: " + toMinutes.getMinutes());
+                tprinboxui.button1("Yes");
+                tprinboxui.button2("No");
                 tprinboxui
                     .show(player)
                     .then((tprInboxResult) => {
@@ -64,8 +64,8 @@ export function tprHandler(player: Player) {
                 const tprsendrequestxui = new ModalFormData();
                 let onlineList: string[] = [];
                 onlineList = Array.from(world.getPlayers(), (player) => player.name);
-                tprsendrequestxui.title("§4TPリクエストを送る§4");
-                tprsendrequestxui.dropdown(`\nTPリクエストを送りたいユーザーを指定\n\n以下のプレイヤーがオンラインです\n`, onlineList);
+                tprsendrequestxui.title("§4Paradox - Send TP Request§4");
+                tprsendrequestxui.dropdown(`\nSelect a player to send a request:\n\nPlayer's Online\n`, onlineList);
                 tprsendrequestxui
                     .show(player)
                     .then((tprSendRequestResult) => {

@@ -8,19 +8,19 @@ function notifyHelp(player: Player, prefix: string, setting: boolean) {
     if (!setting) {
         commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§a有効§6]§f";
+        commandStatus = "§6[§a有効§6]§f。";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6コマンド§4]§f: 通知`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6使用§4]§f: 通知 [任意].`,
-        `§4[§6オプション§4]§f: ヘルプ`,
+        `\n§o§4[§6コマンド§4]§f: notify`,
+        `§4[§6ステータス§4]§f: ${commandStatus}.`,
+        `§4[§6使用法§4]§f: notify [optional]`,
+        `§4[§6Optional§4]§f: help`,
         `§4[§6説明§4]§f：不正行為の通知をトグルのように切り替える。`,
         `§4[§6例§4]§f：`,
         `    ${prefix}notify`,
         `        §4- §6チート通知の切り替え§f`,
         `    ${prefix}notify help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -32,7 +32,7 @@ function notifyHelp(player: Player, prefix: string, setting: boolean) {
 export function notify(message: ChatSendAfterEvent, args: string[]) {
     // 必要なパラメータが定義されていることを確認する
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/moderation/notify.js:26)");
+        return console.warn(`新しい日付()}。|` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? (./commands/moderation/notify.js:26)");
     }
 
     const player = message.sender;
@@ -42,7 +42,11 @@ export function notify(message: ChatSendAfterEvent, args: string[]) {
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
@@ -64,9 +68,9 @@ export function notify(message: ChatSendAfterEvent, args: string[]) {
         sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはチート通知を無効にしています。`);
     }
 
-    // Booleanにする
+    // 有効にする
     if (!tagBoolean) {
         player.addTag("notify");
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fチート通知をBooleanにしました。`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fチート通知を有効にしました。`);
     }
 }

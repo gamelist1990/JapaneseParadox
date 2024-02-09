@@ -11,16 +11,16 @@ function clearChatHelp(player: Player, prefix: string, setting: boolean) {
         commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\nコマンド§4[§6コマンド§4]§f：クリアチャット`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6使用§4]§f: clearchat [オプション］`,
-        `§4[§6オプション§4]§f: ヘルプ`,
-        `§4[§6説明§4]§f：チャットをクリアする。`,
-        `§4[§6例§4]§f：`,
+        `\n§o§4[§6コマンド§4]§f: clearchat`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
+        `§4[§6使用法§4]§f: clearchat [optional]`,
+        `§4[§6Optional§4]§f: help`,
+        `§4[§6説明§4]§f: Will clear the chat.`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}clearchat`,
-        `        §4- §6チャットをクリアする§f`,
+        `        §4- §6Clear the chat§f`,
         `    ${prefix}clearchat help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -30,27 +30,31 @@ function clearChatHelp(player: Player, prefix: string, setting: boolean) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function clearchat(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./utility/notify.js:26)");
+        return console.warn(`${new Date()} | ` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? (./utility/notify.js:26)");
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 助けを求められたか
+    // Was help requested
     const argCheck = args[0];
     if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.clearchat) {
         return clearChatHelp(player, prefix, configuration.customcommands.clearchat);
@@ -58,5 +62,5 @@ export function clearchat(message: ChatSendAfterEvent, args: string[]) {
 
     for (let clear = 0; clear < 10; clear++) sendMsg("@a", "\n".repeat(60));
 
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f チャットは§7${player.name}§f によってクリアされました`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f Chat has been cleared by §7${player.name}§f`);
 }

@@ -14,7 +14,7 @@ import { paradoxui } from "../paradoxui.js";
 export function uiKICK(banResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUIKick(banResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -27,7 +27,7 @@ export function uiKICK(banResult: ModalFormResponse, onlineList: string[], playe
 
 async function handleUIKick(banResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!banResult || banResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [value, reason] = banResult.formValues;
@@ -41,20 +41,20 @@ async function handleUIKick(banResult: ModalFormResponse, onlineList: string[], 
     }
 
     if (!member) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
         return paradoxui(player);
     }
 
-    // 自分たちで蹴らないようにする
+    // make sure they dont kick themselves
     if (member === player) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 自分を蹴ることはできない。`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cannot kick yourself.`);
         return paradoxui(player);
     }
 
     player.runCommandAsync(`kick "${member.name}" §f\n\n${reason}`).catch((error) => {
         console.warn(`${new Date()} | ` + error);
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手を蹴ることができなかった．`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f I was unable to kick that player!`);
     });
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f が §7${member.name}をキックしました§f. 理由: §7${reason}§f`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has kicked §7${member.name}§f. Reason: §7${reason}§f`);
     return paradoxui(player);
 }

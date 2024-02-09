@@ -7,22 +7,22 @@ import ConfigInterface from "../../../../interfaces/Config";
 export function xrayHandler(player: Player) {
     const modulesxtrayui = new ModalFormData();
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
-    modulesxtrayui.title("§4Xrayメニュー§4");
+    modulesxtrayui.title("§4Paradox Modules - Xray§4");
     const xrayBoolean = configuration.modules.xrayA.enabled;
-    modulesxtrayui.toggle("Xray - プレーヤーが特定の鉱石を採掘した時と場所をスタッフに通知する：", xrayBoolean);
+    modulesxtrayui.toggle("Xray - Notify's staff when and where player's mine specific ores:", xrayBoolean);
     modulesxtrayui
         .show(player)
         .then((xrayResult) => {
             uiXRAY(xrayResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

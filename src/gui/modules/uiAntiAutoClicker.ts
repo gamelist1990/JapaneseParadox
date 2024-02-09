@@ -16,7 +16,7 @@ import ConfigInterface from "../../interfaces/Config";
 export function uiANTIAUTOCLICKER(antiautoclickerResult: ModalFormResponse, player: Player) {
     handleUIAntiAutoClicker(antiautoclickerResult, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -29,34 +29,34 @@ export function uiANTIAUTOCLICKER(antiautoclickerResult: ModalFormResponse, play
 
 async function handleUIAntiAutoClicker(antiautoclickerResult: ModalFormResponse, player: Player) {
     if (!antiautoclickerResult || antiautoclickerResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [AntiAutoClickerToggle] = antiautoclickerResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fオートクリッカーを設定するには、Paradox-Oppedにする必要があります。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to configure Auto Clicker`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
     if (AntiAutoClickerToggle === true) {
-        // 許可する
+        // Allow
         configuration.modules.autoclicker.enabled = true;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6AutoClicker§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6AutoClicker§f!`);
         AutoClicker();
     }
     if (AntiAutoClickerToggle === false) {
-        // 拒否する
+        // Deny
         configuration.modules.autoclicker.enabled = false;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4AutoClicker§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4AutoClicker§f!`);
     }
 
-    //完了したら、プレイヤーにメインUIを表示する。
+    //show the main ui to the player once complete.
     return paradoxui(player);
 }

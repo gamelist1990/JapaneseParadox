@@ -35,7 +35,7 @@ function verifypermission() {
             player.removeTag("paradoxOpped");
         }
 
-        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f §7${player.name}§f に権限のないアクセス許可があった為権限が削除されました。`);
+        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f §7${player.name}§f had unauthorized permissions. Permissions removed!`);
     }
 }
 

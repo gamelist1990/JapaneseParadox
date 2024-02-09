@@ -11,26 +11,26 @@ import ConfigInterface from "../../interfaces/Config.js";
  * @param {boolean} setting - The status of the ops custom command setting.
  */
 function opsHelp(player: Player, prefix: string, opsBoolean: boolean, setting: boolean): void {
-    // コマンドとモジュールのステータスを決定する
-    const commandStatus: string = setting ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
-    const moduleStatus: string = opsBoolean ? "§6[§4無効§6]§f" : "§6[§a有効§6]§f";
+    // Determine the status of the command and module
+    const commandStatus: string = setting ? "§6[§aENABLED§6]§f" : "§6[§4DISABLED§6]§f";
+    const moduleStatus: string = opsBoolean ? "§6[§4DISABLED§6]§f" : "§6[§aENABLED§6]§f";
 
-    // 選手にヘルプ情報を表示する
+    // Display help information to the player
     sendMsgToPlayer(player, [
-        `\nops§o§4[§6コマンド§4]§f: ops`,
+        `\n§o§4[§6Command§4]§f: ops`,
         `§4[§6Status§4]§f: ${commandStatus}`,
         `§4[§6Module§4]§f: ${moduleStatus}`,
         `§4[§6Usage§4]§f: ${prefix}ops [options]`,
-        `§4[§6Description§4]§f：すべてのオンラインプレイヤーに対してワンプレイヤースリープ(OPS)を切り替える。`,
-        `§4[§6オプション§4]§f：`,
+        `§4[§6Description§4]§f: Toggles One Player Sleep (OPS) for all online players.`,
+        `§4[§6Options§4]§f:`,
         `    -h, --help`,
-        `       §4[§7このヘルプメッセージを表示する§4]§f`,
+        `       §4[§7Display this help message§4]§f`,
         `    -s, --status`,
-        `       §4[§7OPSモジュールの現在の状態を表示する§4]§f`,
+        `       §4[§7Display the current status of OPS module§4]§f`,
         `    -e, --enable`,
-        `       §4[§7OPSモジュールをBooleanにする§4]§f`,
+        `       §4[§7Enable OPS module§4]§f`,
         `    -d, --disable`,
-        `       §4[§7OPSモジュールの無効化§4]§f`,
+        `       §4[§7Disable OPS module§4]§f`,
     ]);
 }
 
@@ -42,7 +42,7 @@ function opsHelp(player: Player, prefix: string, opsBoolean: boolean, setting: b
 export function ops(message: ChatSendAfterEvent, args: string[]) {
     handleOps(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -59,71 +59,71 @@ export function ops(message: ChatSendAfterEvent, args: string[]) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 async function handleOps(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
         return console.warn(`${new Date()} | ` + `Error: ${message} isnt defined. Did you forget to pass it? (./commands/settings/oneplayersleep.js:36)`);
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
-    // ダイナミック・プロパティ・ブール値の取得
+    // Get Dynamic Property Boolean
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 位置以外の引数をチェックする
+    // Check for additional non-positional arguments
     const length = args.length;
     let validFlagFound = false; // Flag to track if any valid flag is encountered
     for (let i = 0; i < length; i++) {
         const additionalArg: string = args[i].toLowerCase();
 
-        // 追加引数の処理
+        // Handle additional arguments
         switch (additionalArg) {
             case "-h":
             case "--help":
-                // ヘルプメッセージを表示する
+                // Display help message
                 validFlagFound = true;
                 opsHelp(player, prefix, configuration.modules.ops.enabled, configuration.customcommands.ops);
                 break;
             case "-s":
             case "--status":
-                // OPSモジュールの現在のステータスを表示する
+                // Display current status of OPS module
                 validFlagFound = true;
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f OPS module is currently ${configuration.modules.ops.enabled ? "§aBoolean" : "§4無効"}§f.`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f OPS module is currently ${configuration.modules.ops.enabled ? "§aENABLED" : "§4DISABLED"}§f.`);
                 break;
             case "-e":
             case "--enable":
-                // OPSモジュールをBooleanにする
+                // Enable OPS module
                 validFlagFound = true;
                 if (configuration.modules.ops.enabled) {
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fOPSモジュールは既にBooleanになっています。`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f OPS module is already enabled`);
                 } else {
                     configuration.modules.ops.enabled = true;
                     dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 以下の機能が有効です=> §6OPS§f!`);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6OPS§f!`);
                     //Use the native inbuilt gamerule
                     player.runCommandAsync(`/gamerule playersSleepingPercentage 1`);
                 }
                 break;
             case "-d":
             case "--disable":
-                // OPSモジュールを無効にする
+                // Disable OPS module
                 validFlagFound = true;
                 if (!configuration.modules.ops.enabled) {
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fOPSモジュールは既に無効になっています。`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f OPS module is already disabled`);
                 } else {
                     configuration.modules.ops.enabled = false;
                     dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f は無効 §4OPS§f!`);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4OPS§f!`);
                     //Use the native inbuilt gamerule
                     player.runCommandAsync(`/gamerule playersSleepingPercentage 100`);
                 }

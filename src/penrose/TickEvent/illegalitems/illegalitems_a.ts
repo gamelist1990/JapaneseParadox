@@ -23,11 +23,11 @@ function rip(player: Player, inventory_item: ItemStack, enchData?: { id: string;
     let reason: string;
     if (enchData) {
         const { id, level } = enchData;
-        reason = `不正なアイテム A (${inventory_item.typeId.replace("minecraft:", "")}: ${id}=${level})`;
+        reason = `Illegal Item A (${inventory_item.typeId.replace("minecraft:", "")}: ${id}=${level})`;
     } else {
-        reason = `不正なアイテム A(${inventory_item.typeId.replace("minecraft:", "")}=${inventory_item.amount})`;
+        reason = `Illegal Item A (${inventory_item.typeId.replace("minecraft:", "")}=${inventory_item.amount})`;
         if (lore) {
-            reason += " (伝承)";
+            reason += " (Lore)";
         }
     }
 
@@ -112,8 +112,8 @@ function illegalitemsa(id: number) {
                 // Anti Shulker Boxes
                 if (antiShulkerBoolean && itemStackId.includes("shulker")) {
                     playerContainer.setItem(i);
-                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f§7${player.name}§f から ${itemStackId.replace("minecraft:", "")} を削除しました。`);
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f シュルカーボックスは許可されていません!`);
+                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} from §7${player.name}§f.`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Shulker Boxes are not allowed!`);
                     continue;
                 }
 
@@ -122,8 +122,8 @@ function illegalitemsa(id: number) {
                 const maxStack = playerItemStack.maxAmount;
                 if (stackBanBoolean && currentStack > maxStack) {
                     playerContainer.setItem(i);
-                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f§7${player.name}§f から ${itemStackId.replace("minecraft:", "")} x ${currentStack} を削除しました.`);
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 違法なスタックは許可されていません!`);
+                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} x ${currentStack} from §7${player.name}§f.`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Illegal Stacks are not allowed!`);
                     rip(player, playerItemStack);
                     break;
                 }
@@ -131,8 +131,8 @@ function illegalitemsa(id: number) {
                 // If the item is in the "illegalitems" object, remove it from the player's inventory and run the "rip" function on it
                 if (illegalitems.has(itemStackId)) {
                     playerContainer.setItem(i);
-                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f §7${player.name}§f から ${itemStackId.replace("minecraft:", "")} を削除しました。.`);
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 違法なアイテムは許可されていません!`);
+                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} from §7${player.name}§f.`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Illegal Items are not allowed!`);
                     rip(player, playerItemStack);
                     break;
                 }
@@ -140,8 +140,8 @@ function illegalitemsa(id: number) {
                 // Illegal Lores
                 if (illegalLoresBoolean && !configuration.modules.illegalLores.exclude.includes(String(playerItemStack.getLore()))) {
                     playerContainer.setItem(i);
-                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f§7${player.name}§f から ${itemStackId.replace("minecraft:", "")} を伝承で削除しました.`);
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 違法な伝承を含むアイテムは許可されていません!`);
+                    sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.replace("minecraft:", "")} with lore from §7${player.name}§f.`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Item with illegal lores are not allowed!`);
                     rip(player, playerItemStack, null, true);
                     break;
                 }
@@ -210,8 +210,8 @@ function illegalitemsa(id: number) {
                                 };
                                 const itemStackId = playerContainer.getItem(itemSlot);
                                 playerContainer.setItem(itemSlot);
-                                sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f §7${player.name}§f から ${itemStackId.typeId.replace("minecraft:", "")} 違法なエンチャントを削除しました。`);
-                                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 不正なエンチャントを持つアイテムは許可されません!`);
+                                sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f Removed ${itemStackId.typeId.replace("minecraft:", "")} with Illegal Enchantments from §7${player.name}§f.`);
+                                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Item with illegal Enchantments are not allowed!`);
                                 enchantmentPresenceMap.clear();
                                 enchantmentDataMap.clear();
                                 inventorySlotMap.clear();

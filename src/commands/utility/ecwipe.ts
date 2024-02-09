@@ -11,16 +11,16 @@ function ecWipeHelp(player: Player, prefix: string, setting: boolean) {
         commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n[コマンド§4[§6コマンド§4]§f：ワイプ`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6使用§4]§f: ecwipe [オプション］`,
-        `§4[§6オプション§4]§f: ユーザー名、ヘルプ`,
-        `§4[§6Description§4]§f：プレイヤーのエンダーチェストをすべて消し去る。`,
-        `§4[§6例§4]§f：`,
+        `\n§o§4[§6コマンド§4]§f: ecwipe`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
+        `§4[§6使用法§4]§f: ecwipe [optional]`,
+        `§4[§6Optional§4]§f: username, help`,
+        `§4[§6説明§4]§f: Will wipe out player's entire ender chest.`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}ecwipe ${player.name}`,
         `        §4- §6Wipe out the entire ender chest of ${player.name}§f`,
         `    ${prefix}ecwipe help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -32,7 +32,7 @@ function ecWipeHelp(player: Player, prefix: string, setting: boolean) {
 export function ecwipe(message: ChatSendAfterEvent, args: string[]) {
     handleECWipe(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -44,38 +44,42 @@ export function ecwipe(message: ChatSendAfterEvent, args: string[]) {
 }
 
 async function handleECWipe(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/utility/ecwipe.js:29)");
+        return console.warn(`${new Date()} | ` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? (./commands/utility/ecwipe.js:29)");
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 反論はあるか
+    // Are there arguements
     if (!args.length) {
         return ecWipeHelp(player, prefix, configuration.customcommands.ecwipe);
     }
 
-    // 助けを求められたか
+    // Was help requested
     const argCheck = args[0];
     if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.ecwipe) {
         return ecWipeHelp(player, prefix, configuration.customcommands.ecwipe);
     }
 
-    // リクエストされた選手を探す
+    // try to find the player requested
     let member: Player;
     const players = world.getPlayers();
     for (const pl of players) {
@@ -86,10 +90,14 @@ async function handleECWipe(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f そのプレーヤーが見つかりませんでした!
+`
+        );
     }
 
-    // 0から29までの30個のスロットがある。
+    // There are 30 slots ranging from 0 to 29
     for (let slot = 0; slot < 30; slot++) {
         member.runCommand(`replaceitem entity @s slot.enderchest ${slot} air`);
     }

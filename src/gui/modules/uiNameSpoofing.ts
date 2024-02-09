@@ -9,49 +9,49 @@ import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiNAMESPOOFING(namespoofingResult: ModalFormResponse, player: Player) {
     if (!namespoofingResult || namespoofingResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [NameSpoofAToggle, NameSpoofBToggle] = namespoofingResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f名前スプーフィングを設定するには、Paradox・オッピングが必要です。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to configure Name Spoofing`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // ダイナミック・プロパティ・ブール値の取得
+    // Get Dynamic Property Boolean
     const nameSpoofABoolean = configuration.modules.namespoofA.enabled;
     const nameSpoofBBoolean = configuration.modules.namespoofB.enabled;
 
     if (NameSpoofAToggle === true && nameSpoofABoolean === false) {
-        // 許可する
+        // Allow
         configuration.modules.namespoofA.enabled = true;
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6NamespoofA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6NamespoofA§f!`);
         NamespoofA();
     }
     if (NameSpoofAToggle === false && nameSpoofABoolean === true) {
-        // 拒否する
+        // Deny
         configuration.modules.namespoofA.enabled = false;
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4NamespoofA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4NamespoofA§f!`);
     }
     if (NameSpoofBToggle === true && nameSpoofBBoolean === false) {
-        // 許可する
+        // Allow
         configuration.modules.namespoofB.enabled = true;
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6NamespoofB§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6NamespoofB§f!`);
         NamespoofB;
     }
     if (NameSpoofBToggle === false && nameSpoofBBoolean === true) {
-        // 拒否する
+        // Deny
         configuration.modules.namespoofB.enabled = false;
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4NamespoofB§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4NamespoofB§f!`);
     }
 
     dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
 
-    //完了したら、プレイヤーにメインUIを表示する。
+    //show the main ui to the player once complete.
     return paradoxui(player);
 }

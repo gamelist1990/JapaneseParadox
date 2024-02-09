@@ -9,49 +9,49 @@ import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiREACH(reachResult: ModalFormResponse, player: Player) {
     if (!reachResult || reachResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [ReachAToggle, ReachBToggle] = reachResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fリーチを設定するには、Paradox・オップである必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to configure Reach`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // ダイナミック・プロパティ・ブール値の取得
+    // Get Dynamic Property Boolean
     const reachABoolean = configuration.modules.reachA.enabled;
     const reachBBoolean = configuration.modules.reachB.enabled;
 
     if (ReachAToggle === true && reachABoolean === false) {
-        // 許可する
+        // Allow
         configuration.modules.reachA.enabled = true;
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6ReachA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6ReachA§f!`);
         BeforeReachA();
     }
     if (ReachAToggle === false && reachABoolean === true) {
-        // 拒否する
+        // Deny
         configuration.modules.reachA.enabled = false;
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4ReachA§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4ReachA§f!`);
     }
     if (ReachBToggle === true && reachBBoolean === false) {
-        // 許可する
+        // Allow
         configuration.modules.reachB.enabled = true;
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6ReachB§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6ReachB§f!`);
         ReachB();
     }
     if (ReachBToggle === false && reachBBoolean === true) {
-        // 拒否する
+        // Deny
         configuration.modules.reachB.enabled = false;
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4ReachB§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4ReachB§f!`);
     }
 
     dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
 
-    //完了したら、プレイヤーにメインUIを表示する。
+    //show the main ui to the player once complete.
     return paradoxui(player);
 }

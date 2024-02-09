@@ -15,15 +15,15 @@ function dhms(ms: number) {
     const minutesms = ms % (60 * 1000);
     const sec = Math.floor(minutesms / 1000);
     if (days !== 0) {
-        return days + " 日 : " + hours + " 時間 : " + minutes + " 分 : " + sec + " 秒";
+        return days + " Days : " + hours + " Hours : " + minutes + " Minutes : " + sec + " Seconds";
     }
     if (hours !== 0) {
-        return hours + " 時間 : " + minutes + " 分 : " + sec + " 秒";
+        return hours + " Hours : " + minutes + " Minutes : " + sec + " Seconds";
     }
     if (minutes !== 0) {
-        return minutes + " 分 : " + sec + " 秒";
+        return minutes + " Minutes : " + sec + " Seconds";
     }
-    return sec + " 秒";
+    return sec + " Seconds";
 }
 
 function goHomeHelp(player: Player, prefix: string, setting: boolean) {
@@ -35,15 +35,15 @@ function goHomeHelp(player: Player, prefix: string, setting: boolean) {
     }
     return sendMsgToPlayer(player, [
         `\n§o§4[§6コマンド§4]§f: gohome`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6使用§4]§f: gohome [オプション］`,
-        `§4[§6オプション§4]§f: 名前、ヘルプ`,
-        `§4[§6説明§4]§f：指定した保存場所に帰る。`,
-        `§4[§6例§4]§f：`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
+        `§4[§6使用法§4]§f: gohome [optional]`,
+        `§4[§6Optional§4]§f: name, help`,
+        `§4[§6説明§4]§f: Return home to a specified saved location.`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}gohome barn`,
-        `        §4-§6「納屋」ホームへの帰還§f`,
+        `        §4- §6Return to the "barn" home§f`,
         `    ${prefix}gohome help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -55,7 +55,7 @@ function goHomeHelp(player: Player, prefix: string, setting: boolean) {
 export function gohome(message: ChatSendAfterEvent, args: string[]) {
     handleGoHome(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -67,41 +67,41 @@ export function gohome(message: ChatSendAfterEvent, args: string[]) {
 }
 
 async function handleGoHome(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを検証する
+    // Validate that required params are defined
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? ./commands/utility/gohome.js:52)");
+        return console.warn(`${new Date()} | ` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? ./commands/utility/gohome.js:52)");
     }
 
     const player = message.sender;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // キャッシュ
+    // Cache
     const length = args.length;
 
-    // 反論はあるか
+    // Are there arguements
     if (!length) {
         return goHomeHelp(player, prefix, configuration.customcommands.gohome);
     }
 
-    // 助けを求められたか
+    // Was help requested
     const argCheck = args[0];
     if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.gohome) {
         return goHomeHelp(player, prefix, configuration.customcommands.gohome);
     }
 
-    // スペースを許可しない
+    // Don't allow spaces
     if (length > 1) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f名前にスペースを入れないでください！`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f No spaces in names please!`);
     }
 
-    // 安全のために座標をハッシュ化する
+    // Hash the coordinates for security
     const salt = world.getDynamicProperty("crypt");
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
     let homex: number;
@@ -113,23 +113,23 @@ async function handleGoHome(message: ChatSendAfterEvent, args: string[]) {
     const tagsLength = tags.length;
     for (let i = 0; i < tagsLength; i++) {
         if (tags[i].startsWith("1337")) {
-            // それを検証するためにデコードする
+            // Decode it so we can verify it
             tags[i] = (world as WorldExtended).decryptString(tags[i], salt as string);
         }
         if (tags[i].startsWith(args[0].toString() + " X", 13)) {
-            // 文字列を配列に分割する
+            // Split string into array
             coordinatesArray = tags[i].split(" ");
             break;
         }
     }
 
     if (!coordinatesArray) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f '§7${args[0]}§f' は見つかりません`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Home '§7${args[0]}§f' does not exist!`);
     }
 
     const coordArrayLength = coordinatesArray.length;
     for (let i = 0; i < coordArrayLength; i++) {
-        // 配列から位置を取得する
+        // Get their location from the array
         if (coordinatesArray[i].includes("X:")) {
             homex = parseInt(coordinatesArray[i].replace("X:", ""));
         }
@@ -145,30 +145,30 @@ async function handleGoHome(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if (!homex || !homey || !homez || !dimension) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  '§7${args[0]}§f' 存在しないよ！もう一回確認してみて`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Home '§7${args[0]}§f' does not exist!`);
     } else {
         let cooldownCalc: number;
         let activeTimer: string;
-        // 元の時間をミリ秒単位で取得
+        // Get original time in milliseconds
         const cooldownVerify = cooldownTimer.get(player);
-        // コンフィグ設定をミリ秒に変換し、カウントダウンが正確であることを確認できるようにする。
+        // Convert config settings to milliseconds so we can be sure the countdown is accurate
         const msSettings = configuration.modules.goHome.days * 24 * 60 * 60 * 1000 + configuration.modules.goHome.hours * 60 * 60 * 1000 + configuration.modules.goHome.minutes * 60 * 1000 + configuration.modules.goHome.seconds * 1000;
         if (cooldownVerify !== undefined) {
-            // 新しいタイムと元のタイムの差をミリ秒単位で判断する
+            // Determine difference between new and original times in milliseconds
             const bigBrain = new Date().getTime() - cooldownVerify;
-            // 設定のカウントダウンからリアルタイムクロックを引いて差を求める
+            // Subtract realtime clock from countdown in configuration to get difference
             cooldownCalc = msSettings - bigBrain;
-            // 差分をクロック形式に変換 D：H：M：S
+            // Convert difference to clock format D : H : M : S
             activeTimer = dhms(cooldownCalc);
         } else {
-            // 初めて実行されるため、デフォルトではミリ秒単位で設定されます。
+            // First time executed so we default to configuration in milliseconds
             cooldownCalc = msSettings;
         }
-        // タイマーが存在しないか、期限が切れている場合は、テレポートの許可を与え、カウントダウンを設定する。
+        // If timer doesn't exist or has expired then grant permission to teleport and set the countdown
         if (cooldownCalc === msSettings || cooldownCalc <= 0 || uniqueId === player.name) {
-            // このタイマーは猶予期間である
+            // This timer is a grace period
             setTimer(player.id);
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f tpしました！`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Welcome back!`);
             player.teleport(
                 { x: homex, y: homey, z: homez },
                 {
@@ -179,13 +179,13 @@ async function handleGoHome(message: ChatSendAfterEvent, args: string[]) {
                     keepVelocity: false,
                 }
             );
-            // 古いキーと値を削除する
+            // Delete old key and value
             cooldownTimer.delete(player);
-            // ミリ秒単位の現在時刻を持つ新しいキーと値を作成する。
+            // Create new key and value with current time in milliseconds
             cooldownTimer.set(player, new Date().getTime());
         } else {
-            // 高速テレポート
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 速すぎる！7${activeTimer}§fまで待ってからtpしてください。`);
+            // Teleporting to fast
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Too fast! Please wait for §7${activeTimer}§f before going home.`);
         }
     }
 }

@@ -297,6 +297,7 @@ export const banplayer = [
     { name: "PeakAttic816794" },
     { name: "Pepegamessk" },
     { name: "PerkySinger3944" },
+    { name: "PEXkoukunn" },
     { name: "PianoPandora948" },
     { name: "PicanteRat27798" },
     { name: "PicaresqueRat" },
@@ -509,4 +510,6 @@ export const banplayer = [
     { name: "Zrixi8628" },
     { name: "Zxero110" },
     { name: "HOGSWORTH7769" },
+    { name: "zekerpunch" },
+    { name: "Mr Pheonix2141" },
 ];

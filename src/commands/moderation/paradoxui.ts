@@ -8,21 +8,21 @@ import ConfigInterface from "../../interfaces/Config.js";
 function paradoxuiHelp(player: Player, prefix: string, setting: boolean) {
     let commandStatus: string;
     if (!setting) {
-        commandStatus = "§6[§4無効§6]§f";
+        commandStatus = "§6[§4DISABLED§6]§f";
     } else {
-        commandStatus = "§6[§a有効§6]§f";
+        commandStatus = "§6[§aENABLED§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `§6コマンド§4]§f: パラドクスイ`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6使用§4]§f: paradoxui [オプション]。`,
-        `§4[§6オプション§4]§f: ヘルプ`,
-        `§4[§6説明§4]§f：メインメニューの GUI を表示する。`,
-        `§4[§6例§4]§f：`,
+        `\n§o§4[§6コマンド§4]§f: paradoxui`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
+        `§4[§6使用法§4]§f: paradoxui [オプション]`,
+        `§4[§6オプション§4]§f: help`,
+        `§4[§6説明§4]§f: メインメニューのGUIを表示します。`,
+        `§4[§6例§4]§f:`,
         `    ${prefix}paradoxui`,
         `        §4- §6ParadoxのメインメニューGUIを開く§f`,
         `    ${prefix}paradoxui help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6コマンドのヘルプを表示§f`,
     ]);
 }
 
@@ -32,32 +32,32 @@ function paradoxuiHelp(player: Player, prefix: string, setting: boolean) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function paradoxUI(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/moderation/paradoxui.js:36)");
+        return console.warn(`${new Date()} | ` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? (./commands/moderation/paradoxui.js:36)");
     }
 
     const player = message.sender;
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    //の前にUIコマンドを呼び出すことができた場合に備えて、プレーヤーがルールタグを持っているかどうかをチェックする。
-    // のルールが表示された。
+    //check to see if the player has the rules tag incase they have been able to call the UI command before the
+    // rules have been displayed.
     if (player.hasTag("ShowRulesOnJoin") && configuration.modules.showrules.enabled === true) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはルールに同意していません。表示されましたら、お試しください。`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ルールに同意していない。これらが表示されたら試してみてください.`);
         return ShowRules();
     }
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 助けを求められたか
+    // Was help requested
     const argCheck = args[0];
     if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.paradoxiu) {
         return paradoxuiHelp(player, prefix, configuration.customcommands.paradoxiu);
     }
 
-    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fParadoxUIのチャットウィンドウを閉じる。`);
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f がメニューを開きました§f!`);
+    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ParadoxUIのチャットウィンドウを閉じる.`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f §6ParadoxUI§f を要求しました!`);
     paradoxui(player);
 }

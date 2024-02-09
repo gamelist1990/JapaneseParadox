@@ -14,7 +14,7 @@ import { paradoxui } from "../paradoxui.js";
 export function uiENCHANTEDARMOR(enchantedarmorResult: ModalFormResponse, player: Player) {
     handleUIEnchantedArmor(enchantedarmorResult, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -27,28 +27,28 @@ export function uiENCHANTEDARMOR(enchantedarmorResult: ModalFormResponse, player
 
 async function handleUIEnchantedArmor(enchantedarmorResult: ModalFormResponse, player: Player) {
     if (!enchantedarmorResult || enchantedarmorResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [EnchantedArmorToggle] = enchantedarmorResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f エンチャント・アーマーを設定するには、Paradox・オッ プする必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to configure Enchanted Armor`);
     }
     if (EnchantedArmorToggle === true) {
-        // 許可する
+        // Allow
         player.runCommand(`scoreboard players set paradox:config encharmor 1`);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6Anti Enchanted Armor§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6Anti Enchanted Armor§f!`);
     }
     if (EnchantedArmorToggle === false) {
-        // 拒否する
+        // Deny
         player.runCommand(`scoreboard players set paradox:config encharmor 0`);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4Anti Enchanted Armor§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4Anti Enchanted Armor§f!`);
     }
     player.runCommand(`scoreboard players operation @a encharmor = paradox:config encharmor`);
-    //完了したら、プレイヤーにメインUIを表示する。
+    //show the main ui to the player once complete.
     return paradoxui(player);
 }

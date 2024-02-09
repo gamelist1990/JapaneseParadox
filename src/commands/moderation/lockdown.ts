@@ -9,26 +9,26 @@ function lockdownHelp(player: Player, prefix: string, lockdownBoolean: boolean, 
     if (!setting) {
         commandStatus = "§6[§4無効§6]§f";
     } else {
-        commandStatus = "§6[§a有効§6]§f";
+        commandStatus = "§6[§a有効§6]§f。";
     }
     let moduleStatus: string;
     if (lockdownBoolean === false) {
         moduleStatus = "§6[§4無効§6]§f";
     } else {
-        moduleStatus = "§6[§a有効§6]§f";
+        moduleStatus = "§6[§a有効§6]§f。";
     }
     return sendMsgToPlayer(player, [
-        `\n[コマンド§4]§f：ロックダウン`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Module§4]§f: ${moduleStatus}`,
+        `\n§o§4[§6コマンド§4]§f: lockdown`,
+        `§4[§6ステータス§4]§f: ${commandStatus}.`,
+        `§4[§6モジュール§4]§f: ${moduleStatus}.`,
         `§4[§6使用§4]§f：ロックダウン [オプション］`,
-        `§4[§6オプション§4]§f: ヘルプ`,
+        `§4[§6Optional§4]§f: help`,
         `§4[§6解説§4]§f：メンテナンスのためにスタッフを除くプレイヤーをサーバーから追い出す。`,
         `§4[§6例§4]§f：`,
-        `    ${prefix}lockdown`,
+        `    プレフィックス}ロックダウン`,
         `        §メンテナンスのためのサーバロックダウンの開始§f`,
         `    ${prefix}lockdown help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -39,13 +39,13 @@ function lockdownHelp(player: Player, prefix: string, lockdownBoolean: boolean, 
  */
 export function lockdown(message: ChatSendAfterEvent, args: string[]) {
     handleLockdown(message, args).catch((error) => {
-        console.error("Paradox Unhandled Rejection: ", error);
+        console.error("Paradoxの未処理拒否：", error);
         // スタックトレース情報の抽出
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
                 const sourceInfo = stackLines;
-                console.error("Error originated from:", sourceInfo[0]);
+                console.error("エラーの原因", sourceInfo[0]);
             }
         }
     });
@@ -54,7 +54,7 @@ export function lockdown(message: ChatSendAfterEvent, args: string[]) {
 async function handleLockdown(message: ChatSendAfterEvent, args: string[]) {
     // 必要なパラメータが定義されていることを確認する
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/moderation/lockdown.js:37)");
+        return console.warn(`新しい日付()}。|` + "エラー: ${message} が定義されていません。渡し忘れですか？(./commands/moderation/lockdown.js:37)");
     }
 
     const player = message.sender;
@@ -64,7 +64,11 @@ async function handleLockdown(message: ChatSendAfterEvent, args: string[]) {
 
     // ユーザーにコマンドを実行する権限があることを確認する。
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
     // ダイナミック・プロパティ・ブール値の取得
@@ -81,14 +85,15 @@ async function handleLockdown(message: ChatSendAfterEvent, args: string[]) {
 
     // すでにロックされている場合は、サーバーのロックを解除する。
     if (configuration.modules.lockdown.enabled) {
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§fサーバはもはやロックダウンされていません！`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4] サーバーのロックダウンを停止しました`);
         configuration.modules.lockdown.enabled = false;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
         return;
     }
 
     // ロックするデフォルトの理由
-    const reason = "メンテナンス中です！ご迷惑をおかけします";
+    const reason = "Under Maintenance! Sorry for the inconvenience.";
+
     // ロックする
     const players = world.getPlayers();
     for (const pl of players) {

@@ -7,23 +7,23 @@ import { paradoxui } from "../paradoxui.js";
 
 export function uiUNBAN(unbanResult: ModalFormResponse, player: Player) {
     if (!unbanResult || unbanResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [textField, deleteUnban] = unbanResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fプレイヤーをBANするにはParadoxOPする必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to Ban a player.`);
     }
     if (deleteUnban === true) {
         queueUnban.delete(textField as string);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${textField}§f が禁止解除キューから削除されました。`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${textField}§f has been removed from the unban queue!`);
     }
-    // 選手をキューに追加
+    // Add player to queue
     queueUnban.add(textField as string);
-    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${textField}§f は禁止解除のキューに入れられています。`);
+    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${textField}§f is queued to be unbanned!`);
     return paradoxui(player);
 }

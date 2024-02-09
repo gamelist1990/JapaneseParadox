@@ -7,30 +7,30 @@ import ConfigInterface from "../../interfaces/Config.js";
  * Provides help information for the ChatRanks command.
  * @param {Player} player - The player requesting help.
  * @param {string} prefix - The custom prefix for the player.
- * @param {boolean} chatranksBoolean - The status of ChatRanks module.
+ * @param {boolean} chatRanksBoolean - The status of ChatRanks module.
  * @param {boolean} setting - The status of the ChatRanks custom command setting.
  */
-function chatRanksHelp(player: Player, prefix: string, chatranksBoolean: boolean, setting: boolean): void {
-    // コマンドとモジュールのステータスを決定する
-    const commandStatus: string = setting ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
-    const moduleStatus: string = chatranksBoolean ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
+function chatRanksHelp(player: Player, prefix: string, chatRanksBoolean: boolean, setting: boolean): void {
+    // Determine the status of the command and module
+    const commandStatus: string = setting ? "§6[§aENABLED§6]§f" : "§6[§4DISABLED§6]§f";
+    const moduleStatus: string = chatRanksBoolean ? "§6[§aENABLED§6]§f" : "§6[§4DISABLED§6]§f";
 
-    // 選手にヘルプ情報を表示する
+    // Display help information to the player
     sendMsgToPlayer(player, [
-        `\n§o§4[§6コマンド§4]§f: チャットランク`,
+        `\n§o§4[§6Command§4]§f: chatranks`,
         `§4[§6Status§4]§f: ${commandStatus}`,
         `§4[§6Module§4]§f: ${moduleStatus}`,
         `§4[§6Usage§4]§f: ${prefix}chatranks [options]`,
-        `§4[§6説明§4]§f：チャットのランクを切り替える。`,
-        `§4[§6オプション§4]§f：`,
+        `§4[§6Description§4]§f: Toggles chat ranks.`,
+        `§4[§6Options§4]§f:`,
         `    -h, --help`,
-        `       §4[§7このヘルプメッセージを表示する§4]§f`,
+        `       §4[§7Display this help message§4]§f`,
         `    -s, --status`,
-        `       §4[§7ChatRanksモジュールの現在の状態を表示する§4]§f`,
+        `       §4[§7Display the current status of ChatRanks module§4]§f`,
         `    -e, --enable`,
-        `       §4[§7ChatRanksモジュールをBooleanにする§4]§f`,
+        `       §4[§7Enable ChatRanks module§4]§f`,
         `    -d, --disable`,
-        `       §4[§7ChatRanksモジュールを無効にする§4]§f`,
+        `       §4[§7Disable ChatRanks module§4]§f`,
     ]);
 }
 
@@ -43,7 +43,7 @@ function chatRanksHelp(player: Player, prefix: string, chatranksBoolean: boolean
 export function chatranks(message: ChatSendAfterEvent, args: string[]) {
     handleChatRanks(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -60,34 +60,34 @@ export function chatranks(message: ChatSendAfterEvent, args: string[]) {
  * @param {string[]} args - Additional arguments provided (optional).
  */
 async function handleChatRanks(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
         return console.warn(`${new Date()} | ` + `Error: ${message} isnt defined. Did you forget to pass it? (./commands/settings/chatranks.js:35)`);
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
-    // ダイナミック・プロパティ・ブール値の取得
+    // Get Dynamic Property Boolean
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 位置以外の引数をチェックする
+    // Check for additional non-positional arguments
     const length = args.length;
     let validFlagFound = false; // Flag to track if any valid flag is encountered
     for (let i = 0; i < length; i++) {
         const additionalArg: string = args[i].toLowerCase();
 
-        // 追加引数の処理
+        // Handle additional arguments
         switch (additionalArg) {
             case "-h":
             case "--help":
@@ -95,39 +95,39 @@ async function handleChatRanks(message: ChatSendAfterEvent, args: string[]) {
                 return chatRanksHelp(player, prefix, configuration.modules.chatranks.enabled, configuration.customcommands.chatranks);
             case "-s":
             case "--status":
-                // ハンドル状態フラグ
+                // Handle status flag
                 validFlagFound = true;
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ChatRanks module is currently ${configuration.modules.chatranks.enabled ? "有効" : "無効"}`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ChatRanks module is currently ${configuration.modules.chatranks.enabled ? "enabled" : "disabled"}`);
                 break;
             case "-e":
             case "--enable":
-                // ハンドルイネーブルフラグ
+                // Handle enable flag
                 validFlagFound = true;
                 if (configuration.modules.chatranks.enabled) {
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fChatRanksモジュールは既にBooleanになっています。`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ChatRanks module is already enabled.`);
                 } else {
                     configuration.modules.chatranks.enabled = true;
                     dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 以下の機能が有効です=> §6ChatRanks§f!`);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6ChatRanks§f!`);
                 }
                 break;
             case "-d":
             case "--disable":
-                // ハンドル無効フラグ
+                // Handle disable flag
                 validFlagFound = true;
                 if (!configuration.modules.chatranks.enabled) {
-                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fChatRanksモジュールは既に無効になっています。`);
+                    sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f ChatRanks module is already disabled.`);
                 } else {
                     configuration.modules.chatranks.enabled = false;
                     dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f は無効 §4ChatRanks§f!`);
+                    sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4ChatRanks§f!`);
                 }
                 break;
         }
     }
 
     if (!validFlagFound) {
-        // 追加の引数はありません。
+        // No additional arguments provided, display help
         sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Invalid command. Use ${prefix}chatranks --help for more information.`);
     }
 }

@@ -113,7 +113,7 @@ function worldborder(id: number) {
 
             // Make sure nobody climbs over the wall
             if (x > overworldSize || x < -overworldSize || z > overworldSize || z < -overworldSize) {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f あなたは世界の国境に到達しました。`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You have reached the world border.`);
 
                 const teleportToBorder = (x: number, z: number) => {
                     const safe = safetyProtocol(player, x, y, z);
@@ -144,7 +144,7 @@ function worldborder(id: number) {
 
             // Make sure nobody climbs over the wall
             if (x > netherSize || x < -netherSize || z > netherSize || z < -netherSize) {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f あなたは世界の境界に到達しました.`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You have reached the world border.`);
 
                 const teleportToBorder = (x: number, z: number) => {
                     const safe = safetyProtocol(player, x, y, z);
@@ -175,7 +175,7 @@ function worldborder(id: number) {
 
             // Make sure nobody climbs over the wall
             if (x > endSize || x < -endSize || z > endSize || z < -endSize) {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f あなたは世界の境界に到達しました.`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You have reached the world border.`);
 
                 const teleportToBorder = (x: number, z: number) => {
                     const safe = safetyProtocol(player, x, y, z);

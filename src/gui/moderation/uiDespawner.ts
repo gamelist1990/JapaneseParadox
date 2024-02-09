@@ -14,7 +14,7 @@ import { paradoxui } from "../paradoxui.js";
 export function uiDESPAWNER(despawnerResult: ModalFormResponse, player: Player) {
     handleUIDespawner(despawnerResult, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -27,43 +27,43 @@ export function uiDESPAWNER(despawnerResult: ModalFormResponse, player: Player) 
 
 async function handleUIDespawner(despawnerResult: ModalFormResponse, player: Player) {
     if (!despawnerResult || despawnerResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [entityValue, DespawnAllToggle] = despawnerResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped.`);
     }
 
-    // エンティティを見つけるか、要求があればすべてをデスポーンしてみる。
+    // try to find the entity or despawn them all if requested
     const filter: EntityQueryOptions = {
         excludeTypes: ["player"],
     };
     const filteredEntities = world.getDimension("overworld").getEntities(filter);
     if (DespawnAllToggle === false) {
-        // 特定団体
+        // Specified entity
         let counter = 0;
         let requestedEntity: string = "";
         for (const entity of filteredEntities) {
             const filteredEntity = entity.typeId.replace("minecraft:", "");
             requestedEntity = (entityValue as string).replace("minecraft:", "");
-            // エンティティが指定された場合は、ここでそれを処理する。
+            // If an entity was specified then handle it here
             if (filteredEntity === requestedEntity || filteredEntity === entityValue) {
                 counter = ++counter;
-                // このエンティティをデスポーンする
+                // Despawn this entity
                 entity.remove();
                 continue;
-                // すべてのエンティティが指定された場合、ここでこれを処理する。
+                // If all entities were specified then handle this here
             }
         }
         if (counter > 0) {
             sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Despawned:\n\n §o§6|§f §4[§f${requestedEntity}§4]§f §6Amount: §4x${counter}§f`);
         } else {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f デスポーンする実体が見つからない！`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f No entity found to despawn!`);
         }
     }
     if (DespawnAllToggle === true) {
@@ -82,7 +82,7 @@ async function handleUIDespawner(despawnerResult: ModalFormResponse, player: Pla
             } else {
                 entityCount[filteredEntity]++;
             }
-            // このエンティティをデスポーンする
+            // Despawn this entity
             entity.remove();
         }
         let totalCounter = 0;
@@ -97,10 +97,10 @@ async function handleUIDespawner(despawnerResult: ModalFormResponse, player: Pla
             }
         }
         if (totalCounter > 0) {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f デスポーンした：`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Despawned:`);
             sendMsgToPlayer(player, entityMessage);
         } else {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f デスポーンする実体が見つからない！`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f No entities found to despawn!`);
         }
     }
     return paradoxui;

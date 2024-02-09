@@ -4,29 +4,29 @@ import { getPrefix, sendMsgToPlayer, sendMsg } from "../../util.js";
 import ConfigInterface from "../../interfaces/Config.js";
 
 function banHelp(player: Player, prefix: string, setting: boolean) {
-    const commandStatus: string = setting ? "§6[§a有効§6]§f" : "§6[§4無効§6]§f";
+    const commandStatus: string = setting ? "§6[§aENABLED§6]§f" : "§6[§4DISABLED§6]§f";
 
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6コマンド§4]§f: 禁止`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Usage§4]§f: ${prefix}ban [options]`,
-        `§4[§6オプション§4]§f: ユーザー名、理由、ヘルプ`,
-        `§4[§6Description§4]§f：指定されたユーザを禁止し、オプションで理由を与える。`,
-        `§4[§6オプション§4]§f：`,
+        `\n§o§4[§6コマンド§4]§f: ban`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
+        `§4[§6使用法§4]§f: ${prefix}ban [オプション]`,
+        `§4[§6オプション§4]§f: ユーザー名, 理由, ヘルプ`,
+        `§4[§6説明§4]§f: 指定したユーザーをBANし、必要に応じて理由を付けます。`,
+        `§4[§6オプション§4]§f:`,
         `    -h, --help`,
-        `       §4[§7このヘルプメッセージを表示する§4]§f`,
+        `       §4[§7このヘルプメッセージを表示§4]§f`,
         `    -p, --player`,
-        `       §4[§7禁止するプレーヤーの名前§4]§f`,
-        `    -r, --理由`,
-        `       §4[§7 禁止された理由 §4]§f。`,
+        `       §4[§7BANするプレイヤーの名前.§4]§f`,
+        `    -r, --reason`,
+        `       §4[§7プレイヤーがBANされた理由（オプション）。§4]§f`,
         `                                                                      `,
-        `§4[§6例§4]§f：`,
+        `§4[§6例§4]§f:`,
         `    ${prefix}ban ${player.name}`,
-        `        §4- §6理由を指定せずに${player.name}を禁止§f`,
+        `        §4- §6理由を指定せずに${player.name}をBAN§f`,
         `    ${prefix}ban ${player.name} -r Hacker!`,
-        `        §4- §6理由"Hacker!"で${player.name}を禁止§f`,
+        `        §4- §6理由"Hacker!"で${player.name}をBAN§f`,
         `    ${prefix}ban -player ${player.name} --reason Caught exploiting!`,
-        `        §4- §6理由"Caught exploiting!"で${player.name}を禁止§f`,
+        `        §4- §6理由"Caught exploiting!"で${player.name}をBAN§f`,
         `    ${prefix}ban -h`,
         `        §4- §6コマンドのヘルプを表示§f`,
     ]);
@@ -38,26 +38,26 @@ function banHelp(player: Player, prefix: string, setting: boolean) {
  * @param {array} args - Additional arguments provided (optional).
  */
 export function ban(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
         return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? ./commands/moderation/ban.js:31)");
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to use this command.`);
     }
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // キャッシュ
+    // Cache
     const length = args.length;
     let playerName = "";
     let reason = "";
@@ -66,11 +66,11 @@ export function ban(message: ChatSendAfterEvent, args: string[]) {
     for (let i = 0; i < length; i++) {
         const additionalArg = args[i].toLowerCase();
 
-        // 追加引数の処理
+        // Handle additional arguments
         switch (additionalArg) {
             case "-h":
             case "--help":
-                // ヘルプメッセージを表示する
+                // Display help message
                 return banHelp(player, prefix, configuration.customcommands.ban);
             case "-p":
             case "--player":
@@ -88,7 +88,7 @@ export function ban(message: ChatSendAfterEvent, args: string[]) {
     }
     if (gotPlayerName === true && gotReason === true) {
         reason = reason.replace(/,/g, " ");
-        // リクエストされた選手を探す
+        // try to find the player requested
         let member;
         const players = world.getPlayers();
         for (const pl of players) {
@@ -97,42 +97,42 @@ export function ban(message: ChatSendAfterEvent, args: string[]) {
                 break;
             }
         }
-        // 選手が存在するかチェックする
+        // Check if player exists
         if (!member) {
-            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
+            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f そのプレーヤーが見つかりませんでした!`);
         }
-        // 彼らが自分自身を追放しないようにする
+        // make sure they dont ban themselves
         if (member === player) {
-            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 自分自身を禁止することはできない。`);
+            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f あなたは自分自身を禁止することはできません.`);
         }
         try {
             member.addTag("Reason:" + reason);
             member.addTag("By:" + player.name);
             member.addTag("isBanned");
         } catch (error) {
-            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f そのプレイヤーを禁止できませんでした！エラー：${error}`);
+            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 私はそのプレイヤーを禁止することができませんでした!エラー: ${error}`);
         }
-        return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§fが§7${member.name}§fを禁止しました。理由：§7${reason}§f`);
+        return sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f は §7${member.name}§f を禁止しました。理由: §7${reason}§f`);
     }
 }
 
-//正しい値を得るための関数
+//Functions to get values right
 function getPlayerName(args: string[]) {
-    // pまたは--playerの後に二重引用符があるかチェックする。
+    // Check if double quotes are present after -p or --player
     if (/(--player|-p),"([^"]*)"/.test(args.toString())) {
-        // 正規表現を使用して、--playerまたは-pの後に二重引用符で囲んだ値をマッチさせる。
+        // Use a regular expression to match the value after --player or -p with double quotes
         const match = /(--player|-p),"([^"]*)"/.exec(args.toString());
-        // マッチするかどうかをチェックし、キャプチャされたグループを取得する。
+        // Check if a match is found and get the captured group
         const playerName = match ? match[2].replace(/,/g, "") : null;
         return playerName;
     } else if (/(--player|-p),([^,]+)/.test(args.toString())) {
-        // 二重引用符は使用せず、引用符なしの正規表現を使用する。
+        // No double quotes, use a regular expression without quotes
         const match = /(--player|-p),([^,]+)/.exec(args.toString());
-        // マッチするかどうかをチェックし、キャプチャされたグループを取得する。
+        // Check if a match is found and get the captured group
         const playerName = match ? match[2] : null;
         return playerName;
     } else {
-        // playerまたは-p,"... "がない場合の処理：選手名を抽出し、-rがある場合はその部分を削除する。
+        // Handle cases without --player or -p,"...": extract player name and remove the part after -r if present
         const match = /(--player|-p),([^,]+)/.exec(args.toString());
         let playerName = match ? match[2] : null;
         const reasonIndex = args.indexOf("-r");
@@ -143,17 +143,17 @@ function getPlayerName(args: string[]) {
     }
 }
 function getReason(args: string[]) {
-    // reasonまたは-rの後に二重引用符があるかチェックする。
+    // Check if double quotes are present after --reason or -r
     if (/(-r|--reason),"([^"]*)"/.test(args.toString())) {
-        // 正規表現を使用して、--reason または -r の後に二重引用符で囲んだ値をマッチさせる。
+        // Use a regular expression to match the value after --reason or -r with double quotes
         const match = /(-r|--reason),"([^"]*)"/.exec(args.toString());
-        // マッチするかどうかをチェックし、キャプチャされたグループを取得する。
+        // Check if a match is found and get the captured group
         const reason = match ? match[2] : null;
         return reason;
     } else {
-        // 二重引用符は使用せず、引用符なしの正規表現を使用する。
+        // No double quotes, use a regular expression without quotes
         const match = /(--reason|-r)\s*"?([^"]*)"?/.exec(args.toString());
-        // マッチするかどうかをチェックし、キャプチャされたグループを取得する。
+        // Check if a match is found and get the captured group
         const reason = match ? match[2] : null;
         return reason;
     }

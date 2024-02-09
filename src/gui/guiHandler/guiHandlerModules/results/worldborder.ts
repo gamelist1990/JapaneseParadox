@@ -11,24 +11,24 @@ export function worldBorderHandler(player: Player) {
     const overworldBorderNumber = configuration.modules.worldBorder.overworld;
     const netherworldBorderNumber = configuration.modules.worldBorder.nether;
     const endworldBorderNumber = configuration.modules.worldBorder.end;
-    modulesworldborderui.title("§4World Borderメニュー§4");
-    modulesworldborderui.textField("オーバー・ワールド・ボーダー - ブロック単位の価値：", "1000", String(overworldBorderNumber));
-    modulesworldborderui.textField("ネザー・ワールド・ボーダー - ブロック内の値。無効にする必要がある場合は0に設定する：", "0", String(netherworldBorderNumber));
-    modulesworldborderui.textField("End World Border - ブロック単位の値。無効にする必要がある場合は0を設定する：", "0", String(endworldBorderNumber));
-    modulesworldborderui.toggle("ワールドボーダーをBooleanにする", overWorldBorderBoolean);
+    modulesworldborderui.title("§4Paradox Modules - World Border§4");
+    modulesworldborderui.textField("Over World Border - Value in blocks:", "1000", String(overworldBorderNumber));
+    modulesworldborderui.textField("Nether World Border - Values in blocks. Set to 0 if it needs to be disabled:", "0", String(netherworldBorderNumber));
+    modulesworldborderui.textField("End World Border - Values in blocks. Set to 0 if it needs to be disabled:", "0", String(endworldBorderNumber));
+    modulesworldborderui.toggle("Enable World Border:", overWorldBorderBoolean);
     modulesworldborderui
         .show(player)
         .then((spamResult) => {
             uiWORLDBORDER(spamResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

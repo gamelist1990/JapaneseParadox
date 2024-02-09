@@ -12,16 +12,16 @@ function vanishHelp(player: Player, prefix: string, setting: boolean) {
         commandStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `\n§o§4[§6 コマンド§4]§f: vanish`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6使用§4]§f: vanish [オプション].`,
-        `§4[§6オプション§4]§f: ヘルプ`,
-        `§4[§6解説§4]§f：オンラインプレイヤーを監視するためにプレイヤーを透明化する。`,
-        `§4[§6例§4]§f：`,
+        `\n§o§4[§6コマンド§4]§f: vanish`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
+        `§4[§6使用法§4]§f: vanish [optional]`,
+        `§4[§6Optional§4]§f: help`,
+        `§4[§6説明§4]§f: Turns the player invisible to monitor online player's.`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}vanish`,
-        `        §4- §6他のプレイヤーから見えなくなる§f`,
+        `        §4- §6Turns the player invisible to other players§f`,
         `    ${prefix}vanish help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -33,7 +33,7 @@ function vanishHelp(player: Player, prefix: string, setting: boolean) {
 export function vanish(message: ChatSendAfterEvent, args: string[]) {
     handleVanish(message, args).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -45,27 +45,31 @@ export function vanish(message: ChatSendAfterEvent, args: string[]) {
 }
 
 async function handleVanish(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./utility/vanish.js:26)");
+        return console.warn(`${new Date()} | ` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? (./utility/vanish.js:26)");
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 助けを求められたか
+    // Was help requested
     const argCheck = args[0];
     if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.vanish) {
         return vanishHelp(player, prefix, configuration.customcommands.vanish);
@@ -76,18 +80,18 @@ async function handleVanish(message: ChatSendAfterEvent, args: string[]) {
     if (vanishBoolean) {
         player.removeTag("vanish");
         player.triggerEvent("unvanish");
-        // 効果を取り除く
+        // Remove effects
         const effectsToRemove = [MinecraftEffectTypes.Invisibility, MinecraftEffectTypes.NightVision];
 
         for (const effectType of effectsToRemove) {
             player.removeEffect(effectType);
         }
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fもはやあなたは消えていない。`);
-        sendMsg(`a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f §7${player.name}§f is no longer in vanish.`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You are no longer vanished.`);
+        sendMsg(`@a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f §7${player.name}§f is no longer in vanish.`);
     } else {
         player.addTag("vanish");
         player.triggerEvent("vanish");
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたは今、消滅した！`);
-        sendMsg(`a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f §7${player.name}§f is now vanished!`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You are now vanished!`);
+        sendMsg(`@a[tag=paradoxOpped]`, `§f§4[§6Paradox§4]§f §7${player.name}§f is now vanished!`);
     }
 }

@@ -7,10 +7,10 @@ export function prefixHandler(player: Player) {
     const prefixui = new ModalFormData();
     let onlineList: string[] = [];
     onlineList = Array.from(world.getPlayers(), (player) => player.name);
-    prefixui.title("§4起動文字変更§4");
-    prefixui.dropdown(`\n変えたい文字指定:\n\n以下のプレイヤーがオンラインです\n`, onlineList);
-    prefixui.textField(`\n文字:\n`, `新しい起動文字`, null);
-    prefixui.toggle(`\nリセット:`, false);
+    prefixui.title("§4Paradox - Change command prefix§4");
+    prefixui.dropdown(`\nChanges prefix used for commands:\n\nPlayer's Online\n`, onlineList);
+    prefixui.textField(`\nPrefix:\n`, `Put new prefix here`, null);
+    prefixui.toggle(`\nReset Prefix:`, false);
     prefixui
         .show(player)
         .then((prefixResult) => {

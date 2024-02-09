@@ -12,7 +12,6 @@ import { modulesui } from "./guiHandler/guiHandlerModules/modulesui";
 import { prefixHandler } from "./guiHandler/results/prefix";
 import { statsHandler } from "./guiHandler/results/stats";
 import { chatChannelMainMenu } from "./guiHandler/results/chatChannelsMenu";
-import { inventoryHandler } from "./guiHandler/guiHandlerModeration/results/inventoryui";
 import { managePlayerSavedLocationsHandler } from "./guiHandler/guiHandlerModeration/results/managePlayersSavedLocations";
 
 /**
@@ -39,26 +38,25 @@ async function handleParadoxUI(player: Player) {
     const hash = player.getDynamicProperty("hash");
     const salt = player.getDynamicProperty("salt");
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
-    maingui.title("§4メニュー§4");
-    maingui.body("§eこのメニューではTPリクエストや座標を保存そして報告機能が使えます！§e\n" + "§fVersion: §2" + versionFile.version);
+    maingui.title("§4Paradox§4");
+    maingui.body("§eA utility to fight against malicious hackers on Bedrock Edition§e\n" + "§fVersion: §2" + versionFile.version);
     if (uniqueId !== player.name) {
-        maingui.button("管理者", "textures/ui/op");
-        maingui.button("TPリクエスト！", "textures/blocks/portal_placeholder");
-        maingui.button("座標保存", "textures/items/compass_item");
-        maingui.button("報告！", "textures/items/paper");
+        maingui.button("Op", "textures/ui/op");
+        maingui.button("Teleport Requests", "textures/blocks/portal_placeholder");
+        maingui.button("Saved Locations", "textures/items/compass_item");
+        maingui.button("Report", "textures/items/paper");
+        maingui.button("Chat Channels", "textures/ui/mute_off");
     } else {
-        maingui.button("オペレーター", "textures/ui/op");
-        maingui.button("権限剝奪", "textures/items/ender_pearl");
-        maingui.button("管理者メニュー", "textures/items/book_normal");
-        maingui.button("アンチチート設定", "textures/blocks/command_block");
-        maingui.button("起動文字変更", "textures/ui/UpdateGlyph");
-        maingui.button("TPリクエスト", "textures/blocks/portal_placeholder");
-        maingui.button("座標保存", "textures/items/compass_item");
-        maingui.button("ユーザーログ", "textures/items/book_normal");
-        maingui.button("報告！", "textures/items/paper");
-        maingui.button("インベントリ確認", "textures/blocks/chest_front");
-        maingui.button("パーティー", "textures/ui/mute_off");
-        maingui.button("ユーザーの座標管理", "textures/items/compass_item");
+        maingui.button("Op", "textures/ui/op");
+        maingui.button("Deop", "textures/items/ender_pearl");
+        maingui.button("Moderation", "textures/items/book_normal");
+        maingui.button("Modules", "textures/blocks/command_block");
+        maingui.button("Prefix", "textures/ui/UpdateGlyph");
+        maingui.button("Teleport Requests", "textures/blocks/portal_placeholder");
+        maingui.button("Saved Locations", "textures/items/compass_item");
+        maingui.button("Stats", "textures/items/book_normal");
+        maingui.button("Chat Channels", "textures/ui/mute_off");
+        maingui.button("Manage Players Saved Locations", "textures/items/compass_item");
     }
     maingui
         .show(player)
@@ -78,6 +76,9 @@ async function handleParadoxUI(player: Player) {
                         break;
                     case 3:
                         reportHandler(player);
+                        break;
+                    case 4:
+                        chatChannelMainMenu(player);
                         break;
                     default:
                         // Handle other selections for isUnique case
@@ -110,15 +111,9 @@ async function handleParadoxUI(player: Player) {
                         statsHandler(player);
                         break;
                     case 8:
-                        reportHandler(player);
-                        break;
-                    case 9:
-                        inventoryHandler(player);
-                        break;
-                    case 10:
                         chatChannelMainMenu(player);
                         break;
-                    case 11:
+                    case 9:
                         managePlayerSavedLocationsHandler(player);
                         break;
                     default:

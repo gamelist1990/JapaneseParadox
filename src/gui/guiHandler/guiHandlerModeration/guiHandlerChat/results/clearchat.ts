@@ -4,12 +4,12 @@ import { uiCLEARCHAT } from "../../../../moderation/uiClearchat";
 import { paradoxui } from "../../../../paradoxui";
 
 export function clearChatHandler(player: Player) {
-    //クリアチャットui
+    //Clear Chat ui
     const clearchatui = new MessageFormData();
-    clearchatui.title("§4Clear Chatメニュー§4");
-    clearchatui.body("本当にチャットをクリアにしますか？");
-    clearchatui.button1("はい");
-    clearchatui.button2("いいえ");
+    clearchatui.title("§4Clear Chat§4");
+    clearchatui.body("Are you sure you want to clear chat?");
+    clearchatui.button1("Yes");
+    clearchatui.button2("No");
     clearchatui
         .show(player)
         .then((clearchatResult) => {
@@ -21,13 +21,13 @@ export function clearChatHandler(player: Player) {
             }
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

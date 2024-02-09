@@ -16,7 +16,7 @@ import ConfigInterface from "../../interfaces/Config.js";
 export function uiLOCKDOWN(lockdownResult: ModalFormResponse, player: Player) {
     handleUILockdown(lockdownResult, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -29,54 +29,54 @@ export function uiLOCKDOWN(lockdownResult: ModalFormResponse, player: Player) {
 
 async function handleUILockdown(lockdownResult: ModalFormResponse, player: Player) {
     if (!lockdownResult || lockdownResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [reason, LockdownToggle] = lockdownResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped.`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
     if (LockdownToggle === true) {
-        // ロックする
+        // Lock it down
         const players = world.getPlayers();
         for (const pl of players) {
-            // ハッシュ/ソルトのチェックとパスワードの検証
+            // Check for hash/salt and validate password
             const hash = pl.getDynamicProperty("hash");
             const salt = pl.getDynamicProperty("salt");
 
-            // オペレーターのIDまたは暗号化パスワードのいずれかをキーとして使用する。
+            // Use either the operator's ID or the encryption password as the key
             const key = configuration.encryption.password ? configuration.encryption.password : pl.id;
 
-            // ハッシュを生成する
+            // Generate the hash
             const encode = (world as WorldExtended).hashWithSalt(salt as string, key);
             if (encode && hash !== undefined && encode === hash) {
                 continue;
             }
-            // サーバーからプレーヤーをキックする
+            // Kick players from server
             pl.runCommandAsync(`kick ${pl.name} §f\n\n${reason}`).catch(() => {
-                // サーバーからプレイヤーをデスポーンさせる
+                // Despawn players from server
                 pl.triggerEvent("paradox:kick");
             });
         }
-        // 閉鎖
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§fサーバーはロックダウン中です！`);
+        // Shutting it down
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f Server is in lockdown!`);
         configuration.modules.lockdown.enabled = true;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f Boolean＝＞ §6Lockdown§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has enabled §6Lockdown§f!`);
     }
-    //無効
+    //Disable
     if (LockdownToggle === false) {
         configuration.modules.lockdown.enabled = false;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ §4Lockdown§f!`);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§fサーバはもはやロックダウンされていません！`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled §4Lockdown§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f Server is no longer in lockdown!`);
     }
     return paradoxui;
 }

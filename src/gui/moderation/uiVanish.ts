@@ -16,7 +16,7 @@ import { MinecraftEffectTypes } from "../../node_modules/@minecraft/vanilla-data
 export function uiVANISH(vanishResult: ModalFormResponse, onlineList: string[], player: Player) {
     handleUIVanish(vanishResult, onlineList, player).catch((error) => {
         console.error("Paradox Unhandled Rejection: ", error);
-        // スタックトレース情報の抽出
+        // Extract stack trace information
         if (error instanceof Error) {
             const stackLines = error.stack.split("\n");
             if (stackLines.length > 1) {
@@ -29,7 +29,7 @@ export function uiVANISH(vanishResult: ModalFormResponse, onlineList: string[], 
 
 async function handleUIVanish(vanishResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!vanishResult || vanishResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [value] = vanishResult.formValues;
@@ -41,16 +41,16 @@ async function handleUIVanish(vanishResult: ModalFormResponse, onlineList: strin
             break;
         }
     }
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped.`);
     }
 
-    // オンラインですか？
+    // Are they online?
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
     if (member.hasTag("vanish")) {
         member.addTag("novanish");
@@ -62,14 +62,14 @@ async function handleUIVanish(vanishResult: ModalFormResponse, onlineList: strin
 
     if (member.hasTag("novanish")) {
         member.triggerEvent("unvanish");
-        // 効果を取り除く
+        // Remove effects
         const effectsToRemove = [MinecraftEffectTypes.Invisibility, MinecraftEffectTypes.NightVision];
 
         for (const effectType of effectsToRemove) {
             player.removeEffect(effectType);
         }
-        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§fもはやあなたは消えていない。`);
-        sendMsg(`a[tag=paradoxOpped]`, `§7${member.name}§f is no longer in vanish.`);
+        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You are no longer vanished.`);
+        sendMsg(`@a[tag=paradoxOpped]`, `§7${member.name}§f is no longer in vanish.`);
     }
 
     if (!member.hasTag("novanish")) {
@@ -78,8 +78,8 @@ async function handleUIVanish(vanishResult: ModalFormResponse, onlineList: strin
 
     if (member.hasTag("vanish") && !member.hasTag("novanish")) {
         member.triggerEvent("vanish");
-        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§fあなたは今、消滅した！`);
-        sendMsg(`a[tag=paradoxOpped]`, `§7${member.name}§f is now vanished!`);
+        sendMsgToPlayer(member, `§f§4[§6Paradox§4]§f You are now vanished!`);
+        sendMsg(`@a[tag=paradoxOpped]`, `§7${member.name}§f is now vanished!`);
     }
 
     if (member.hasTag("novanish")) {

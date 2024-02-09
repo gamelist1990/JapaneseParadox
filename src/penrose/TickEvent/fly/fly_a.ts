@@ -156,6 +156,7 @@ function flya(id: number) {
         if (glideCheck) {
             continue;
         }
+
         const fallCheck = player.isFalling;
         if (fallCheck) {
             // Record falling data

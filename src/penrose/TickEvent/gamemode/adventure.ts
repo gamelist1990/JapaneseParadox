@@ -49,7 +49,7 @@ async function adventure(id: number) {
             player.runCommandAsync(`gamemode survival`);
         }
         ScoreManager.setScore(player, "gamemodevl", 1, true);
-        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f ${player.name} §6がゲームモードを変更しようとしました §7(Gamemode_A)§6.§4 VL= ${ScoreManager.getScore("gamemodevl", player)}`);
+        sendMsg("@a[tag=notify]", `§f§4[§6Paradox§4]§f ${player.name} §6has tried to change their gamemode §7(Gamemode_A)§6.§4 VL= ${ScoreManager.getScore("gamemodevl", player)}`);
     }
 }
 

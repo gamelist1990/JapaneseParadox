@@ -6,10 +6,10 @@ import { paradoxui } from "../paradoxui.js";
 import { WorldExtended } from "../../classes/WorldExtended/World.js";
 import ConfigInterface from "../../interfaces/Config.js";
 
-//Visual1インパクトが提供する機能
+//Function provided by Visual1mpact
 export function uiOP(opResult: ModalFormResponse | ActionFormResponse, salt: string | number | boolean, hash: string | number | boolean, player: Player, onlineList?: string[]) {
     if (!opResult || opResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
 
@@ -18,18 +18,18 @@ export function uiOP(opResult: ModalFormResponse | ActionFormResponse, salt: str
     if (!hash || !salt || (hash !== (world as WorldExtended).hashWithSalt(salt as string, configuration.encryption.password || player.id) && (world as WorldExtended).isValidUUID(salt as string))) {
         if (!configuration.encryption.password) {
             if (!player.isOp()) {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うにはオペレータである必要がある。`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Operator to use this command.`);
                 return paradoxui(player);
             }
         }
     }
 
     if ("formValues" in opResult) {
-        // これはModalFormResponseです。
+        // It's a ModalFormResponse
 
         const [value] = opResult.formValues;
 
-        // 要求された選手を見つけよう
+        // Try to find the player requested
         let targetPlayer: Player;
 
         if (onlineList.length > 0) {
@@ -43,8 +43,8 @@ export function uiOP(opResult: ModalFormResponse | ActionFormResponse, salt: str
         } else {
             targetPlayer = player;
             if (configuration.encryption.password !== value) {
-                // パスワードの誤り
-                return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fパスワードが間違っています。このコマンドを使用するには Operator である必要があります。`);
+                // Incorrect password
+                return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Incorrect password. You need to be Operator to use this command.`);
             }
         }
 
@@ -55,33 +55,33 @@ export function uiOP(opResult: ModalFormResponse | ActionFormResponse, salt: str
                 const targetSalt = (world as WorldExtended).generateRandomUUID();
                 targetPlayer.setDynamicProperty("salt", targetSalt);
 
-                // オペレーターのIDまたは暗号化パスワードのいずれかをキーとして使用する。
+                // Use either the operator's ID or the encryption password as the key
                 const targetKey = configuration.encryption.password ? configuration.encryption.password : targetPlayer.id;
 
-                // ハッシュを生成する
+                // Generate the hash
                 const newHash = (world as WorldExtended).hashWithSalt(targetSalt, targetKey);
 
                 targetPlayer.setDynamicProperty("hash", newHash);
 
                 dynamicPropertyRegistry.setProperty(targetPlayer, targetPlayer.id, targetPlayer.name);
 
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Paradox操作を§7${targetPlayer.name}§fに付与しました。`);
-                sendMsgToPlayer(targetPlayer, `§f§4[§6Paradox§4]§f あなたは今、操作している！`);
-                sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${targetPlayer.name}§f は Paradox-Opped になりました。`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You have granted Paradox-Op to §7${targetPlayer.name}§f.`);
+                sendMsgToPlayer(targetPlayer, `§f§4[§6Paradox§4]§f You are now op!`);
+                sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${targetPlayer.name}§f is now Paradox-Opped.`);
                 targetPlayer.addTag("paradoxOpped");
                 return paradoxui(player);
             } else {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f§7${targetPlayer.name}§f は既にParadoxOPである。`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f §7${targetPlayer.name}§f is already Paradox-Opped.`);
                 return paradoxui(player);
             }
         } else {
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fプレーヤーが見つかりませんでした§7${targetPlayer.name}§f.`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Could not find player §7${targetPlayer.name}§f.`);
             return paradoxui(player);
         }
     } else if ("selection" in opResult) {
-        // これはActionFormResponseである。
+        // It's an ActionFormResponse
         if (opResult.selection === 0) {
-            // 選手が自分のパスワードを変更したい
+            // player wants to change their own password
             const targetSalt = (world as WorldExtended).generateRandomUUID();
             const newHash = (world as WorldExtended).hashWithSalt(targetSalt, player.id);
 
@@ -89,7 +89,7 @@ export function uiOP(opResult: ModalFormResponse | ActionFormResponse, salt: str
             player.setDynamicProperty("salt", targetSalt);
             player.addTag("paradoxOpped");
 
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたは今、Paradoxに縛られている！`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You are now Paradox-Opped!`);
 
             dynamicPropertyRegistry.setProperty(player, player.id, player.name);
 

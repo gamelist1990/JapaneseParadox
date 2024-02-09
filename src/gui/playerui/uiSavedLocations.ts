@@ -31,7 +31,7 @@ export function uiSAVEDLOCATIONS(savedlocationsResult: ModalFormResponse, Locati
     }
     if (teleportToSelectedLocation && deleteSelectedLocation === true) {
         //If both toggles are enabled the message bellow will be sent to the player and the UI will be dispalyed.
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 場所をテレポートしたり削除したりすることはできません。`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cant teleport and delete the location!`);
         return paradoxui(player);
     }
     if (teleportToSelectedLocation === true) {
@@ -47,7 +47,7 @@ export function uiSAVEDLOCATIONS(savedlocationsResult: ModalFormResponse, Locati
                 keepVelocity: false,
             }
         );
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f TPしました`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Welcome back!`);
         return player;
     }
     if (deleteSelectedLocation === true) {
@@ -64,7 +64,7 @@ export function uiSAVEDLOCATIONS(savedlocationsResult: ModalFormResponse, Locati
             }
             if (tags[i].startsWith("LocationHome:" && Locations[selectedLocationvalue as number] + " X", 13)) {
                 player.removeTag(encryptedString);
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  '§7${Locations[selectedLocationvalue as number]}§f'座標が正常に削除されました!`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Successfully deleted home '§7${Locations[selectedLocationvalue as number]}§f'!`);
                 break;
             }
         }
@@ -80,12 +80,12 @@ export function uiSAVEDLOCATIONS(savedlocationsResult: ModalFormResponse, Locati
                 counter = ++counter;
             }
             if (coordArray[i].includes("LocationHome:" + newLocationName)) {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f この名前はすでに存在します。もう一度お試しください。`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f This name already exists please try again.`);
                 return paradoxui(player);
             }
             //Check to make sure they havent exceeded the max locations in config.js
             if (counter >= configuration.modules.setHome.max) {
-                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f  §7${configuration.modules.setHome.max}§f 場所を保存できる上限です`);
+                sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You can only have §7${configuration.modules.setHome.max}§f saved locations at a time!`);
                 return paradoxui(player);
             }
             continue;
@@ -103,7 +103,7 @@ export function uiSAVEDLOCATIONS(savedlocationsResult: ModalFormResponse, Locati
         //Check to make sure there are no spaces in the name that has been entered.
         if (typeof newLocationName === "string" && newLocationName.includes(" ")) {
             doSave = false;
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 名前にはスペースを入れないでください`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f No spaces in names please!`);
             return paradoxui(player);
         }
         // Save which dimension they were in
@@ -116,13 +116,14 @@ export function uiSAVEDLOCATIONS(savedlocationsResult: ModalFormResponse, Locati
             doSave = true;
         }
         if (player.dimension.id === "minecraft:the_end") {
-            doSave = true;
+            doSave = false;
+            return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Not allowed to save a location in this dimension!`);
         }
         if (doSave === true) {
             const decryptedLocationString = `LocationHome:${newLocationName} X:${currentX} Y:${currentY} Z:${currentZ} Dimension:${currentDimension}`;
             const security = (world as WorldExtended).encryptString(decryptedLocationString, salt as string);
             player.addTag(security);
-            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 座標を保存しました`);
+            sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f New Location has been saved.`);
         }
     }
 

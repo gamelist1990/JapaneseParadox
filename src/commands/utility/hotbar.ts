@@ -5,7 +5,7 @@ import { getPrefix, sendMsg, sendMsgToPlayer } from "../../util.js";
 import ConfigInterface from "../../interfaces/Config.js";
 
 const configMessageBackup = new WeakMap();
-// ダミーオブジェクト
+// Dummy object
 const dummy: object = [];
 
 function hotbarHelp(player: Player, prefix: string, hotbarBoolean: boolean, setting: boolean) {
@@ -22,21 +22,21 @@ function hotbarHelp(player: Player, prefix: string, hotbarBoolean: boolean, sett
         moduleStatus = "§6[§a有効§6]§f";
     }
     return sendMsgToPlayer(player, [
-        `§n§o§4[§6コマンド§4]§f: ホットバー`,
-        `§4[§6Status§4]§f: ${commandStatus}`,
-        `§4[§6Module§4]§f: ${moduleStatus}`,
-        `§4[§6使用§4]§f: ホットバー [オプション］`,
-        `§4[§6オプション§4]§f：メッセージ、無効、ヘルプ`,
-        `§4[§6解説§4]§f：現在オンラインになっているすべてのプレイヤーのホットバーメッセージを表示する。`,
-        `§4[§6例§4]§f：`,
+        `\n§o§4[§6コマンド§4]§f: hotbar`,
+        `§4[§6ステータス§4]§f: ${commandStatus}`,
+        `§4[§6モジュール§4]§f: ${moduleStatus}`,
+        `§4[§6使用法§4]§f: hotbar [optional]`,
+        `§4[§6Optional§4]§f: message, disable, help`,
+        `§4[§6説明§4]§f: Displays a hotbar message for all player's currently online.`,
+        `§4[§6Examples§4]§f:`,
         `    ${prefix}hotbar`,
-        `        §4- §6現在のホットバーメッセージを表示する§f`,
+        `        §4- §6Display the current hotbar message§f`,
         `    ${prefix}hotbar disable`,
-        `        §4- §6ホットバーメッセージを無効にする§f`,
+        `        §4- §6Disable the hotbar message§f`,
         `    ${prefix}hotbar Anarchy Server | Realm Code: 34fhf843`,
-        `        §4- §6ホットバーのメッセージを「Anarchy Server | Realm Code：34fhf843"§f`,
+        `        §4- §6Set the hotbar message to "Anarchy Server | Realm Code: 34fhf843"§f`,
         `    ${prefix}hotbar help`,
-        `        §4- §6コマンドを表示するヘルプ§f`,
+        `        §4- §6Show command help§f`,
     ]);
 }
 
@@ -46,28 +46,32 @@ function hotbarHelp(player: Player, prefix: string, hotbarBoolean: boolean, sett
  * @param {string[]} args - Additional arguments provided (optional).
  */
 export function hotbar(message: ChatSendAfterEvent, args: string[]) {
-    // 必要なパラメータが定義されていることを確認する
+    // validate that required params are defined
     if (!message) {
-        return console.warn(`${new Date()} | ` + "Error: ${message} isnt defined. Did you forget to pass it? (./commands/utility/hotbar.js:37)");
+        return console.warn(`${new Date()} | ` + "エラー: ${message} が定義されていません。渡すのを忘れましたか? (./commands/utility/hotbar.js:37)");
     }
 
     const player = message.sender;
 
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fこのコマンドを使うには、Paradox-Oppedである必要がある。`);
+        return sendMsgToPlayer(
+            player,
+            `§f§4[§6Paradox§4]§f このコマンドを使用するには、管理者にしか使えません
+`
+        );
     }
 
-    // ダイナミック・プロパティ・ブール値の取得
+    // Get Dynamic Property Boolean
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
 
-    // カスタム接頭辞のチェック
+    // Check for custom prefix
     const prefix = getPrefix(player);
 
-    // 助けを求められたか
+    // Was help requested
     const argCheck = args[0];
     if ((argCheck && args[0].toLowerCase() === "help") || !configuration.customcommands.hotbar) {
         return hotbarHelp(player, prefix, configuration.modules.hotbar.enabled, configuration.customcommands.hotbar);
@@ -83,7 +87,7 @@ export function hotbar(message: ChatSendAfterEvent, args: string[]) {
     }
 
     if ((configuration.modules.hotbar.enabled === false && !args.length) || (configuration.modules.hotbar.enabled === false && args[0].toLowerCase() !== "disable")) {
-        // 許可する
+        // Allow
         configuration.modules.hotbar.enabled = true;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
         if (args.length >= 1) {
@@ -91,13 +95,13 @@ export function hotbar(message: ChatSendAfterEvent, args: string[]) {
         } else {
             configuration.modules.hotbar.message = configMessageBackup.get(dummy);
         }
-        sendMsg("@a[tag=paradoxOpped]", `§7${player.name}§f 以下の機能が有効です=> §6Hotbar`);
+        sendMsg("@a[tag=paradoxOpped]", `§7${player.name}§f 有効になりました: §6Hotbar`);
         Hotbar();
     } else if (configuration.modules.hotbar.enabled === true && args.length === 1 && args[0].toLowerCase() === "disable") {
-        // 拒否する
+        // Deny
         configuration.modules.hotbar.enabled = false;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§7${player.name}§f は無効 §6Hotbar`);
+        sendMsg("@a[tag=paradoxOpped]", `§7${player.name}§f 無効にしました: §6Hotbar`);
     } else if ((configuration.modules.hotbar.enabled === true && args.length >= 1) || (configuration.modules.hotbar.enabled === true && !args.length)) {
         if (args.length >= 1) {
             configuration.modules.hotbar.message = args.join(" ");

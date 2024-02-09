@@ -8,16 +8,16 @@ import ConfigInterface from "../../interfaces/Config.js";
 
 export function uiWORLDBORDER(worldborderResult: ModalFormResponse, player: Player) {
     if (!worldborderResult || worldborderResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [OverworldValueTextfield, NetherValueTextfield, EndValueTextfield, WorldBorderToggle] = worldborderResult.formValues;
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fワールド・ボーダーを設定するには、Paradox・オッピングが必要です。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped to configure World Borders`);
     }
 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
@@ -37,9 +37,9 @@ export function uiWORLDBORDER(worldborderResult: ModalFormResponse, player: Play
         configuration.modules.worldBorder.nether = 0;
         configuration.modules.worldBorder.end = 0;
         dynamicPropertyRegistry.setProperty(undefined, "paradoxConfig", configuration);
-        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f 無効＝＞ the §6World Border§f!`);
+        sendMsg("@a[tag=paradoxOpped]", `§f§4[§6Paradox§4]§f §7${player.name}§f has disabled the §6World Border§f!`);
     }
 
-    //完了したら、プレイヤーにメインUIを表示する。
+    //show the main ui to the player once complete.
     return paradoxui(player);
 }

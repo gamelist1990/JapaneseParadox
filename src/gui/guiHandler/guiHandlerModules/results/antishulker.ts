@@ -8,21 +8,21 @@ export function antiShulkerHandler(player: Player) {
     const modulesantishulkerui = new ModalFormData();
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const antiShulkerBoolean = configuration.modules.antishulker.enabled;
-    modulesantishulkerui.title("§4 Anti Shulkerメニュー§4");
-    modulesantishulkerui.toggle("Anti Shulker - 世界中のシュルカーボックスを許可または拒否します：", antiShulkerBoolean);
+    modulesantishulkerui.title("§4Paradox Modules - Anti Shulker§4");
+    modulesantishulkerui.toggle("Anti Shulker - Allows or denies shulker boxes in the world:", antiShulkerBoolean);
     modulesantishulkerui
         .show(player)
         .then((antishulkerResult) => {
             uiANTISHULKER(antishulkerResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

@@ -5,25 +5,25 @@ import { uiANTIFLY } from "../../../../modules/uiAntiFly";
 import ConfigInterface from "../../../../../interfaces/Config";
 
 export function antiFlyHandler(player: Player) {
-    //アンチ・フライ
+    //Anti Fly
     const modulesantiflyui = new ModalFormData();
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     const flyABoolean = configuration.modules.flyA.enabled;
-    modulesantiflyui.title("§4Anti Flyメニュー§4");
-    modulesantiflyui.toggle("アンチフライ - サバイバル中の違法飛行をチェックする：", flyABoolean);
+    modulesantiflyui.title("§4Paradox Modules - Anti Fly§4");
+    modulesantiflyui.toggle("Anti Fly - Checks for illegal flying in survival:", flyABoolean);
     modulesantiflyui
         .show(player)
         .then((antiflyResult) => {
             uiANTIFLY(antiflyResult, player);
         })
         .catch((error) => {
-            console.error("Paradoxの未処理拒否：", error);
-            // スタックトレース情報の抽出
+            console.error("Paradox Unhandled Rejection: ", error);
+            // Extract stack trace information
             if (error instanceof Error) {
                 const stackLines = error.stack.split("\n");
                 if (stackLines.length > 1) {
                     const sourceInfo = stackLines;
-                    console.error("エラーの原因", sourceInfo[0]);
+                    console.error("Error originated from:", sourceInfo[0]);
                 }
             }
         });

@@ -6,7 +6,7 @@ import { paradoxui } from "../paradoxui.js";
 
 export function uiTPA(tpaResult: ModalFormResponse, onlineList: string[], player: Player) {
     if (!tpaResult || tpaResult.canceled) {
-        // キャンセルされたフォームまたは未定義の結果を処理する
+        // Handle canceled form or undefined result
         return;
     }
     const [value, toggleToTarget, toggleTargetTo] = tpaResult.formValues;
@@ -18,30 +18,30 @@ export function uiTPA(tpaResult: ModalFormResponse, onlineList: string[], player
             break;
         }
     }
-    // ユニークIDの取得
+    // Get unique ID
     const uniqueId = dynamicPropertyRegistry.getProperty(player, player?.id);
 
-    // ユーザーにコマンドを実行する権限があることを確認する。
+    // Make sure the user has permissions to run the command
     if (uniqueId !== player.name) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§fあなたはParadox・オップされる必要がある。`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You need to be Paradox-Opped.`);
     }
-    // オンラインですか？
+    // Are they online?
     if (!member) {
-        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f その選手は見つからなかった！`);
+        return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Couldn't find that player!`);
     }
-    // 選手が両方のオプションをBooleanにしていないか確認する。
+    // Check to make sure they player hasnt enabled both options
     if (toggleTargetTo === true && toggleToTarget === true) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f両方のオプションをBooleanにすることはできません。`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You cant enable both options`);
         return paradoxui(player);
     }
-    //は、プレーヤーがBoolean＝＞少なくとも1つの選択肢を持っていることを確認します。
+    //check to make sure the player has enabled at least one option.
     if (toggleTargetTo === false && toggleToTarget === false) {
-        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f 一つのオプションをBooleanにしなければならない。`);
+        sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f You must enable one option.`);
         return paradoxui(player);
     }
     if (toggleToTarget === true) {
-        // オペをターゲットに送る
-        // その選手のところにテレポートしよう
+        // tp the op to the target
+        // Let's teleport you to that player
         setTimer(player.id);
         player.teleport(member.location, {
             dimension: member.dimension,
@@ -50,12 +50,12 @@ export function uiTPA(tpaResult: ModalFormResponse, onlineList: string[], player
             checkForBlocks: true,
             keepVelocity: false,
         });
-        // テレポートしたことを知らせる
+        // Let you know that you have been teleported
         return sendMsgToPlayer(player, `§f§4[§6Paradox§4]§f Teleported §7${player.name}§f to §7${member.name}§f`);
     }
 
     if (toggleTargetTo === true) {
-        //ターゲットからオペへ
+        //tp the target to the op
         setTimer(member.id);
         member.teleport(player.location, {
             dimension: player.dimension,

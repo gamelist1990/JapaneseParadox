@@ -11,20 +11,20 @@ export function opHandler(player: Player, uniqueId: string, salt: string, hash: 
     const configuration = dynamicPropertyRegistry.getProperty(undefined, "paradoxConfig") as ConfigInterface;
     if (uniqueId === player.name) {
         opgui = new ModalFormData();
-        opgui.title("§4管理者§4");
+        opgui.title("§4OP§4");
 
         onlineList = Array.from(world.getPlayers(), (player) => player.name);
-        opgui.dropdown(`\n§fユーザーを指定:§f\n\n以下のプレイヤーがオンラインです\n`, onlineList);
+        opgui.dropdown(`\n§fSelect a player to give access to Paradox:§f\n\nPlayer's Online\n`, onlineList);
     } else if (!configuration.encryption.password) {
         opgui = new ActionFormData();
-        opgui.title("§4管理者§4");
+        opgui.title("§4OP§4");
 
-        opgui.button("OP権限取得", "textures/ui/op");
+        opgui.button("Grant OP Access", "textures/ui/op");
     } else if (configuration.encryption.password) {
         opgui = new ModalFormData();
-        opgui.title("§4レルムズ用管理者§4");
+        opgui.title("§4OP§4");
 
-        opgui.textField("パスワード:", "");
+        opgui.textField("Enter Password:", "");
     }
     opgui
         .show(player)
